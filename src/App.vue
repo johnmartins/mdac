@@ -1,14 +1,22 @@
 <template>
-  <div style="height: 100%; width: 100%;">
+  <div style="height: 100%;">
+
+    <!--
     <div id="nav">
       <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link>
     </div>
-    <router-view style="height: 100%; width: 100%;"/>
+    -->
+
+    <router-view class="content-window"/>
+
   </div>
 </template>
 
-<style>
+<style lang="scss">
+
+$nav-height: 60px;
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -18,7 +26,8 @@
 }
 
 #nav {
-  padding: 30px;
+  height: $nav-height;
+  border-bottom: 2px solid darkgrey;
 }
 
 #nav a {
@@ -28,5 +37,11 @@
 
 #nav a.router-link-exact-active {
   color: #42b983;
+}
+
+.content-window {
+  height: calc(100vh - $nav-height - 2px);
+  overflow-y: auto;
+  overflow-x: none;
 }
 </style>
