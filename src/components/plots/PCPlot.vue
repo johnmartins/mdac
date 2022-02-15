@@ -5,6 +5,9 @@
 			<!-- Plot boundaries -->
 			<text x="50%" y="20" class="title" text-anchor="middle">{{metaData.title}}</text>
 
+			<g class="canvas-axis-group" ref="canvasAxisGroup"></g>
+			<g class="canvas-axis-group" ref="canvasLineGroup"></g>
+
 		</svg>
 	</div>
 </template>
@@ -14,7 +17,10 @@ import { reactive, ref, onMounted, onUpdated } from "vue"
 
 import * as d3 from "d3"
 
+// DOM Elements
 const plotCanvas = ref(null)
+const canvasAxisGroup = ref(null)
+const canvasLineGroup = ref(null)
 
 const dataSet = reactive(
 	[
@@ -43,16 +49,18 @@ const metaData = reactive({
 	title: "Plot Title",
 })
 
-const renderData = reactive({
-	axisRenderCount: 0,
-})
-
 function renderPlot() {
-
 	renderAxisArray()
 }
 
 function renderAxisArray() {
+	console.log("Rendering axis")
+
+	// Wipe existing content from group
+	canvasAxisGroup.value.innerHTML = ""	
+
+	// Go through the dataset and create an axis for each subgroup
+	let axisRenderCount = 0;
 	for (let i = 0; i < dataSet.length; i++) {
 		const d = dataSet[i]
 
@@ -72,21 +80,21 @@ function renderAxisArray() {
 			lb = d3.min(d.data)
 		}
 
-		createAxis(d.title, [ub, lb])
-		renderData.axisRenderCount++
+		createAxis(d.title, [ub, lb], i)
+		axisRenderCount++
 	}
 }
 
-function createAxis(title, domainVector) {
+function createAxis(title, domainVector, axisIndex) {
 	// Parameters
 	const padding = 50
 	const height = plotCanvas.value.getBoundingClientRect().height - (2*padding)
 	const width = plotCanvas.value.getBoundingClientRect().width - (2*padding)
 	let verticalOffset = width / (dataSet.length-1) // Width of available space / number of data series
-	const axisOffset = renderData.axisRenderCount*verticalOffset
+	const axisOffset = axisIndex*verticalOffset
 
 	// Select SVG DOM element
-	const svg = d3.select(plotCanvas.value)
+	const svg = d3.select(canvasAxisGroup.value)
 
 	// Create axis scale
 	const scale = d3.scaleLinear()
