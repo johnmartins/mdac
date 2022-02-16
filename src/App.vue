@@ -42,6 +42,6 @@ $nav-height: 60px;
 .content-window {
   height: calc(100vh - $nav-height - 2px);
   overflow-y: auto;
-  overflow-x: none;
+  overflow-x: hidden;
 }
 </style>
