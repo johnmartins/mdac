@@ -20,7 +20,7 @@
 					
 					<line x1="0" y1="0" x2="0" :y2="getPlotYBounds()[1]-(plotParameters.axisTitlePadding)" stroke-width="1" stroke="black"/>
 
-					<g class="tick" v-for="(tick, tickIndex) in c.ticks" :key="tickIndex"> <!-- Tick group -->
+					<g class="tick" v-for="(tick, index) in c.getTickArray()" :key="index"> <!-- Tick group -->
 						<text x="-10" :y="c.scaleLinear(tick)*getAxisLength()" class="tick-string">{{tick}}</text>
 						<line x1="0" :y1="c.scaleLinear(tick)*getAxisLength()" x2="-5" :y2="c.scaleLinear(tick)*getAxisLength()" stroke-width="1" stroke="black"/>	<!-- Top tick -->
 					</g>
@@ -33,6 +33,8 @@
 <script setup>
 import { reactive, ref, onMounted, onUpdated } from "vue"
 import * as d3 from "d3"
+
+import Category from "../../models/plots/Category"
 
 const plotCanvas = ref(null)
 const svgContainer = ref(null)
@@ -53,18 +55,8 @@ function addCategory() {
 		position = categories[categories.length - 1].position + 1
 	}
 
-	categories.push({
-		position: position,
-		title: "Very long category name wow",
-		ticks: [20, 15, 10, 5, 0],
-		scaleLinear: d3.scaleLinear().range([0, 1]).domain([20, 0]),
-		ub: 20,
-		lb: 0
-	})
-
-	const scale = d3.scaleLinear().range([0, 1]).domain([0, 20])
-	console.log(scale(10))
-
+	const c = new Category("Cat name", 0, 20)
+	categories.push(c)
 	plotParameters.horizontalOffset = getPlotXBounds()[1]/Math.max(1,(categories.length-1))	
 }
 
