@@ -5,9 +5,10 @@
 			<svg 
 			class="pcp-plot svg-content-responsive" height="100%" width="100%" ref="plotCanvas">
 				
+				<!-- Full graphics group -->
 				<g
-				:transform="`translate(${plotParameters.padding} 0)`"> <!-- Full graphics group -->
-					
+				:transform="`translate(${plotParameters.padding} 0)`"> 
+				
 					<!-- Data line generator -->
 					<path 
 					fill="transparent" 
@@ -32,7 +33,8 @@
 						</text>
 						
 						<line x1="0" y1="0" x2="0" :y2="getPlotYBounds()[1]-(plotParameters.axisTitlePadding)" stroke-width="1" stroke="black"/>
-
+						
+						<!-- Axis tick group -->
 						<g class="tick" v-for="(tick, index) in c.getTickArray()" :key="index"> <!-- Tick group -->
 							<text x="-10" :y="c.scaleLinear(tick)*getAxisLength()" class="tick-string">{{tick}}</text>
 							<line x1="0" :y1="c.scaleLinear(tick)*getAxisLength()" x2="-5" :y2="c.scaleLinear(tick)*getAxisLength()" stroke-width="1" stroke="black"/>	<!-- Top tick -->
@@ -61,10 +63,6 @@ const plotParameters = {
 	axisTitleRotation: 45
 }
 
-const runtimeVariables = reactive({
-	_rendered: false
-})
-
 const categories = reactive([])
 const data = reactive([])
 const categoryNameMap = new Map()
@@ -76,22 +74,26 @@ function lineGenerator(data) {
 
 	for (let i = 0; i < dataCats.length; i++) {
 		let c = categoryNameMap.get(dataCats[i])
-		dataArray[c.position] = [
-			c.position*plotParameters.horizontalOffset, 
-			c.scaleLinear(data[c.title])*getAxisLength()
-			]
+		dataArray[c.position] = {
+			x: c.position*plotParameters.horizontalOffset, 
+			y: c.scaleLinear(data[c.title])*getAxisLength()
+		}
 	}
 
-	console.log(dataArray)
+	const lengthPreFilter = dataArray.length
+	dataArray = dataArray.filter((obj) => { return obj != null })
+	const lengthPostFilter = dataArray.length
 
+	if (lengthPostFilter < lengthPreFilter)	{
+		console.error("Warning! Undefined categories in data-set.")
+	}
+	
 	return d3.line([])
-		.x((d) => {return d[0]})
-		.y((d) => {return d[1]})
+		.x((d) => {return d.x})
+		.y((d) => {return d.y})
 		.curve(d3.curveMonotoneX)
 		(dataArray)
 }
-
-
 
 function addRandomCategory() {
 	const names = ['Sture', 'Märta', 'Skurt', 'Anna', 'Astrid', 'Anders', 'Kurs', 'Bob', 'Per', 'Mulle Meck', 'Stolle', 'Stig', 'Robin', 'August', 'Lisa', 'Pelle']
@@ -160,8 +162,6 @@ onMounted( () => {
 		"bf": 20,
 		"aeroblock": 70
 	})	
-
-	runtimeVariables._rendered = true
 })
 
 </script>
