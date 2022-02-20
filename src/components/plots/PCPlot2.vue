@@ -12,8 +12,8 @@
 					<!-- Data line generator -->
 					<path 
 					fill="transparent" 
-					stroke="black" 
 					stroke-width="1"
+					:stroke="getLineColor(d)"
 					:transform="`translate(0 ${getPlotYBounds()[0]})`"
 					v-for="(d, index) in data" :key="index" :d="lineGenerator(d)" />
 
@@ -65,6 +65,11 @@ const plotParameters = {
 
 const categories = reactive([])
 const data = reactive([])
+const settings = reactive({
+	colorScaleCategory: null,
+	colorScale: () => {return "black"}
+})
+
 const categoryNameMap = new Map()
 
 function lineGenerator(data) {
@@ -129,6 +134,18 @@ function getPlotXBounds () {
 	return array
 }
 
+function getLineColor (data) {
+	if (!settings.colorScaleCategory) return "black"
+	if (!data[settings.colorScaleCategory]) return "black"
+	return settings.colorScale(data[settings.colorScaleCategory])
+}
+
+function setColorScale (category) {
+	settings.colorScaleCategory = category.title
+	settings.colorScale = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateViridis)
+	//settings.colorScale = d3.scaleLinear().domain([category.lb, category.ub]).range(['red', 'blue'])
+}
+
 onMounted( () => {
 	// Add listener for resize
 
@@ -147,6 +164,8 @@ onMounted( () => {
 	addCategory(new Category("volume", 0, 200))
 	addCategory(new Category("bf", 0, 20))
 	addCategory(new Category("aeroblock", 0, 100))
+
+	setColorScale(categoryNameMap.get("maxdef"))
 
 	// Test data
 	data.push(
