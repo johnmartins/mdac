@@ -1,6 +1,7 @@
 <template>
 	<div class="component-container" ref="componentContainer">
-		<button @click="addRandomCategory">Add axis</button>
+		<button @click="addRandomCategory">Add axis</button> <input @change="readFile" type="file" />
+
 		<div style="height: 100%;" class="svg-container" ref="svgContainer">
 			<svg 
 			class="pcp-plot svg-content-responsive" height="100%" width="100%" ref="plotCanvas">
@@ -79,6 +80,13 @@ function lineGenerator(data) {
 
 	for (let i = 0; i < dataCats.length; i++) {
 		let c = categoryNameMap.get(dataCats[i])
+
+		if (!c)  {
+			console.error("Category not found")
+			console.error(data)
+			return
+		}
+
 		dataArray[c.position] = {
 			x: c.position*plotParameters.horizontalOffset, 
 			y: c.scaleLinear(data[c.title])*getAxisLength()
@@ -117,7 +125,7 @@ function addCategory(c) {
 	categories.push(c)
 	plotParameters.horizontalOffset = getPlotXBounds()[1]/Math.max(1,(categories.length-1))	
 	categoryNameMap.set(c.title, c)
-	console.log(`Added category ${c.name}`)
+	console.log(`Added category ${c.title}`)
 }
 
 function getAxisLength () {
@@ -146,6 +154,86 @@ function setColorScale (category) {
 	//settings.colorScale = d3.scaleLinear().domain([category.lb, category.ub]).range(['red', 'blue'])
 }
 
+function readFile (evt) {
+	const file = evt.target.files[0]
+	const reader = new FileReader()
+	reader.readAsText(new Blob([file], {"type": file.type}))	
+	reader.onloadend = (e) => {
+		let csvData = d3.csvParse(e.target.result)
+		console.log(csvData.columns)
+
+		const dataToPlot = []
+
+		let maxValMap = new Map()
+		let minValMap = new Map()
+
+		for (let row of csvData) {
+			let dataPoint = {}
+			for (let col of csvData.columns) {
+				let value = row[col]
+
+				if (isNaN(parseFloat(value))) {
+					// Not numeric
+					continue
+				} else {
+					// Numeric
+					value = parseFloat(value)
+					
+
+					if (!maxValMap.get(col)) maxValMap.set(col, value)
+					if (!minValMap.get(col)) minValMap.set(col, value)
+
+					if (maxValMap.get(col) < value) maxValMap.set(col, value)
+					else if (minValMap.get(col) > value) minValMap.set(col, value)
+				}
+
+				dataPoint[col] = value
+			}
+			dataToPlot.push(dataPoint)
+		}
+
+		for (let col of csvData.columns) {
+			addCategory(new Category(col, minValMap.get(col), maxValMap.get(col)))
+		}
+
+		data.push(...dataToPlot)
+
+		/**
+		for (let col of csvData.columns) {
+			
+			let vals = []
+			for (let row of csvData) {
+				const val = parseFloat(row[col])
+
+				if (isNaN(val)) {
+					// Non-numeric data
+					console.log(`${val} is not a number`)
+					continue
+				} else {
+					// Numeric data
+
+				}	
+
+				vals.push(parseFloat(row[col]))
+				
+				const dataPoint = {"VANE_TOTAL_COUNT_FLOAT": 10, "ID": 50, "VANE_TOTAL_COUNT": 12}
+				dataToPlot.push(dataPoint)
+			}
+
+			if (vals.length === 0) continue
+
+			console.log(`LB = ${Math.min(...vals)}\tUB = ${Math.max(...vals)}`)
+
+			addCategory(new Category(col, Math.min(...vals), Math.max(...vals)))
+		}
+		*/
+		//data.push(...dataToPlot)
+
+		console.log("DONE!")
+		
+	}
+}
+
 onMounted( () => {
 	// Add listener for resize
 
@@ -158,13 +246,13 @@ onMounted( () => {
 	}
 
 	window.onresize = updateWindow
-
+	
+	/**
 	// Test categories
 	addCategory(new Category("maxdef", 0, 1))
 	addCategory(new Category("volume", 0, 200))
 	addCategory(new Category("bf", 0, 20))
 	addCategory(new Category("aeroblock", 0, 100))
-
 	setColorScale(categoryNameMap.get("maxdef"))
 
 	// Test data
@@ -175,12 +263,13 @@ onMounted( () => {
 		"bf": 10,
 		"aeroblock": 25
 	},
-		{
+	{
 		"maxdef": 0.5,
 		"volume": 150,
 		"bf": 20,
 		"aeroblock": 70
 	})	
+	*/ 
 })
 
 </script>
@@ -204,7 +293,7 @@ onMounted( () => {
 		.tick-string {
 			stroke: transparent;
 			fill: black;
-			font-size: 0.8em;
+			font-size: 0.6em;
 			text-anchor: end;
 			dominant-baseline: middle;
 		}
