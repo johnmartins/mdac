@@ -27,7 +27,7 @@
 						@click="selectCategory(c)"
 						@mouseover="highlightedCategoryName = c.title"
 						@mouseleave="highlightedCategoryName = null"
-						v-bind:class="{highlighted: highlightedCategoryName == c.title}"
+						v-bind:class="{highlighted: highlightedCategoryName == c.title || selectedCategoryName == c.title}"
 						:key="c.position" 
 						:transform="`translate(${c.position*plotParameters.horizontalOffset} ${getPlotYBounds()[0]})`">	<!-- Axis group -->
 						
@@ -77,6 +77,7 @@ const settings = reactive({
 	colorScale: () => {return "black"}
 })
 const highlightedCategoryName = ref(null)
+const selectedCategoryName = ref(null)
 
 const categoryNameMap = new Map()
 
@@ -180,6 +181,7 @@ function clearHighlightCategory (c) {
 }
 
 function selectCategory (c) {
+	selectedCategoryName.value = c.title
 	setColorScale(c)
 }
 
