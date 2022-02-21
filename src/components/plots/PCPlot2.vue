@@ -1,6 +1,6 @@
 <template>
 	<div class="component-container" ref="componentContainer">
-		<div style="height: 100%;" class="svg-container" ref="svgContainer">
+		<div style="height: 100%;" class="svg-container">
 			<svg 
 			class="pcp-plot svg-content-responsive" height="100%" width="100%" ref="plotCanvas">
 				
@@ -9,12 +9,16 @@
 				:transform="`translate(${plotParameters.padding} 0)`"> 
 				
 					<!-- Data line generator -->
-					<path 
-					fill="transparent" 
-					stroke-width="1"
-					:stroke="getLineColor(d)"
-					:transform="`translate(0 ${getPlotYBounds()[0]})`"
-					v-for="(d, index) in data" :key="index" :d="lineGenerator(d)" />
+					<g v-for="(d, index) in data" :key="index">
+						<path 
+						fill="transparent" 
+						stroke-width="1"
+						v-if="dataPointFilterCheck(d) || !plotParameters.hideFiltered"
+						:stroke="getLineColor(d)"
+						:stroke-opacity="getLineOpacity(d)"
+						:transform="`translate(0 ${getPlotYBounds()[0]})`"
+						:d="lineGenerator(d)" />
+					</g>
 
 					<!-- Axis group -->
 					<g 
@@ -25,8 +29,18 @@
 						@mouseleave="highlightedCategoryName = null"
 						v-bind:class="{highlighted: highlightedCategoryName == c.title || selectedCategoryName == c.title}"
 						:key="c.position" 
-						:transform="`translate(${c.position*plotParameters.horizontalOffset} ${getPlotYBounds()[0]})`">	<!-- Axis group -->
-						
+						:transform="`translate(${c.position*plotParameters.horizontalOffset} ${getPlotYBounds()[0]})`">	
+
+						<!-- Axis Filters -->
+						<g v-for="(f, index) in filters[c.title]" :key="index">
+							<rect 
+							class="filter-box"
+							x="-8" 
+							:y="c.scaleLinear(f.thresholdB)*getAxisLength()" 
+							width="16" 
+							:height="(c.scaleLinear(f.thresholdA)-c.scaleLinear(f.thresholdB))*getAxisLength()" />
+						</g>
+						<!-- Axis label -->
 						<text 
 							x="0" 
 							:y="getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10)" 
@@ -35,6 +49,7 @@
 							{{c.title}}
 						</text>
 						
+						<!-- Axis vertical line -->
 						<line x1="0" y1="0" x2="0" :y2="getPlotYBounds()[1]-(plotParameters.axisTitlePadding)"/>
 						
 						<!-- Axis tick group -->
@@ -53,22 +68,27 @@
 import { reactive, ref, onMounted, onUpdated, inject } from "vue"
 import * as d3 from "d3"
 
-import Category from "../../models/plots/Category"
+import Category from "@/models/plots/Category"
+import DataFilter from "@/models/plots/DataFilter"
 
+// Layout references
 const plotCanvas = ref(null)
-const svgContainer = ref(null)
 const componentContainer = ref(null)
 
-const plotParameters = {
+const plotParameters = reactive({
 	padding: 50,
 	horizontalOffset: 200,
 	axisTitlePadding: 150,
-	axisTitleRotation: 45
-}
+	axisTitleRotation: 45,
+	defaultDataOpacity: 1,
+	hideFiltered: false
+})
 
+// Data structures
 const categoryNameMap = new Map()
 const categories = reactive([])
 const data = reactive([])
+const filters = reactive({}) // "categoryName" -> [filterA, filterB, ..]
 const settings = reactive({
 	colorScaleCategory: null,
 	colorScale: () => {return "black"}
@@ -175,16 +195,39 @@ function getPlotXBounds () {
 	return array
 }
 
-function getLineColor (data) {
+function getLineColor (dataPoint) {
 	if (!settings.colorScaleCategory) return "black"
-	if (!data[settings.colorScaleCategory]) return "black"
-	return settings.colorScale(data[settings.colorScaleCategory])
+	if (!dataPoint[settings.colorScaleCategory]) return "black"
+	return settings.colorScale(dataPoint[settings.colorScaleCategory])
 }
+
+function getLineOpacity (dataPoint) {
+	if (dataPointFilterCheck(dataPoint)) {
+		return plotParameters.defaultDataOpacity
+	} 
+
+	return 0.05
+}
+
+function dataPointFilterCheck (dataPoint) {
+	/**
+	 * Returns true if the data point passes the filter
+	 */
+	for (let key of Object.keys(filters)) {
+		for (let filter of filters[key]) {
+			if (!filter.filter(dataPoint[key])) {
+				return false
+			} 
+		}
+	}
+
+	return true
+}
+
 
 function setColorScale (category) {
 	settings.colorScaleCategory = category.title
 	settings.colorScale = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateRgbBasis(["red", "green", "blue"]))
-	//settings.colorScale = d3.scaleLinear().domain([category.lb, category.ub]).range(['red', 'blue'])
 }
 
 function getTickString (tickData) {
@@ -197,12 +240,11 @@ function getTickString (tickData) {
 	}
 }
 
-function highlightCategory (c) {
-
-}
-
-function clearHighlightCategory (c) {
-
+function addFilter(f) {
+	if (!filters[f.property]) {
+		filters[f.property] = []
+	}
+	filters[f.property].push(f)
 }
 
 function selectCategory (c) {
@@ -212,7 +254,6 @@ function selectCategory (c) {
 }
 
 function readFile (evt) {
-	console.log("yes!")
 	const file = evt.target.files[0]
 	const reader = new FileReader()
 	reader.readAsText(new Blob([file], {"type": file.type}))	
@@ -255,6 +296,10 @@ function readFile (evt) {
 		}
 
 		data.push(...dataToPlot)
+
+		console.log("REMOVE THIS LATER")
+		const df = new DataFilter("VANE_TOTAL_COUNT", 10, 12)
+		addFilter(df)
 		
 	}
 }
@@ -318,6 +363,13 @@ onMounted( () => {
 		line {
 			stroke: black;
 			fill: transparent;
+		}
+
+		.filter-box {
+			stroke: black;
+			stroke-opacity: 0.5;
+			fill: purple;
+			fill-opacity: 0.3;
 		}
 
 		.title {
