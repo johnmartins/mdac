@@ -26,6 +26,14 @@ class Category {
         }
         return ta
     }
+
+    morph (c) {
+        this.title = c.title
+        this.lb = c.lb
+        this.ub = c.ub
+        this.position = c.position
+        this.ticks = c.ticks
+    }
 }
 
 export default Category

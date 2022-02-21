@@ -2,4 +2,14 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 
-createApp(App).use(router).mount('#app')
+import "bootstrap/dist/css/bootstrap.min.css"
+import "bootstrap"
+
+import mitt from 'mitt'
+
+const eventBus = mitt()
+
+const app = createApp(App)
+app.use(router)
+app.provide('eventBus', eventBus)
+app.mount('#app')

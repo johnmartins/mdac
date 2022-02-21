@@ -1,9 +1,5 @@
 <template>
 	<div class="component-container" ref="componentContainer">
-		<div>
-			Import CSV file: 
-			<input @change="readFile" type="file" />
-		</div>
 		<div style="height: 100%;" class="svg-container" ref="svgContainer">
 			<svg 
 			class="pcp-plot svg-content-responsive" height="100%" width="100%" ref="plotCanvas">
@@ -54,7 +50,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, onUpdated } from "vue"
+import { reactive, ref, onMounted, onUpdated, inject } from "vue"
 import * as d3 from "d3"
 
 import Category from "../../models/plots/Category"
@@ -70,6 +66,7 @@ const plotParameters = {
 	axisTitleRotation: 45
 }
 
+const categoryNameMap = new Map()
 const categories = reactive([])
 const data = reactive([])
 const settings = reactive({
@@ -79,7 +76,13 @@ const settings = reactive({
 const highlightedCategoryName = ref(null)
 const selectedCategoryName = ref(null)
 
-const categoryNameMap = new Map()
+// Event buss listeners
+const eventBus = inject('eventBus')
+eventBus.on('PlotTools.readFile', readFile)
+eventBus.on('PlotTools.deleteCategory', deleteCategory)
+eventBus.on('PlotTools.editCategory', (cAr) => {
+	editCategory(cAr[0], cAr[1])
+})
 
 function lineGenerator(data) {
 
@@ -90,9 +93,7 @@ function lineGenerator(data) {
 		let c = categoryNameMap.get(dataCats[i])
 
 		if (!c)  {
-			console.error("Category not found")
-			console.error(data)
-			return
+			continue
 		}
 
 		dataArray[c.position] = {
@@ -104,10 +105,6 @@ function lineGenerator(data) {
 	const lengthPreFilter = dataArray.length
 	dataArray = dataArray.filter((obj) => { return obj != null })
 	const lengthPostFilter = dataArray.length
-
-	if (lengthPostFilter < lengthPreFilter)	{
-		console.error("Warning! Undefined categories in data-set.")
-	}
 	
 	return d3.line([])
 		.x((d) => {return d.x})
@@ -134,6 +131,34 @@ function addCategory(c) {
 	plotParameters.horizontalOffset = getPlotXBounds()[1]/Math.max(1,(categories.length-1))	
 	categoryNameMap.set(c.title, c)
 	console.log(`Added category ${c.title}`)
+}
+
+function editCategory(oldC, newC) {
+	const currentC = categoryNameMap.get(oldC.title)
+	currentC.morph(newC)
+}
+
+function deleteCategory(c) {
+	// Delete category from category list
+	let deleteIndex = -1
+	for (let i = 0; i < categories.length; i++) {
+		const cat = categories[i]
+		if (c.title !== cat.title) continue
+		deleteIndex = i
+		break
+	}
+	console.log(`Deleting category ${categories[deleteIndex].title} at index = ${deleteIndex}`)
+	categoryNameMap.set(c.title, null)
+	categories.splice(deleteIndex, 1)
+
+	// Adjust positions of other categories
+	for (let i=deleteIndex; i < categories.length; i++) {
+		const cat = categories[i]
+		cat.position--
+	}
+
+	// Adjust plot horizontal layout
+	plotParameters.horizontalOffset = getPlotXBounds()[1]/Math.max(1,(categories.length-1))	
 }
 
 function getAxisLength () {
@@ -183,9 +208,11 @@ function clearHighlightCategory (c) {
 function selectCategory (c) {
 	selectedCategoryName.value = c.title
 	setColorScale(c)
+	eventBus.emit('PCPlot.selectCategory', c)
 }
 
 function readFile (evt) {
+	console.log("yes!")
 	const file = evt.target.files[0]
 	const reader = new FileReader()
 	reader.readAsText(new Blob([file], {"type": file.type}))	
