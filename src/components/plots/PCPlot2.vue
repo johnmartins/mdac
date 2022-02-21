@@ -66,7 +66,7 @@ const componentContainer = ref(null)
 const plotParameters = {
 	padding: 50,
 	horizontalOffset: 200,
-	axisTitlePadding: 100,
+	axisTitlePadding: 150,
 	axisTitleRotation: 45
 }
 
@@ -157,7 +157,7 @@ function getLineColor (data) {
 
 function setColorScale (category) {
 	settings.colorScaleCategory = category.title
-	settings.colorScale = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateRainbow)
+	settings.colorScale = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateRgbBasis(["red", "green", "blue"]))
 	//settings.colorScale = d3.scaleLinear().domain([category.lb, category.ub]).range(['red', 'blue'])
 }
 
@@ -292,7 +292,7 @@ onMounted( () => {
 		}
 
 		.title {
-			font-size: 1em;	
+			font-size: 0.8em;	
 			text-anchor: start;
 		}
 
