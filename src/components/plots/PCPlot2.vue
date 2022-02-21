@@ -1,7 +1,9 @@
 <template>
 	<div class="component-container" ref="componentContainer">
-		<button @click="addRandomCategory">Add axis</button> <input @change="readFile" type="file" />
-
+		<div>
+			Import CSV file: 
+			<input @change="readFile" type="file" />
+		</div>
 		<div style="height: 100%;" class="svg-container" ref="svgContainer">
 			<svg 
 			class="pcp-plot svg-content-responsive" height="100%" width="100%" ref="plotCanvas">
@@ -22,6 +24,10 @@
 					<g 
 						class="axis" 
 						v-for="c in categories" 
+						@click="selectCategory(c)"
+						@mouseover="highlightedCategoryName = c.title"
+						@mouseleave="highlightedCategoryName = null"
+						v-bind:class="{highlighted: highlightedCategoryName == c.title}"
 						:key="c.position" 
 						:transform="`translate(${c.position*plotParameters.horizontalOffset} ${getPlotYBounds()[0]})`">	<!-- Axis group -->
 						
@@ -33,12 +39,12 @@
 							{{c.title}}
 						</text>
 						
-						<line x1="0" y1="0" x2="0" :y2="getPlotYBounds()[1]-(plotParameters.axisTitlePadding)" stroke-width="1" stroke="black"/>
+						<line x1="0" y1="0" x2="0" :y2="getPlotYBounds()[1]-(plotParameters.axisTitlePadding)"/>
 						
 						<!-- Axis tick group -->
 						<g class="tick" v-for="(tick, index) in c.getTickArray()" :key="index"> <!-- Tick group -->
-							<text x="-10" :y="c.scaleLinear(tick)*getAxisLength()" class="tick-string">{{tick}}</text>
-							<line x1="0" :y1="c.scaleLinear(tick)*getAxisLength()" x2="-5" :y2="c.scaleLinear(tick)*getAxisLength()" stroke-width="1" stroke="black"/>	<!-- Top tick -->
+							<text x="-10" :y="c.scaleLinear(tick)*getAxisLength()" class="tick-string">{{getTickString(tick)}}</text>
+							<line x1="0" :y1="c.scaleLinear(tick)*getAxisLength()" x2="-5" :y2="c.scaleLinear(tick)*getAxisLength()"/>	<!-- Top tick -->
 						</g>
 					</g>
 				</g>
@@ -60,7 +66,7 @@ const componentContainer = ref(null)
 const plotParameters = {
 	padding: 50,
 	horizontalOffset: 200,
-	axisTitlePadding: 200,
+	axisTitlePadding: 100,
 	axisTitleRotation: 45
 }
 
@@ -70,6 +76,7 @@ const settings = reactive({
 	colorScaleCategory: null,
 	colorScale: () => {return "black"}
 })
+const highlightedCategoryName = ref(null)
 
 const categoryNameMap = new Map()
 
@@ -150,8 +157,30 @@ function getLineColor (data) {
 
 function setColorScale (category) {
 	settings.colorScaleCategory = category.title
-	settings.colorScale = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateViridis)
+	settings.colorScale = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateRainbow)
 	//settings.colorScale = d3.scaleLinear().domain([category.lb, category.ub]).range(['red', 'blue'])
+}
+
+function getTickString (tickData) {
+	if (isNaN(parseFloat(tickData))) {
+		// Not a number
+		return "String!"
+	} else {
+		// A number
+		return Math.round(tickData * 100) / 100
+	}
+}
+
+function highlightCategory (c) {
+
+}
+
+function clearHighlightCategory (c) {
+
+}
+
+function selectCategory (c) {
+	setColorScale(c)
 }
 
 function readFile (evt) {
@@ -197,39 +226,6 @@ function readFile (evt) {
 		}
 
 		data.push(...dataToPlot)
-
-		/**
-		for (let col of csvData.columns) {
-			
-			let vals = []
-			for (let row of csvData) {
-				const val = parseFloat(row[col])
-
-				if (isNaN(val)) {
-					// Non-numeric data
-					console.log(`${val} is not a number`)
-					continue
-				} else {
-					// Numeric data
-
-				}	
-
-				vals.push(parseFloat(row[col]))
-				
-				const dataPoint = {"VANE_TOTAL_COUNT_FLOAT": 10, "ID": 50, "VANE_TOTAL_COUNT": 12}
-				dataToPlot.push(dataPoint)
-			}
-
-			if (vals.length === 0) continue
-
-			console.log(`LB = ${Math.min(...vals)}\tUB = ${Math.max(...vals)}`)
-
-			addCategory(new Category(col, Math.min(...vals), Math.max(...vals)))
-		}
-		*/
-		//data.push(...dataToPlot)
-
-		console.log("DONE!")
 		
 	}
 }
@@ -283,19 +279,39 @@ onMounted( () => {
 
 .pcp-plot {
 	.axis {
-		.title {
-			stroke: transparent;
+		cursor: pointer;
+
+		text {
 			fill: black;
+			stroke: transparent;
+		}
+
+		line {
+			stroke: black;
+			fill: transparent;
+		}
+
+		.title {
 			font-size: 1em;	
 			text-anchor: start;
 		}
 
 		.tick-string {
-			stroke: transparent;
-			fill: black;
 			font-size: 0.6em;
 			text-anchor: end;
 			dominant-baseline: middle;
+		}
+	}
+	.highlighted {
+
+		line {
+			stroke-width: 2px;
+			stroke: darkblue;
+		}
+		text {
+			stroke-width: 2px;
+			fill: darkblue;	
+			font-size: 0.8em;	
 		}
 	}
 }
