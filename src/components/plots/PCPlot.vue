@@ -335,7 +335,7 @@ function deleteFilter(filterToDelete) {
 	}
 
 	filters[filterToDelete.property].splice(deleteIndex, 1)
-	eventBus.emit('PCPlot.deleteFilter', filterToDelete.id)
+	eventBus.emit('PCPlot.deleteFilter', filterToDelete)
 }
 
 function selectCategory (c) {
