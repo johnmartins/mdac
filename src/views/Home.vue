@@ -29,7 +29,7 @@ function resizeMenu () {
 	}
 
 	document.body.onmousemove = (evt) => {
-		const minWidth = 170 // px
+		const minWidth = 220 // px
 		if (!resizing) return
 		let mouseX = evt.clientX
 		if (mouseX < minWidth) mouseX = minWidth
@@ -48,7 +48,7 @@ function resizeMenu () {
 	.layout-container {
 		height: 100%;
 		display: grid;
-		grid-template-columns: 250px 4px auto;      // Menu, resize-border, workspace
+		grid-template-columns: 290px 4px auto;      // Menu, resize-border, workspace
 
 		.resize-border-v {
 			width: 4px;

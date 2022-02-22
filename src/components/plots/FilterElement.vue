@@ -42,11 +42,14 @@ import { inject } from "vue"
     .filter-element-container {
         font-size: 0.6em;
         display: grid;
-        grid-template-columns: 50px 10px auto 10px 50px 5px; 
+        grid-template-columns: 50px 8px auto 8px 50px 5px; 
 
         .property-container {
             font-weight: bold;
-            text-align: center;
+            text-align: left;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
         }
 
         .delete-container {
