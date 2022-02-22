@@ -38,6 +38,14 @@
 						:key="c.position" 
 						:transform="`translate(${c.position*plotParameters.horizontalOffset} ${getPlotYBounds()[0]})`">	
 
+						<rect 
+						class="filter-hitbox"
+						x="-10"
+						y="0"
+						width="20"
+						:height="getAxisLength()"
+						/>
+
 						<!-- Axis Filters -->
 						<g v-for="(f, index) in filters[c.title]" :key="index">
 							<rect 
@@ -438,6 +446,11 @@ onMounted( () => {
 			stroke-opacity: 0.5;
 			fill: purple;
 			fill-opacity: 0.3;
+		}
+
+		.filter-hitbox {
+			stroke: transparent;
+			fill: transparent;
 		}
 
 		.title {
