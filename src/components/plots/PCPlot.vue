@@ -125,28 +125,7 @@ eventBus.on('PlotTools.setDataOpacity', (v) => {
 eventBus.on('PlotTools.editCategory', (cAr) => {
 	editCategory(cAr[0], cAr[1])
 })
-eventBus.on('FilterElement.deleteFilter', (filterToDelete) => {
-	console.log(filters[filterToDelete.property])
-	let deleteIndex = -1
-	for (let i = 0; i < filters[filterToDelete.property].length; i++) {
-		const f = filters[filterToDelete.property][i]
-
-		console.log(`want to delete: ${filterToDelete.id}. Encountered: ${f.id}`)
-
-		if (f.id === filterToDelete.id) {
-			deleteIndex = f.id
-			console.log("they are the same!")
-			break;
-		}
-	}
-	if (deleteIndex === -1) {
-		console.error('Failed to identify filter to delete.')
-	}
-
-	filters[filterToDelete.property].splice(deleteIndex, 1)
-	eventBus.emit('PCPlot.deleteFilter', filterToDelete.id)
-	console.log(filters[filterToDelete.property])
-})
+eventBus.on('FilterElement.deleteFilter', deleteFilter)
 
 // Expose methods from this container to parent containers
 defineExpose({
@@ -264,8 +243,12 @@ function dataPointFilterCheck (dataPoint) {
 	 */
 	for (let key of Object.keys(filters)) {
 		let passed = false
+
+		if (filters[key].length === 0) { 
+			passed = true 
+		}
+
 		for (let filter of filters[key]) {
-			console.log("Filtering..")
 			if (filter.filter(dataPoint[key])) {
 				passed = true
 			} 
@@ -335,6 +318,24 @@ function addFilter(f) {
 	}
 	filters[f.property].push(f)
 	eventBus.emit('PCPlot.addFilter', f)
+}
+
+function deleteFilter(filterToDelete) {
+	let deleteIndex = -1
+	for (let i = 0; i < filters[filterToDelete.property].length; i++) {
+		const f = filters[filterToDelete.property][i]
+		if (f.id === filterToDelete.id) {
+			deleteIndex = i
+			console.log("DELETING FILTER WITH ID = "+f.id)
+			break;
+		}
+	}
+	if (deleteIndex === -1) {
+		console.error('Failed to identify filter to delete.')
+	}
+
+	filters[filterToDelete.property].splice(deleteIndex, 1)
+	eventBus.emit('PCPlot.deleteFilter', filterToDelete.id)
 }
 
 function selectCategory (c) {

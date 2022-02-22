@@ -34,7 +34,7 @@
                 <strong>Filters</strong>
                 
                 <div>
-                    <FilterElement v-for="(filter, index) in filters" :key="index" :filter="filter"/>
+                    <FilterElement v-for="filter in filters" :key="filter.id" :filter="filter"/>
                 </div>
                 
 
@@ -74,6 +74,16 @@ eventBus.on('PCPlot.selectCategory', (c) => {
 })
 eventBus.on('PCPlot.addFilter', (f) => {
     filters.push(f)
+})
+eventBus.on('PCPlot.deleteFilter', (f) => {
+    let deleteIndex = -1
+    for (let i = 0; i < filters.length; i++) {
+        if (filters[i].id === f.id) {
+            deleteIndex = i
+            break
+        }
+    }
+    filters.splice(deleteIndex, 1)
 })
 
 function readFile (evt) {

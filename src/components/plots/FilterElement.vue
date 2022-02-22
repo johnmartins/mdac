@@ -30,8 +30,10 @@ import { inject } from "vue"
     const eventBus = inject('eventBus')
 
     function deleteFilter () {
+        const f = props.filter
+        console.log(`Request to delete filter: ${f.property} ${f.thresholdA} ${f.thresholdB}`)
         console.log("delete filter with ID = " + props.filter.id)
-        eventBus.emit('FilterElement.deleteFilter', props.filter)
+        //eventBus.emit('FilterElement.deleteFilter', props.filter)
     }
 
 </script>
