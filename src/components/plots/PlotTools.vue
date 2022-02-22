@@ -17,7 +17,7 @@
                 <TextInput :value="selectedCategory.ticks" @change="(v) => {selectedCategoryChanged.ticks=parseInt(v)}">Ticks</TextInput>
 
             </div>
-            <div class="btn-group">
+            <div class="btn-group px-2">
                 <button class="btn btn-success btn-sm" @click="editCategory">Update</button>
                 <button class="btn btn-warning btn-sm" @click="resetCategory">Reset</button>
                 <button class="btn btn-danger btn-sm" @click="deleteCategory">Delete</button>
@@ -32,7 +32,20 @@
         <div class="card mt-3">
             <div class="control-group p-2">
                 <strong>Filters</strong>
+                
+                <div>
+                    <FilterElement v-for="(filter, index) in filters" :key="index" :filter="filter"/>
+                </div>
+                
 
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="control-group p-2">
+                <strong>Options</strong>
+                <RangeInput :value="0.8" @change="setDataOpacity">Data opacity</RangeInput>
+                <RangeInput :value="0.05" @change="setFilteredDataOpacity">Filtered data opacity</RangeInput>
             </div>
         </div>
 
@@ -44,10 +57,13 @@
 
 import { reactive, ref, onMounted, onUpdated, inject } from "vue"
 import TextInput from '@/components/inputs/TextInput.vue'
+import RangeInput from '@/components/inputs/RangeInput.vue'
+import FilterElement from '@/components/plots/FilterElement'
 import Category from '@/models/plots/Category'
 
 const selectedCategory = ref(null)
 const selectedCategoryChanged = ref(null)
+const filters = reactive([])
 
 // Listeners
 const eventBus = inject('eventBus')
@@ -55,6 +71,9 @@ eventBus.on('PCPlot.selectCategory', (c) => {
     selectedCategory.value = c
     selectedCategoryChanged.value = new Category(
         c.title, c.lb, c.ub, c.position, c.ticks)
+})
+eventBus.on('PCPlot.addFilter', (f) => {
+    filters.push(f)
 })
 
 function readFile (evt) {
@@ -73,14 +92,24 @@ function resetCategory () {
     const resetCat = selectedCategory.value;
     selectedCategory.value = null
 
-    setTimeout(() => {selectedCategory.value = resetCat}, 100)
-    
+    setTimeout(() => {selectedCategory.value = resetCat}, 100)   
+}
+
+function setDataOpacity (value) {
+    console.log(value)
+    eventBus.emit('PlotTools.setDataOpacity', value)
+}
+
+function setFilteredDataOpacity (value) {
+    console.log(value)
+    eventBus.emit('PlotTools.setFilteredDataOpacity', value)
 }
 
 </script>
 
 <style lang="scss" scoped>
     .plot-tools-container {
+        overflow-y: auto;
         .control-group {
             text-align: left;
             strong {

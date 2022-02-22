@@ -2,7 +2,7 @@
 	<div class="layout-container" ref="layoutContainer">
 		<PlotTools/>
 		<div id="menu-resize-border" class="resize-border-v" @mousedown="resizeMenu"></div>
-		<PCPlot/>
+		<PCPlot ref="plot"/>
 	</div>
 
 </template>
@@ -10,10 +10,11 @@
 <script setup>
 import { reactive, ref, onMounted, onUpdated } from "vue"
 
-import PCPlot from '@/components/plots/PCPlot2.vue'
+import PCPlot from '@/components/plots/PCPlot.vue'
 import PlotTools from '@/components/plots/PlotTools'
 
 const layoutContainer = ref(null)
+const plot = ref(null)
 
 let resizing = false
 function resizeMenu () {
@@ -32,9 +33,10 @@ function resizeMenu () {
 		if (!resizing) return
 		let mouseX = evt.clientX
 		if (mouseX < minWidth) mouseX = minWidth
-		console.log(`Resizing to ${mouseX}`)
-
 		layoutContainer.value.style.gridTemplateColumns = `${mouseX}px 4px auto`
+
+		// Resize child component
+		plot.value.updateContainerSize()
 	}
 }
 

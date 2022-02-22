@@ -15,7 +15,11 @@ class Category {
     }
 
     scaleLinear (value) {
-        return d3.scaleLinear().range([0,1]).domain([this.ub, this.lb])(value)
+        return this.getScale()(value)
+    }
+
+    getScale () {
+        return d3.scaleLinear().range([0,1]).domain([this.ub, this.lb])
     }
 
     getTickArray () {
