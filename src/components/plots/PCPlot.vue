@@ -308,9 +308,16 @@ function dragFilterDone() {
 	// Calculate domain extent
 	const c = plotVariables.currentFilterCategory
 	const y1 = plotVariables.currentFilterStartValue - plotParameters.padding
-	const y1Ratio = (y1 / getAxisLength())
 	const y2 = plotVariables.currentFilterEndValue - plotParameters.padding
-	const y2Ratio = (y2 / getAxisLength())
+	let y1Ratio = (y1 / getAxisLength())
+	let y2Ratio = (y2 / getAxisLength())
+
+	// Limit ratio to be within bounds
+	if (y1Ratio > 1) y1Ratio = 1.01
+	if (y1Ratio < 0) y1Ratio = -0.01
+	if (y2Ratio > 1) y2Ratio = 1.01
+	if (y2Ratio < 0) y2Ratio = -0.01
+
 	const thresholdA = c.getScale().invert(y1Ratio)
 	const thresholdB = c.getScale().invert(y2Ratio)
 
@@ -329,6 +336,7 @@ function addFilter(f) {
 		filters[f.property] = []
 	}
 	filters[f.property].push(f)
+
 	eventBus.emit('PCPlot.addFilter', f)
 }
 
