@@ -55,6 +55,19 @@
 							width="16" 
 							:height="(c.scaleLinear(f.thresholdA)-c.scaleLinear(f.thresholdB))*getAxisLength()" />
 						</g>
+						
+						<!-- Proto axis filters -->
+						<g v-if="plotVariables.currentFilterCategory">
+							<g v-if="plotVariables.currentFilterCategory.title === c.title">
+								<rect 
+								class="filter-box-proto"
+								x="-8"
+								width="16"
+								:y="Math.min(plotVariables.currentFilterStartValue, plotVariables.currentFilterEndValue) - plotParameters.padding"
+								:height="Math.abs(plotVariables.currentFilterEndValue - plotVariables.currentFilterStartValue)"
+								/>
+							</g>
+						</g>
 						<!-- Axis label -->
 						<text 
 							x="0" 
@@ -294,8 +307,8 @@ function dragFilterBox(evt) {
 }
 
 function dragFilterStart (evt, c) {
-	plotVariables.mousedown = true; 
-	plotVariables.currentFilterCategory = c; 
+	plotVariables.mousedown = true
+	plotVariables.currentFilterCategory = c 
 	plotVariables.currentFilterStartValue = evt.layerY
 	plotVariables.currentFilterStartTime = Date.now()
 }
@@ -474,6 +487,13 @@ onMounted( () => {
 			stroke-opacity: 0.5;
 			fill: purple;
 			fill-opacity: 0.3;
+		}
+
+		.filter-box-proto {
+			stroke: black;
+			stroke-opacity: 0.8;
+			fill: yellow;
+			fill-opacity: 0.8;
 		}
 
 		.filter-hitbox {
