@@ -2,6 +2,7 @@
     <div class="filter-element-container">
         <div>
             <input :value="Math.round(filter.thresholdA*100)/100" type="number" 
+            :step="componentParameters.stepSize"
             @change="editFilter($event, 'A')"
             ref="inputThresholdA"
             />
@@ -17,6 +18,7 @@
         </div>
         <div>
             <input :value="Math.round(filter.thresholdB*100)/100" type="number" 
+            :step="componentParameters.stepSize"
             @change="editFilter($event, 'B')" 
             ref="inputThresholdB"
             />
@@ -39,6 +41,10 @@ import DataFilter from '@/models/plots/DataFilter'
 
     const inputThresholdA = ref(null)
     const inputThresholdB = ref(null)
+
+    const componentParameters = {
+        stepSize: Math.pow(10, Math.floor(props.filter.thresholdB).toString().length - 1)/100,
+    }
 
     function deleteFilter () {
         const f = props.filter
