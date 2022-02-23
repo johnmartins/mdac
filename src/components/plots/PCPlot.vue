@@ -153,6 +153,27 @@ eventBus.on('PlotTools.editCategory', (cAr) => {
 	editCategory(cAr[0], cAr[1])
 })
 eventBus.on('FilterElement.deleteFilter', deleteFilter)
+eventBus.on('FilterElement.editFilter', (changeArray) => {
+	const oldFilter = changeArray[0]
+	const newFilter = changeArray[1]
+
+	let changeIndex = -1
+	for (let i = 0; i < filters[oldFilter.property].length; i++) {
+		const f = filters[oldFilter.property][i]
+
+		if (f.id == oldFilter.id) {
+			console.log("found old filter to change")
+			changeIndex = i
+			break
+		}
+	}
+
+	if (changeIndex >= 0) {
+		const f = filters[oldFilter.property][changeIndex]
+		f.thresholdA = newFilter.thresholdA
+		f.thresholdB = newFilter.thresholdB
+	}
+})
 
 // Expose methods from this container to parent containers
 defineExpose({

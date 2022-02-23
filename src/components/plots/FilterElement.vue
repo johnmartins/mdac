@@ -1,7 +1,10 @@
 <template>
     <div class="filter-element-container">
         <div>
-            {{Math.round(filter.thresholdA*100)/100}}
+            <input :value="Math.round(filter.thresholdA*100)/100" type="number" 
+            @change="editFilter($event, 'A')"
+            ref="inputThresholdA"
+            />
         </div>
         <div>
             &le;
@@ -13,7 +16,11 @@
             &le;
         </div>
         <div>
-            {{Math.round(filter.thresholdB*100)/100}}
+            <input :value="Math.round(filter.thresholdB*100)/100" type="number" 
+            @change="editFilter($event, 'B')" 
+            ref="inputThresholdB"
+            />
+            
         </div>
         <div class="delete-container" @click.prevent="deleteFilter">
             X
@@ -22,16 +29,30 @@
 </template>
 
 <script setup>
-import { inject } from "vue"
+import { inject, ref } from "vue"
+import DataFilter from '@/models/plots/DataFilter'
 
     const props = defineProps({
         filter: Object
     })
     const eventBus = inject('eventBus')
 
+    const inputThresholdA = ref(null)
+    const inputThresholdB = ref(null)
+
     function deleteFilter () {
         const f = props.filter
-        eventBus.emit('FilterElement.deleteFilter', props.filter)
+        eventBus.emit('FilterElement.deleteFilter', f)
+    }
+
+    function editFilter (evt) {
+        const tA = parseFloat(inputThresholdA.value.value)
+        const tB = parseFloat(inputThresholdB.value.value)
+
+        const of = props.filter
+        const nf = new DataFilter(of.property, tA, tB)
+
+        eventBus.emit('FilterElement.editFilter', [of, nf])
     }
 
 </script>
@@ -44,10 +65,18 @@ import { inject } from "vue"
 
         .property-container {
             font-weight: bold;
-            text-align: left;
+            text-align: center;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
+        }
+
+        input[type=number] {
+            width: 50px;
+            padding: 0 4px 0 4px;
+            font-family: monospace;
+            text-align: center;
+            border: none;
         }
 
         .delete-container {
