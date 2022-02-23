@@ -126,6 +126,10 @@ eventBus.on('PlotTools.readFile', readFile)
 eventBus.on('PlotTools.deleteCategory', deleteCategory)
 eventBus.on('PlotTools.setFilteredDataOpacity', (v) => {
 	plotParameters.filteredDataOpacity = v
+	plotParameters.hideFiltered = false
+	if (v < 0.01) {
+		plotParameters.hideFiltered = true
+	} 
 })
 eventBus.on('PlotTools.setDataOpacity', (v) => {
 	plotParameters.defaultDataOpacity = v
