@@ -312,18 +312,34 @@ function dragFilterDone() {
 	let y1Ratio = (y1 / getAxisLength())
 	let y2Ratio = (y2 / getAxisLength())
 
+	// Check if completely out of bounds
+	let outOfBounds = false
+	if ((y1Ratio > 1 || y1Ratio < 0) && (y2Ratio > 1 || y2Ratio < 0) ) {
+		outOfBounds = true
+		console.warn('Filter out of bounds. Ignoring.')
+	}
+
 	// Limit ratio to be within bounds
 	if (y1Ratio > 1) y1Ratio = 1.01
 	if (y1Ratio < 0) y1Ratio = -0.01
 	if (y2Ratio > 1) y2Ratio = 1.01
 	if (y2Ratio < 0) y2Ratio = -0.01
+	
+	// Check that the range is large enough to be tangible
+	const minRange = 0.0001
+	let insufficientRange = false
+	if (Math.abs(y1Ratio - y2Ratio) < minRange) {
+		insufficientRange = true
+	}
 
 	const thresholdA = c.getScale().invert(y1Ratio)
 	const thresholdB = c.getScale().invert(y2Ratio)
 
 	// Create and add filter
-	const filter = new DataFilter(c.title, thresholdA, thresholdB)
-	addFilter(filter)
+	if (!outOfBounds && !insufficientRange) {
+		const filter = new DataFilter(c.title, thresholdA, thresholdB)
+		addFilter(filter)
+	}
 
 	plotVariables.mousedown = false; 
 	plotVariables.currentFilterCategory = null

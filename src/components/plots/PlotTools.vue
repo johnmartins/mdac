@@ -33,8 +33,11 @@
             <div class="control-group p-2">
                 <strong>Filters</strong>
                 
-                <div>
+                <div v-if="filters.length > 0">
                     <FilterElement v-for="filter in filters" :key="filter.id" :filter="filter"/>
+                </div>
+                <div v-else>
+                    <span style="font-size: 0.8em;">No filters have been applied</span>
                 </div>
                 
 
