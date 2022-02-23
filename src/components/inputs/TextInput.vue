@@ -15,7 +15,6 @@
     const emit = defineEmits(['change'])
 
     function onChange(evt) {
-        console.log(evt.target.value)
         emit('change', evt.target.value)
     }
 

@@ -109,12 +109,10 @@ function resetCategory () {
 }
 
 function setDataOpacity (value) {
-    console.log(value)
     eventBus.emit('PlotTools.setDataOpacity', value)
 }
 
 function setFilteredDataOpacity (value) {
-    console.log(value)
     eventBus.emit('PlotTools.setFilteredDataOpacity', value)
 }
 

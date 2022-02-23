@@ -205,7 +205,6 @@ function addCategory(c) {
 	categories.push(c)
 	updateHorizontalOffset()
 	categoryNameMap.set(c.title, c)
-	console.log(`Added category ${c.title}`)
 }
 
 function editCategory(oldC, newC) {
@@ -222,7 +221,6 @@ function deleteCategory(c) {
 		deleteIndex = i
 		break
 	}
-	console.log(`Deleting category ${categories[deleteIndex].title} at index = ${deleteIndex}`)
 	categoryNameMap.set(c.title, null)
 	categories.splice(deleteIndex, 1)
 
@@ -379,7 +377,6 @@ function deleteFilter(filterToDelete) {
 		const f = filters[filterToDelete.property][i]
 		if (f.id === filterToDelete.id) {
 			deleteIndex = i
-			console.log("DELETING FILTER WITH ID = "+f.id)
 			break;
 		}
 	}
@@ -418,7 +415,6 @@ function readFile (evt) {
 	reader.readAsText(new Blob([file], {"type": file.type}))	
 	reader.onloadend = (e) => {
 		let csvData = d3.csvParse(e.target.result)
-		console.log(csvData.columns)
 
 		const dataToPlot = []
 

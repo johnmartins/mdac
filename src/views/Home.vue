@@ -20,10 +20,7 @@ let resizing = false
 function resizeMenu () {
 	resizing = true
 
-	console.log("resizing")
-
 	document.body.onmouseup = () => {
-		console.log("stopped resizing")
 		resizing = false
 		document.body.onmousemove = null
 	}
