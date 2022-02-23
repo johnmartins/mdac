@@ -57,7 +57,7 @@
 						</g>
 						
 						<!-- Proto axis filters -->
-						<g v-if="plotVariables.currentFilterCategory">
+						<g v-if="plotVariables.currentFilterCategory && plotVariables.currentFilterDeltaTime > plotParameters.filterMinDragTime">
 							<g v-if="plotVariables.currentFilterCategory.title === c.title">
 								<rect 
 								class="filter-box-proto"
@@ -110,11 +110,13 @@ const plotParameters = reactive({
 	axisTitleRotation: 45,
 	defaultDataOpacity: 0.8,
 	filteredDataOpacity: 0.05,
+	filterMinDragTime: 125, // ms
 	hideFiltered: false
 })
 const plotVariables = reactive({
 	mousedown: false,
 	currentFilterStartTime: 0,
+	currentFilterDeltaTime: 0,
 	currentFilter: null,
 	currentFilterCategory: null,
 	currentFilterStartValue: 0,
@@ -304,6 +306,7 @@ function getTickString (tickData) {
 function dragFilterBox(evt) {
 	if (!plotVariables.mousedown) return
 	plotVariables.currentFilterEndValue = evt.layerY
+	plotVariables.currentFilterDeltaTime = Date.now() - plotVariables.currentFilterStartTime
 }
 
 function dragFilterStart (evt, c) {
@@ -311,12 +314,14 @@ function dragFilterStart (evt, c) {
 	plotVariables.currentFilterCategory = c 
 	plotVariables.currentFilterStartValue = evt.layerY
 	plotVariables.currentFilterStartTime = Date.now()
+	plotVariables.currentFilterDeltaTime = 0
 }
 
 function dragFilterDone() {
-	const minDragTime = 200 // ms
 	if (!plotVariables.mousedown) return
-	if (Date.now() - plotVariables.currentFilterStartTime < minDragTime) return
+	plotVariables.mousedown = false
+
+	if (Date.now() - plotVariables.currentFilterStartTime < plotParameters.filterMinDragTime) return
 
 	// Calculate domain extent
 	const c = plotVariables.currentFilterCategory
@@ -354,7 +359,6 @@ function dragFilterDone() {
 		addFilter(filter)
 	}
 
-	plotVariables.mousedown = false; 
 	plotVariables.currentFilterCategory = null
 	plotVariables.currentFilter = null
 	plotVariables.currentFilterStartValue = 0
