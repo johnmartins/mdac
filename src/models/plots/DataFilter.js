@@ -3,7 +3,6 @@ class DataFilter {
     static counter = 0;
 
     constructor (property, thresholdA, thresholdB) {
-        console.warn("NEW FILTER INSTANTIATED")
         this.property = property    // Category name
         this.thresholdA = thresholdA        
         this.thresholdB = thresholdB      
