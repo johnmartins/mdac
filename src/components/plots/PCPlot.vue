@@ -41,9 +41,9 @@
 						<rect 
 						class="filter-hitbox"
 						x="-10"
-						y="0"
+						y="-20"
 						width="20"
-						:height="getAxisLength()"
+						:height="getAxisLength()+40"
 						/>
 
 						<!-- Axis Filters -->
