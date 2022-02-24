@@ -6,8 +6,10 @@
 			height="100%" 
 			width="100%" 
 			ref="plotCanvas"
+			tabindex="0"
 			@mousemove="dragFilterBox"
 			@mouseup="dragFilterDone"
+			@keydown.delete="deleteCategory(categoryNameMap.get(selectedCategoryName))"
 			>
 				
 				<!-- Full graphics group -->
@@ -180,6 +182,11 @@ defineExpose({
 	updateContainerSize,
 });
 
+function keyPressHandler (evt) {
+	console.log("yes")
+	console.log(evt)
+}
+
 function lineGenerator(data) {
 
 	let dataCats = Object.keys(data)
@@ -225,6 +232,7 @@ function editCategory(oldC, newC) {
 }
 
 function deleteCategory(c) {
+	if (!c) return
 	// Delete category from category list
 	let deleteIndex = -1
 	for (let i = 0; i < categories.length; i++) {
@@ -299,6 +307,14 @@ function dataPointFilterCheck (dataPoint) {
 
 
 function setColorScale (category) {
+	if (!category) {
+		settings.colorScaleCategory = null
+		settings.colorScale = () => {return "black"}
+		return
+	}
+
+	console.log("Colors!")
+
 	settings.colorScaleCategory = category.title
 	settings.colorScale = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateRgbBasis(["red", "green", "blue"]))
 }
@@ -391,7 +407,12 @@ function deleteFilter(filterToDelete) {
 }
 
 function selectCategory (c) {
-	selectedCategoryName.value = c.title
+	if (selectedCategoryName.value === c.title) {
+		c = null
+	}
+	
+	plotCanvas.value.focus()
+	selectedCategoryName.value = c ? c.title : null
 	setColorScale(c)
 	eventBus.emit('PCPlot.selectCategory', c)
 }

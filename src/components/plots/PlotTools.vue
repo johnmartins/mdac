@@ -71,6 +71,12 @@ const filters = reactive([])
 // Listeners
 const eventBus = inject('eventBus')
 eventBus.on('PCPlot.selectCategory', (c) => {
+    if (!c) {
+         selectedCategory.value = null
+         selectedCategoryChanged.value = null
+         return
+    }
+
     selectedCategory.value = c
     selectedCategoryChanged.value = new Category(
         c.title, c.lb, c.ub, c.position, c.ticks)
