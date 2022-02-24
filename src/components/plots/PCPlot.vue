@@ -82,7 +82,7 @@
 						
 						<!-- Axis tick group -->
 						<g class="tick" v-for="(tick, index) in c.getTickArray()" :key="index"> <!-- Tick group -->
-							<text x="-10" :y="c.scaleLinear(tick)*getAxisLength()" class="tick-string">{{getTickString(tick)}}</text>
+							<text x="-10" :y="c.scaleLinear(tick)*getAxisLength()" class="tick-string">{{c.getTickString(tick)}}</text>
 							<line x1="0" :y1="c.scaleLinear(tick)*getAxisLength()" x2="-5" :y2="c.scaleLinear(tick)*getAxisLength()"/>	<!-- Top tick -->
 						</g>
 					</g>
@@ -209,15 +209,6 @@ function lineGenerator(data) {
 		(dataArray)
 }
 
-function addRandomCategory() {
-	const names = ['Sture', 'Märta', 'Skurt', 'Anna', 'Astrid', 'Anders', 'Kurs', 'Bob', 'Per', 'Mulle Meck', 'Stolle', 'Stig', 'Robin', 'August', 'Lisa', 'Pelle']
-	const lb = Math.floor(Math.random() * 100);
-	const ub = Math.floor(Math.random() * 100);
-	const name = names[Math.floor(Math.random()*names.length)];
-	const c = new Category(name, lb, ub)
-	addCategory(c)
-}
-
 function addCategory(c) {
 	let position = 0
 	if (categories.length > 0) {
@@ -310,16 +301,6 @@ function dataPointFilterCheck (dataPoint) {
 function setColorScale (category) {
 	settings.colorScaleCategory = category.title
 	settings.colorScale = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateRgbBasis(["red", "green", "blue"]))
-}
-
-function getTickString (tickData) {
-	if (isNaN(parseFloat(tickData))) {
-		// Not a number
-		return "String!"
-	} else {
-		// A number
-		return Math.round(tickData * 100) / 100
-	}
 }
 
 function dragFilterBox(evt) {

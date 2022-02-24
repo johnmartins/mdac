@@ -10,8 +10,29 @@ class Category {
         this.ub = ub
         this.position = position
         this.ticks = ticks
+        this.magnitude = Math.floor(Math.log10(this.lb))
 
         Category.count++
+    }
+
+    getTickString (value) {
+        if (isNaN(parseFloat(value))) {
+            return "String"
+        }
+
+        let tickStr = "Whoops"
+        
+        if (this.magnitude < -1) {
+            let rounded = Math.round(value * Math.pow(10,(Math.abs(this.magnitude)+3)))/Math.pow(10,3)
+            tickStr = `${rounded}e${this.magnitude}`
+        } else if (this.magnitude > 3) {
+            let rounded = Math.round(value / Math.pow(10,(this.magnitude-3)))*Math.pow(10,(this.magnitude-3))
+            tickStr = `${rounded/Math.pow(10, this.magnitude)}e${this.magnitude}`
+        } else {
+            tickStr = `${Math.round(value * 1000) / 1000}`
+        }
+
+        return tickStr
     }
 
     scaleLinear (value) {
