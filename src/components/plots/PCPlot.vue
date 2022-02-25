@@ -155,27 +155,8 @@ eventBus.on('PlotTools.editCategory', (cAr) => {
 	editCategory(cAr[0], cAr[1])
 })
 eventBus.on('FilterElement.deleteFilter', deleteFilter)
-eventBus.on('FilterElement.editFilter', (changeArray) => {
-	const oldFilter = changeArray[0]
-	const newFilter = changeArray[1]
+eventBus.on('FilterElement.editFilter', editFilter)
 
-	let changeIndex = -1
-	for (let i = 0; i < filters[oldFilter.property].length; i++) {
-		const f = filters[oldFilter.property][i]
-
-		if (f.id == oldFilter.id) {
-			console.log("found old filter to change")
-			changeIndex = i
-			break
-		}
-	}
-
-	if (changeIndex >= 0) {
-		const f = filters[oldFilter.property][changeIndex]
-		f.thresholdA = newFilter.thresholdA
-		f.thresholdB = newFilter.thresholdB
-	}
-})
 
 // Expose methods from this container to parent containers
 defineExpose({
@@ -224,6 +205,7 @@ function addCategory(c) {
 	categories.push(c)
 	updateHorizontalOffset()
 	categoryNameMap.set(c.title, c)
+	eventBus.emit('PCPlot.addCategory', c)
 }
 
 function editCategory(oldC, newC) {
@@ -252,6 +234,7 @@ function deleteCategory(c) {
 
 	// Adjust plot horizontal layout
 	plotParameters.horizontalOffset = getPlotXBounds()[1]/Math.max(1,(categories.length-1))	
+	eventBus.emit('PCPlot.deleteCategory', c)
 }
 
 function getAxisLength () {
@@ -380,6 +363,17 @@ function dragFilterDone() {
 	plotVariables.currentFilterStartValue = 0
 }
 
+function onFilterChange() {
+	let filteredData = []
+	for (let d of data) {
+		if (dataPointFilterCheck(d)) {
+			filteredData.push(d)
+		}
+	}
+
+	eventBus.emit('PCPlot.onFilterChange', filteredData)
+}
+
 function addFilter(f) {
 	if (!filters[f.property]) {
 		filters[f.property] = []
@@ -387,6 +381,7 @@ function addFilter(f) {
 	filters[f.property].push(f)
 
 	eventBus.emit('PCPlot.addFilter', f)
+	onFilterChange();
 }
 
 function deleteFilter(filterToDelete) {
@@ -404,6 +399,31 @@ function deleteFilter(filterToDelete) {
 
 	filters[filterToDelete.property].splice(deleteIndex, 1)
 	eventBus.emit('PCPlot.deleteFilter', filterToDelete)
+	onFilterChange()
+}
+
+function editFilter (changeArray) {
+	const oldFilter = changeArray[0]
+	const newFilter = changeArray[1]
+
+	let changeIndex = -1
+	for (let i = 0; i < filters[oldFilter.property].length; i++) {
+		const f = filters[oldFilter.property][i]
+
+		if (f.id == oldFilter.id) {
+			console.log("found old filter to change")
+			changeIndex = i
+			break
+		}
+	}
+
+	if (changeIndex >= 0) {
+		const f = filters[oldFilter.property][changeIndex]
+		f.thresholdA = newFilter.thresholdA
+		f.thresholdB = newFilter.thresholdB
+	}
+
+	onFilterChange()
 }
 
 function selectCategory (c) {
@@ -474,6 +494,7 @@ function readFile (evt) {
 		}
 
 		data.push(...dataToPlot)
+		eventBus.emit('PCPlot.readData', data)
 	}
 }
 
