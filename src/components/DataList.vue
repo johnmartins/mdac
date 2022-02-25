@@ -4,14 +4,14 @@
         <table class="table table-sm table-striped">
             <thead>
                 <tr>
-                    <th v-for="c in categories" :key="c.position">
+                    <th v-for="c in categories" :key="c.id">
                         <div><span>{{c.title}}</span></div>
                     </th>
                 </tr>
             </thead>
             <tbody class="table-bordered">
                 <tr v-for="(d, index) in data" :key="index">
-                    <td v-for="c in categories" :key="c.position">
+                    <td v-for="c in categories" :key="c.id">
                         {{d[c.title]}}
                     </td>
                 </tr>

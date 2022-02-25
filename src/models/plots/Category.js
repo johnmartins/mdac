@@ -11,6 +11,7 @@ class Category {
         this.position = position
         this.ticks = ticks
         this.magnitude = Math.floor(Math.log10(this.lb))
+        this.id = Category.count
 
         Category.count++
     }
