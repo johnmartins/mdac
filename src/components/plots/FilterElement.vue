@@ -8,13 +8,13 @@
             />
         </div>
         <div>
-            &le;
+            <span v-if="thresholdA <= thresholdB">&le;</span> <span v-else>&ge;</span>
         </div>
         <div class="property-container">
             {{filter.property}}
         </div>
         <div>
-            &le;
+            <span v-if="thresholdA <= thresholdB">&le;</span> <span v-else>&ge;</span>
         </div>
         <div>
             <input type="number" 
@@ -41,6 +41,8 @@ import DataFilter from '@/models/plots/DataFilter'
 
     const inputThresholdA = ref(null)
     const inputThresholdB = ref(null)
+    const thresholdA = ref(0)
+    const thresholdB = ref(1)
 
     const componentParameters = {
         stepSize: Math.pow(10, Math.floor(Math.log10(props.filter.thresholdA)))/100,
@@ -49,6 +51,9 @@ import DataFilter from '@/models/plots/DataFilter'
     onMounted( () => {
         inputThresholdA.value.value = Math.round(props.filter.thresholdA*100)/100
         inputThresholdB.value.value = Math.round(props.filter.thresholdB*100)/100
+        thresholdA.value = Math.round(props.filter.thresholdA*100)/100
+        thresholdB.value = Math.round(props.filter.thresholdB*100)/100
+
     })
 
     function deleteFilter () {
@@ -59,6 +64,8 @@ import DataFilter from '@/models/plots/DataFilter'
     function editFilter (evt) {
         const tA = parseFloat(inputThresholdA.value.value)
         const tB = parseFloat(inputThresholdB.value.value)
+        thresholdA.value = tA
+        thresholdB.value = tB
 
         const of = props.filter
         const nf = new DataFilter(of.property, tA, tB)
@@ -72,7 +79,7 @@ import DataFilter from '@/models/plots/DataFilter'
     .filter-element-container {
         font-size: 0.6rem;
         display: grid;
-        grid-template-columns: 50px 8px auto 8px 50px 5px; 
+        grid-template-columns: 25% 8px auto 8px 25% 5px; 
 
         .property-container {
             font-weight: bold;
@@ -83,7 +90,7 @@ import DataFilter from '@/models/plots/DataFilter'
         }
 
         input[type=number] {
-            width: 50px;
+            width: 100%;
             padding: 0 4px 0 4px;
             font-family: monospace;
             text-align: center;
