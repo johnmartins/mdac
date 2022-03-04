@@ -70,7 +70,7 @@ import DataFilter from '@/models/plots/DataFilter'
 
 <style lang="scss" scoped>
     .filter-element-container {
-        font-size: 0.6em;
+        font-size: 0.6rem;
         display: grid;
         grid-template-columns: 50px 8px auto 8px 50px 5px; 
 

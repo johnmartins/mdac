@@ -22,7 +22,7 @@
 
 <style lang="scss" scoped>
     .input-group-text {
-        font-size: 0.8em;
+        font-size: 0.8rem;
         width: 60px;
         padding: 0.1em 0 0.1em 0.4em;
 
@@ -33,8 +33,8 @@
     }
 
     .form-control  {
-        padding: 0.1em 0 0.1em 0.4em;
-        font-size: 0.6em !important;
+        padding: 0.1rem 0 0.1rem 0.4rem;
+        font-size: 0.6rem !important;
         font-family: monospace;
         font-weight: bold;
         text-align: right;

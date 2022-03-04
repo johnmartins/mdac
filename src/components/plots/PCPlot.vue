@@ -453,12 +453,12 @@ function updateContainerSize () {
 }
 
 
-function readFile (evt) {
-	const file = evt.target.files[0]
+function readFile ({file, delimiter} = object) {
 	const reader = new FileReader()
 	reader.readAsText(new Blob([file], {"type": file.type}))	
 	reader.onloadend = (e) => {
-		let csvData = d3.csvParse(e.target.result)
+		const dataFormat = d3.dsvFormat(delimiter)
+		let csvData = dataFormat.parse(e.target.result)
 
 		const dataToPlot = []
 

@@ -3,7 +3,16 @@
         <div class="card mt-3">
             <div class="control-group p-2">
                 <strong>Data source</strong>
-                <input class="form-control form-control-sm" id="formFileSm" type="file" @change="readFile">
+                <input class="form-control form-control-sm mb-2" id="formFileSm" type="file" @change="readFile">
+
+                <div class="labeled-form">                
+                    <span>Delimiter:</span>
+                    <select name="delimiter" id="formFileDelimiter" ref="fileDelimiterSelect">
+                        <option value="," selected>Comma ","</option>
+                        <option value=";">Semi-colon ";"</option>
+                        <option value="\t">Tab "\t"</option>
+                    </select>
+                </div>
             </div>
         </div>
         <div class="card mt-3" v-if="selectedCategoryChanged">
@@ -66,6 +75,7 @@ import Category from '@/models/plots/Category'
 
 const selectedCategory = ref(null)
 const selectedCategoryChanged = ref(null)
+const fileDelimiterSelect = ref(null)
 const filters = reactive([])
 
 // Listeners
@@ -96,7 +106,7 @@ eventBus.on('PCPlot.deleteFilter', (f) => {
 })
 
 function readFile (evt) {
-    eventBus.emit('PlotTools.readFile', (evt))
+    eventBus.emit('PlotTools.readFile', {file: evt.target.files[0], delimiter: fileDelimiterSelect.value.value})
 }
 
 function deleteCategory () {
@@ -126,11 +136,27 @@ function setFilteredDataOpacity (value) {
 
 <style lang="scss" scoped>
     .plot-tools-container {
+        font-size: 0.8rem;
         overflow-y: auto;
+
         .control-group {
             text-align: left;
-            strong {
-                font-size: 0.8em;
+            input {
+                font-size: 0.8rem;
+            }
+        }
+
+        .labeled-form {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            align-items: center;
+            span {
+                font-size: 0.8rem;
+                margin-right: 8px;
+            }
+            select {
+                width: 100%;
             }
         }
     }

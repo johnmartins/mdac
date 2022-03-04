@@ -42,7 +42,7 @@
 
 <style lang="scss" scoped>
 .title {
-    font-size: 0.8em;
+    font-size: 0.8rem;
 }
 
 .range-input-container {
@@ -50,14 +50,14 @@
     grid-template-columns: auto 80px; 
 
     label {
-        font-size: 0.8em;
+        font-size: 0.8rem;
         margin-bottom: 0;
     }
 
     input[type=number] {
         margin-left: 10px;
         width: 70px;
-        font-size: 0.8em;
+        font-size: 0.7rem;
         font-family: monospace;
         font-weight: bold;
     }
