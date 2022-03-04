@@ -10,7 +10,7 @@ class Category {
         this.ub = ub
         this.position = position
         this.ticks = ticks
-        this.magnitude = Math.floor(Math.log10(this.lb))
+        this.magnitude = this.lb > 0 ? Math.floor(Math.log10(this.lb)) : 0
         this.id = Category.count
 
         Category.count++

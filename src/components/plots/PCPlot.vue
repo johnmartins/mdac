@@ -198,6 +198,7 @@ function lineGenerator(data) {
 }
 
 function addCategory(c) {
+	console.log(`Add category: ${c.title}, ${c.lb}, ${c.ub}`)
 	let position = 0
 	if (categories.length > 0) {
 		position = categories[categories.length - 1].position + 1
@@ -477,8 +478,8 @@ function readFile (evt) {
 					value = parseFloat(value)
 					
 
-					if (!maxValMap.get(col)) maxValMap.set(col, value)
-					if (!minValMap.get(col)) minValMap.set(col, value)
+					if (isNaN(maxValMap.get(col))) maxValMap.set(col, value)
+					if (isNaN(minValMap.get(col))) minValMap.set(col, value)
 
 					if (maxValMap.get(col) < value) maxValMap.set(col, value)
 					else if (minValMap.get(col) > value) minValMap.set(col, value)
