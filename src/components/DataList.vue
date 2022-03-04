@@ -26,13 +26,18 @@
 import { reactive, ref, onMounted, onUpdated, inject } from "vue"
 
 const eventBus = inject('eventBus')
-const categories = reactive([])
+const categories = ref([])
 const data = ref([])
 
 // Event bus
 eventBus.on('PCPlot.readData', setData)
-eventBus.on('PCPlot.addCategory', (c) => categories.push(c))
+eventBus.on('PCPlot.addCategory', (c) => categories.value.push(c))
 eventBus.on('PCPlot.onFilterChange', setData)
+eventBus.on('PlotTools.readFile', clearCategories)
+
+function clearCategories () {
+    categories.value = []
+}
 
 function setData(d) {
     data.value = d

@@ -127,8 +127,8 @@ const plotVariables = reactive({
 
 // Data structures
 const categoryNameMap = new Map()
-const categories = reactive([])
-const data = reactive([])
+const categories = ref([])
+const data = ref([])
 const filters = reactive({}) // "categoryName" -> [filterA, filterB, ..]
 const settings = reactive({
 	colorScaleCategory: null,
@@ -163,14 +163,9 @@ defineExpose({
 	updateContainerSize,
 });
 
-function keyPressHandler (evt) {
-	console.log("yes")
-	console.log(evt)
-}
+function lineGenerator(d) {
 
-function lineGenerator(data) {
-
-	let dataCats = Object.keys(data)
+	let dataCats = Object.keys(d)
 	let dataArray = Array(dataCats.length).fill(null)
 
 	for (let i = 0; i < dataCats.length; i++) {
@@ -182,7 +177,7 @@ function lineGenerator(data) {
 
 		dataArray[c.position] = {
 			x: c.position*plotParameters.horizontalOffset, 
-			y: c.scaleLinear(data[c.title])*getAxisLength()
+			y: c.scaleLinear(d[c.title])*getAxisLength()
 		}
 	}
 
@@ -191,19 +186,18 @@ function lineGenerator(data) {
 	const lengthPostFilter = dataArray.length
 	
 	return d3.line([])
-		.x((d) => {return d.x})
-		.y((d) => {return d.y})
+		.x((de) => {return de.x})
+		.y((de) => {return de.y})
 		.curve(d3.curveMonotoneX)
 		(dataArray)
 }
 
 function addCategory(c) {
-	console.log(`Add category: ${c.title}, ${c.lb}, ${c.ub}`)
 	let position = 0
-	if (categories.length > 0) {
-		position = categories[categories.length - 1].position + 1
+	if (categories.value.length > 0) {
+		position = categories.value[categories.value.length - 1].position + 1
 	}
-	categories.push(c)
+	categories.value.push(c)
 	updateHorizontalOffset()
 	categoryNameMap.set(c.title, c)
 	eventBus.emit('PCPlot.addCategory', c)
@@ -218,23 +212,23 @@ function deleteCategory(c) {
 	if (!c) return
 	// Delete category from category list
 	let deleteIndex = -1
-	for (let i = 0; i < categories.length; i++) {
-		const cat = categories[i]
+	for (let i = 0; i < categories.value.length; i++) {
+		const cat = categories.value[i]
 		if (c.title !== cat.title) continue
 		deleteIndex = i
 		break
 	}
 	categoryNameMap.set(c.title, null)
-	categories.splice(deleteIndex, 1)
+	categories.value.splice(deleteIndex, 1)
 
 	// Adjust positions of other categories
-	for (let i=deleteIndex; i < categories.length; i++) {
-		const cat = categories[i]
+	for (let i=deleteIndex; i < categories.value.length; i++) {
+		const cat = categories.value[i]
 		cat.position--
 	}
 
 	// Adjust plot horizontal layout
-	plotParameters.horizontalOffset = getPlotXBounds()[1]/Math.max(1,(categories.length-1))	
+	plotParameters.horizontalOffset = getPlotXBounds()[1]/Math.max(1,(categories.value.length-1))	
 	eventBus.emit('PCPlot.deleteCategory', c)
 }
 
@@ -296,8 +290,6 @@ function setColorScale (category) {
 		settings.colorScale = () => {return "black"}
 		return
 	}
-
-	console.log("Colors!")
 
 	settings.colorScaleCategory = category.title
 	settings.colorScale = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateRgbBasis(["red", "green", "blue"]))
@@ -366,7 +358,7 @@ function dragFilterDone() {
 
 function onFilterChange() {
 	let filteredData = []
-	for (let d of data) {
+	for (let d of data.value) {
 		if (dataPointFilterCheck(d)) {
 			filteredData.push(d)
 		}
@@ -412,7 +404,6 @@ function editFilter (changeArray) {
 		const f = filters[oldFilter.property][i]
 
 		if (f.id == oldFilter.id) {
-			console.log("found old filter to change")
 			changeIndex = i
 			break
 		}
@@ -439,7 +430,7 @@ function selectCategory (c) {
 }
 
 function updateHorizontalOffset () {
-	plotParameters.horizontalOffset = getPlotXBounds()[1]/Math.max(1,(categories.length-1))	
+	plotParameters.horizontalOffset = getPlotXBounds()[1]/Math.max(1,(categories.value.length-1))	
 }
 
 function updateContainerSize () {
@@ -454,6 +445,15 @@ function updateContainerSize () {
 
 
 function readFile ({file, delimiter} = object) {
+	if (delimiter === "\\t") delimiter = "\t";
+
+	// Clear any existing state
+	data.value = []
+	categories.value = []
+	categoryNameMap.clear()
+	Category.count = 0;
+
+	// Read the CSV file
 	const reader = new FileReader()
 	reader.readAsText(new Blob([file], {"type": file.type}))	
 	reader.onloadend = (e) => {
@@ -494,8 +494,8 @@ function readFile ({file, delimiter} = object) {
 			addCategory(new Category(col, minValMap.get(col), maxValMap.get(col)))
 		}
 
-		data.push(...dataToPlot)
-		eventBus.emit('PCPlot.readData', data)
+		data.value.push(...dataToPlot)
+		eventBus.emit('PCPlot.readData', data.value)
 	}
 }
 

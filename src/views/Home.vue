@@ -40,11 +40,9 @@ function setView (viewName) {
 	dataContainer.value.style.display="none"
 	switch(viewName) {
 		case "plot":
-			console.log("plot")
 			pcdContainer.value.style.display="grid"
 			break;
 		case "data":
-			console.log('data')
 			dataContainer.value.style.display="block"
 			break;
 		default:

@@ -3,11 +3,11 @@
         <div class="card mt-3">
             <div class="control-group p-2">
                 <strong>Data source</strong>
-                <input class="form-control form-control-sm mb-2" id="formFileSm" type="file" @change="readFile">
+                <input class="form-control form-control-sm mb-2" id="formFileSm" type="file" ref="fileInput" @change="readFile">
 
                 <div class="labeled-form">                
                     <span>Delimiter:</span>
-                    <select name="delimiter" id="formFileDelimiter" ref="fileDelimiterSelect">
+                    <select name="delimiter" id="formFileDelimiter" ref="fileDelimiterSelect" @change="readFile">
                         <option value="," selected>Comma ","</option>
                         <option value=";">Semi-colon ";"</option>
                         <option value="\t">Tab "\t"</option>
@@ -75,8 +75,11 @@ import Category from '@/models/plots/Category'
 
 const selectedCategory = ref(null)
 const selectedCategoryChanged = ref(null)
-const fileDelimiterSelect = ref(null)
 const filters = reactive([])
+
+// DOM references
+const fileDelimiterSelect = ref(null)
+const fileInput = ref(null)
 
 // Listeners
 const eventBus = inject('eventBus')
@@ -105,8 +108,8 @@ eventBus.on('PCPlot.deleteFilter', (f) => {
     filters.splice(deleteIndex, 1)
 })
 
-function readFile (evt) {
-    eventBus.emit('PlotTools.readFile', {file: evt.target.files[0], delimiter: fileDelimiterSelect.value.value})
+function readFile () {
+    eventBus.emit('PlotTools.readFile', {file: fileInput.value.files[0], delimiter: fileDelimiterSelect.value.value})
 }
 
 function deleteCategory () {
