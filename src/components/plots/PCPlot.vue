@@ -33,10 +33,8 @@
 					class="axis" 
 					v-for="c in categories" 
 					@click="selectCategory(c)"
-					@mouseover="highlightedCategoryName = c.title"
-					@mouseleave="highlightedCategoryName = null"
 					@mousedown.prevent="dragFilterStart($event, c)"
-					v-bind:class="{highlighted: highlightedCategoryName == c.title || selectedCategoryName == c.title}"
+					v-bind:class="{highlighted: selectedCategoryName == c.title}"
 					:key="c.position" 
 					:transform="`translate(${c.position*plotParameters.horizontalOffset} ${getPlotYBounds()[0]})`">	
 
@@ -127,7 +125,6 @@ const settings = reactive({
 	colorScaleCategory: null,
 	colorScale: () => {return "black"}
 })
-const highlightedCategoryName = ref(null)
 const selectedCategoryName = ref(null)
 
 // Event buss listeners and triggers
@@ -157,6 +154,7 @@ defineExpose({
 });
 
 function lineGenerator(d) {
+	console.log(Date.now())
 
 	let dataCats = Object.keys(d)
 	let dataArray = Array(dataCats.length).fill(null)
@@ -560,16 +558,29 @@ onMounted( () => {
 			dominant-baseline: middle;
 		}
 	}
-	.highlighted {
+
+	.axis:hover {
+		.title {
+			fill: darkblue;
+			font-weight: bold;
+		}
 
 		line {
-			stroke-width: 4px;
+			stroke-width: 2px;
 			stroke: darkblue;
 		}
-		text {
+		
+	}
+
+	.highlighted {
+		.title {
+			fill: darkblue;
+			font-weight: bold;
+		}
+
+		line {
 			stroke-width: 2px;
-			fill: darkblue;	
-			font-size: 0.8em;	
+			stroke: darkblue;
 		}
 	}
 }
