@@ -1,6 +1,5 @@
 <template>
     <div style="overflow: auto;">
-        <h3>Data list</h3>
         <table class="table table-sm table-striped">
             <thead>
                 <tr>

@@ -17,34 +17,30 @@
 				:transform="`translate(${plotParameters.padding} 0)`"> 
 				
 					<!-- Data line generator -->
-					<g v-for="(d, index) in data" :key="index">
-						<path 
-						fill="transparent" 
-						stroke-width="1"
-						v-if="dataPointFilterCheck(d) || !plotParameters.hideFiltered"
-						:stroke="getLineColor(d)"
-						:stroke-opacity="getLineOpacity(d)"
-						:transform="`translate(0 ${getPlotYBounds()[0]})`"
-						:d="lineGenerator(d)" />
+					<g stroke-width="1" fill="transparent">
+						<g v-for="(d, index) in data" :key="index">
+							<path 
+							v-if="dataPointFilterCheck(d) || !plotParameters.hideFiltered"
+							:stroke="getLineColor(d)"
+							:stroke-opacity="getLineOpacity(d)"
+							:transform="`translate(0 ${getPlotYBounds()[0]})`"
+							:d="lineGenerator(d)" />
+						</g>
 					</g>
 
 					<!-- Axis group -->
 					<g 
-						class="axis" 
-						v-for="c in categories" 
-						@click="selectCategory(c)"
-						@mouseover="highlightedCategoryName = c.title"
-						@mouseleave="highlightedCategoryName = null"
-						@mousedown.prevent="dragFilterStart($event, c)"
-						v-bind:class="{highlighted: highlightedCategoryName == c.title || selectedCategoryName == c.title}"
-						:key="c.position" 
-						:transform="`translate(${c.position*plotParameters.horizontalOffset} ${getPlotYBounds()[0]})`">	
+					class="axis" 
+					v-for="c in categories" 
+					@click="selectCategory(c)"
+					@mousedown.prevent="dragFilterStart($event, c)"
+					v-bind:class="{highlighted: selectedCategoryName == c.title}"
+					:key="c.position" 
+					:transform="`translate(${c.position*plotParameters.horizontalOffset} ${getPlotYBounds()[0]})`">	
 
+						<!-- Hitbox -->
 						<rect 
 						class="filter-hitbox"
-						x="-10"
-						y="-20"
-						width="20"
 						:height="getAxisLength()+40"
 						/>
 
@@ -52,9 +48,7 @@
 						<g v-for="(f, index) in filters[c.title]" :key="index">
 							<rect 
 							class="filter-box"
-							x="-8" 
 							:y="c.scaleLinear(f.thresholdB)*getAxisLength()" 
-							width="16" 
 							:height="(c.scaleLinear(f.thresholdA)-c.scaleLinear(f.thresholdB))*getAxisLength()" />
 						</g>
 						
@@ -63,16 +57,14 @@
 							<g v-if="plotVariables.currentFilterCategory.title === c.title">
 								<rect 
 								class="filter-box-proto"
-								x="-8"
-								width="16"
 								:y="Math.min(plotVariables.currentFilterStartValue, plotVariables.currentFilterEndValue) - plotParameters.padding"
 								:height="Math.abs(plotVariables.currentFilterEndValue - plotVariables.currentFilterStartValue)"
 								/>
 							</g>
 						</g>
+						
 						<!-- Axis label -->
 						<text 
-							x="0" 
 							:y="getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10)" 
 							class="title" 
 							:transform="`rotate(${plotParameters.axisTitleRotation} 0 ${getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10)})`">
@@ -100,6 +92,7 @@ import * as d3 from "d3"
 
 import Category from "@/models/plots/Category"
 import DataFilter from "@/models/plots/DataFilter"
+import dataUtils from "@/utils/data-utils"
 
 // Layout references
 const plotCanvas = ref(null)
@@ -119,7 +112,6 @@ const plotVariables = reactive({
 	mousedown: false,
 	currentFilterStartTime: 0,
 	currentFilterDeltaTime: 0,
-	currentFilter: null,
 	currentFilterCategory: null,
 	currentFilterStartValue: 0,
 	currentFilterEndValue: 0
@@ -134,7 +126,6 @@ const settings = reactive({
 	colorScaleCategory: null,
 	colorScale: () => {return "black"}
 })
-const highlightedCategoryName = ref(null)
 const selectedCategoryName = ref(null)
 
 // Event buss listeners and triggers
@@ -164,7 +155,6 @@ defineExpose({
 });
 
 function lineGenerator(d) {
-
 	let dataCats = Object.keys(d)
 	let dataArray = Array(dataCats.length).fill(null)
 
@@ -174,10 +164,12 @@ function lineGenerator(d) {
 		if (!c)  {
 			continue
 		}
+		const x = dataUtils.mercilessDecimalDeleter(c.position*plotParameters.horizontalOffset, 1)
+		const y = dataUtils.mercilessDecimalDeleter(c.scaleLinear(d[c.title])*getAxisLength(), 1)
 
 		dataArray[c.position] = {
-			x: c.position*plotParameters.horizontalOffset, 
-			y: c.scaleLinear(d[c.title])*getAxisLength()
+			x: x, 
+			y: y
 		}
 	}
 
@@ -352,7 +344,6 @@ function dragFilterDone() {
 	}
 
 	plotVariables.currentFilterCategory = null
-	plotVariables.currentFilter = null
 	plotVariables.currentFilterStartValue = 0
 }
 
@@ -443,7 +434,6 @@ function updateContainerSize () {
 	updateHorizontalOffset()
 }
 
-
 function readFile ({file, delimiter} = object) {
 	if (delimiter === "\\t") delimiter = "\t";
 
@@ -532,6 +522,8 @@ onMounted( () => {
 			stroke-opacity: 0.5;
 			fill: purple;
 			fill-opacity: 0.3;
+			x: -8px;
+			width: 16px; 
 		}
 
 		.filter-box-proto {
@@ -539,14 +531,20 @@ onMounted( () => {
 			stroke-opacity: 0.8;
 			fill: yellow;
 			fill-opacity: 0.8;
+			x: -8px;
+			width: 16px;
 		}
 
 		.filter-hitbox {
 			stroke: transparent;
 			fill: transparent;
+			x: -10px;
+			y: -20px;
+			width: 20px;
 		}
 
 		.title {
+			x: 0px;
 			font-size: 0.8em;	
 			text-anchor: start;
 		}
@@ -557,16 +555,29 @@ onMounted( () => {
 			dominant-baseline: middle;
 		}
 	}
-	.highlighted {
+
+	.axis:hover {
+		.title {
+			fill: darkblue;
+			font-weight: bold;
+		}
 
 		line {
-			stroke-width: 4px;
+			stroke-width: 2px;
 			stroke: darkblue;
 		}
-		text {
+		
+	}
+
+	.highlighted {
+		.title {
+			fill: darkblue;
+			font-weight: bold;
+		}
+
+		line {
 			stroke-width: 2px;
-			fill: darkblue;	
-			font-size: 0.8em;	
+			stroke: darkblue;
 		}
 	}
 }
