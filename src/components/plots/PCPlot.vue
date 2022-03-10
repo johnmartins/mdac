@@ -38,6 +38,7 @@
 					:key="c.position" 
 					:transform="`translate(${c.position*plotParameters.horizontalOffset} ${getPlotYBounds()[0]})`">	
 
+						<!-- Hitbox -->
 						<rect 
 						class="filter-hitbox"
 						:height="getAxisLength()+40"
@@ -61,6 +62,7 @@
 								/>
 							</g>
 						</g>
+						
 						<!-- Axis label -->
 						<text 
 							:y="getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10)" 
@@ -110,7 +112,6 @@ const plotVariables = reactive({
 	mousedown: false,
 	currentFilterStartTime: 0,
 	currentFilterDeltaTime: 0,
-	currentFilter: null,
 	currentFilterCategory: null,
 	currentFilterStartValue: 0,
 	currentFilterEndValue: 0
@@ -154,8 +155,6 @@ defineExpose({
 });
 
 function lineGenerator(d) {
-	console.log(Date.now())
-
 	let dataCats = Object.keys(d)
 	let dataArray = Array(dataCats.length).fill(null)
 
@@ -345,7 +344,6 @@ function dragFilterDone() {
 	}
 
 	plotVariables.currentFilterCategory = null
-	plotVariables.currentFilter = null
 	plotVariables.currentFilterStartValue = 0
 }
 
@@ -435,7 +433,6 @@ function updateContainerSize () {
 
 	updateHorizontalOffset()
 }
-
 
 function readFile ({file, delimiter} = object) {
 	if (delimiter === "\\t") delimiter = "\t";
