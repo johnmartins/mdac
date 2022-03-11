@@ -7,6 +7,7 @@
 			width="100%" 
 			ref="plotCanvas"
 			tabindex="0"
+			style="font-size: 1em;"
 			@mousemove="dragFilterBox"
 			@mouseup="dragFilterDone"
 			@keydown.delete="deleteCategory(categoryNameMap.get(selectedCategoryName))"
@@ -134,19 +135,31 @@ const selectedCategoryName = ref(null)
 const eventBus = inject('eventBus')
 eventBus.on('PlotTools.readFile', readFile)
 eventBus.on('PlotTools.deleteCategory', deleteCategory)
-eventBus.on('PlotTools.setFilteredDataOpacity', (v) => {
+eventBus.on('PlotTools.editCategory', (cAr) => {
+	editCategory(cAr[0], cAr[1])
+})
+
+eventBus.on('OptionsForm.setFilteredDataOpacity', (v) => {
 	plotParameters.filteredDataOpacity = v
 	plotParameters.hideFiltered = false
 	if (v < 0.01) {
 		plotParameters.hideFiltered = true
 	} 
 })
-eventBus.on('PlotTools.setDataOpacity', (v) => {
+eventBus.on('OptionsForm.setDataOpacity', (v) => {
 	plotParameters.defaultDataOpacity = v
 })
-eventBus.on('PlotTools.editCategory', (cAr) => {
-	editCategory(cAr[0], cAr[1])
+eventBus.on('OptionsForm.setTickSize', (v) => {
+	for (let e of document.querySelectorAll('text.tick-string')) {
+		e.style.fontSize = `${v}em`
+	}
 })
+eventBus.on('OptionsForm.setTitleSize', (v) => {
+	for (let e of document.querySelectorAll('text.title')) {
+		e.style.fontSize = `${v}em`
+	}
+})
+
 eventBus.on('ExportForm.exportRequest', handleExportRequest)
 eventBus.on('FilterElement.deleteFilter', deleteFilter)
 eventBus.on('FilterElement.editFilter', editFilter)
@@ -580,14 +593,16 @@ onMounted( () => {
 
 		.title {
 			x: 0px;
-			font-size: 0.8rem;	
+			font-size: 0.8em;	
 			text-anchor: start;
 		}
 
 		.tick-string {
-			font-size: 0.6rem;
+			font-size: 0.6em;
 			text-anchor: end;
 			dominant-baseline: middle;
+			font-weight: bold;
+
 		}
 	}
 

@@ -1,13 +1,18 @@
 .labeled-form {
     display: flex;
     justify-content: space-between;
-    font-size: 0.8rem;
+    font-size: 0.9em;
     align-items: center;
     span {
-        font-size: 0.8rem;
         margin-right: 8px;
+        white-space: nowrap;
     }
     select {
+        width: 100%;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    input {
         width: 100%;
     }
 }
