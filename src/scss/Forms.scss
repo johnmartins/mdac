@@ -1,0 +1,13 @@
+.labeled-form {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    align-items: center;
+    span {
+        font-size: 0.8rem;
+        margin-right: 8px;
+    }
+    select {
+        width: 100%;
+    }
+}

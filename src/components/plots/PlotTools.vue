@@ -57,6 +57,12 @@
             </div>
         </div>
 
+        <div class="card mt-3">
+            <ExportForm />
+        </div>
+
+
+
 
     </div>
 </template>
@@ -67,6 +73,8 @@ import { reactive, ref, onMounted, onUpdated, inject } from "vue"
 import TextInput from '@/components/inputs/TextInput.vue'
 import RangeInput from '@/components/inputs/RangeInput.vue'
 import FilterElement from '@/components/plots/FilterElement'
+import ExportForm from '@/components/forms/ExportForm'
+
 import Category from '@/models/plots/Category'
 
 const selectedCategory = ref(null)
@@ -142,20 +150,6 @@ function setFilteredDataOpacity (value) {
             text-align: left;
             input {
                 font-size: 0.8rem;
-            }
-        }
-
-        .labeled-form {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            align-items: center;
-            span {
-                font-size: 0.8rem;
-                margin-right: 8px;
-            }
-            select {
-                width: 100%;
             }
         }
     }
