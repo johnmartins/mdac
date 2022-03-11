@@ -50,11 +50,7 @@
         </div>
 
         <div class="card mt-3">
-            <div class="control-group p-2">
-                <strong>Options</strong>
-                <RangeInput :value="0.8" @change="setDataOpacity">Data opacity</RangeInput>
-                <RangeInput :value="0.05" @change="setFilteredDataOpacity">Filtered data opacity</RangeInput>
-            </div>
+            <OptionsForm />
         </div>
 
         <div class="card mt-3">
@@ -74,6 +70,7 @@ import TextInput from '@/components/inputs/TextInput.vue'
 import RangeInput from '@/components/inputs/RangeInput.vue'
 import FilterElement from '@/components/plots/FilterElement'
 import ExportForm from '@/components/forms/ExportForm'
+import OptionsForm from '@/components/forms/OptionsForm'
 
 import Category from '@/models/plots/Category'
 
@@ -129,14 +126,6 @@ function resetCategory () {
     selectedCategory.value = null
 
     setTimeout(() => {selectedCategory.value = resetCat}, 100)   
-}
-
-function setDataOpacity (value) {
-    eventBus.emit('PlotTools.setDataOpacity', value)
-}
-
-function setFilteredDataOpacity (value) {
-    eventBus.emit('PlotTools.setFilteredDataOpacity', value)
 }
 
 </script>

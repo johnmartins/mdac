@@ -42,22 +42,24 @@
 
 <style lang="scss" scoped>
 .title {
-    font-size: 0.8rem;
+    font-size: 0.8em;
 }
 
 .range-input-container {
     display: grid;
-    grid-template-columns: auto 80px; 
+    grid-template-columns: auto 60px; 
+    margin: 0;
+    padding: 0;
 
     label {
-        font-size: 0.8rem;
+        font-size: 0.8em;
         margin-bottom: 0;
     }
 
     input[type=number] {
         margin-left: 10px;
-        width: 70px;
-        font-size: 0.7rem;
+        width: 50px;
+        font-size: 0.7em;
         font-family: monospace;
         font-weight: bold;
     }
