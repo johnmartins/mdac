@@ -89,6 +89,8 @@
 <script setup>
 import { reactive, ref, onMounted, onUpdated, inject } from "vue"
 import * as d3 from "d3"
+import { saveAs } from "file-saver"
+import { saveSvgAsPng } from "save-svg-as-png"
 
 import Category from "@/models/plots/Category"
 import DataFilter from "@/models/plots/DataFilter"
@@ -145,6 +147,7 @@ eventBus.on('PlotTools.setDataOpacity', (v) => {
 eventBus.on('PlotTools.editCategory', (cAr) => {
 	editCategory(cAr[0], cAr[1])
 })
+eventBus.on('ExportForm.exportRequest', handleExportRequest)
 eventBus.on('FilterElement.deleteFilter', deleteFilter)
 eventBus.on('FilterElement.editFilter', editFilter)
 
@@ -489,6 +492,38 @@ function readFile ({file, delimiter} = object) {
 	}
 }
 
+function handleExportRequest (format) {
+	if (format === 'svg') {
+		exportCSV()
+	} else if (format === 'png') {
+		exportPNG()
+	} 
+	else {
+		console.error('Unknown format in export request')
+	}
+}
+
+function exportCSV () {
+	const csvElement = plotCanvas.value
+	var svgData = csvElement.innerHTML //put id of your svg element here
+	var head = '<svg title="graph" version="1.1" xmlns="http://www.w3.org/2000/svg">'
+	
+	let style = `<style>`
+	style += '.title {font-size: 0.8rem; text-anchor: start; x: 0px;}'
+	style += '.tick-string {font-size: 0.8rem; text-anchor: end; dominant-baseline: middle;}'
+	style += 'line {stroke: black; fill: transparent;}'
+	style += '.filter-box {stroke: black;stroke-opacity: 0.5;fill: purple;fill-opacity: 0.3;x: -8px;width: 16px;}'
+	style += '</style>'
+	var full_svg = head +  style + svgData + "</svg>"
+	var blob = new Blob([full_svg], {type: "image/svg+xml"});  
+	saveAs(blob, "PCPlot.svg");
+}
+
+function exportPNG () {
+	const csvElement = plotCanvas.value
+	saveSvgAsPng(csvElement, 'PCPlot.png')
+}
+
 onMounted( () => {
 	// Add listener for resize
 	window.onresize = updateContainerSize
@@ -545,12 +580,12 @@ onMounted( () => {
 
 		.title {
 			x: 0px;
-			font-size: 0.8em;	
+			font-size: 0.8rem;	
 			text-anchor: start;
 		}
 
 		.tick-string {
-			font-size: 0.6em;
+			font-size: 0.6rem;
 			text-anchor: end;
 			dominant-baseline: middle;
 		}

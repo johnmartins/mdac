@@ -6,6 +6,8 @@
 
 <style lang="scss">
 
+@import "@/scss/GlobalStyles.scss";
+
 $nav-height: 60px;
 
 #app {
