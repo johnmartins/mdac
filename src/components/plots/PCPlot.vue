@@ -90,6 +90,7 @@
 import { reactive, ref, onMounted, onUpdated, inject } from "vue"
 import * as d3 from "d3"
 import { saveAs } from "file-saver"
+import { saveSvgAsPng } from "save-svg-as-png"
 
 import Category from "@/models/plots/Category"
 import DataFilter from "@/models/plots/DataFilter"
@@ -494,7 +495,10 @@ function readFile ({file, delimiter} = object) {
 function handleExportRequest (format) {
 	if (format === 'svg') {
 		exportCSV()
-	} else {
+	} else if (format === 'png') {
+		exportPNG()
+	} 
+	else {
 		console.error('Unknown format in export request')
 	}
 }
@@ -513,6 +517,11 @@ function exportCSV () {
 	var full_svg = head +  style + svgData + "</svg>"
 	var blob = new Blob([full_svg], {type: "image/svg+xml"});  
 	saveAs(blob, "PCPlot.svg");
+}
+
+function exportPNG () {
+	const csvElement = plotCanvas.value
+	saveSvgAsPng(csvElement, 'PCPlot.png')
 }
 
 onMounted( () => {

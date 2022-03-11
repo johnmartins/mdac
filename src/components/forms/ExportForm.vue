@@ -3,7 +3,7 @@
         <strong>Export</strong>
         <div class="labeled-form">
             <span>Format: </span>
-            <select>
+            <select ref="formatSelector">
                 <option value="png">Image (PNG)</option>
                 <option value="svg">Vector (SVG)</option>
             </select>
@@ -19,11 +19,12 @@ import { reactive, ref, inject } from "vue"
 
 // DOM references
 const downloadButton = ref(null)
+const formatSelector = ref(null)
 
 const eventBus = inject('eventBus')
 
 function exportRequest(evt) {
-    eventBus.emit('ExportForm.exportRequest', 'svg')
+    eventBus.emit('ExportForm.exportRequest', formatSelector.value.value)
 }
 
 </script>
