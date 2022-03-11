@@ -503,7 +503,13 @@ function exportCSV () {
 	const csvElement = plotCanvas.value
 	var svgData = csvElement.innerHTML //put id of your svg element here
 	var head = '<svg title="graph" version="1.1" xmlns="http://www.w3.org/2000/svg">'
-	let style = `<style>.title {x: 0px; font-size: 0.8rem; text-anchor: start;}</style>`
+	
+	let style = `<style>`
+	style += '.title {font-size: 0.8rem; text-anchor: start; x: 0px;}'
+	style += '.tick-string {font-size: 0.8rem; text-anchor: end; dominant-baseline: middle;}'
+	style += 'line {stroke: black; fill: transparent;}'
+	style += '.filter-box {stroke: black;stroke-opacity: 0.5;fill: purple;fill-opacity: 0.3;x: -8px;width: 16px;}'
+	style += '</style>'
 	var full_svg = head +  style + svgData + "</svg>"
 	var blob = new Blob([full_svg], {type: "image/svg+xml"});  
 	saveAs(blob, "PCPlot.svg");
