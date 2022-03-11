@@ -521,7 +521,7 @@ function exportCSV () {
 
 function exportPNG () {
 	const csvElement = plotCanvas.value
-	saveSvgAsPng(csvElement, 'PCPlot.png')
+	saveSvgAsPng(csvElement, 'PCPlot.png', {encoderOptions: 1, backgroundColor: 'white', scale: 2})
 }
 
 onMounted( () => {
