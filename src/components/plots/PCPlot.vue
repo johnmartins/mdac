@@ -109,7 +109,8 @@ const plotParameters = reactive({
 	defaultDataOpacity: 0.8,
 	filteredDataOpacity: 0.05,
 	filterMinDragTime: 125, // ms
-	hideFiltered: false
+	hideFiltered: false,
+	curveType: 'curve'
 })
 const plotVariables = reactive({
 	mousedown: false,
@@ -159,6 +160,7 @@ eventBus.on('OptionsForm.setTitleSize', (v) => {
 		e.style.fontSize = `${v}em`
 	}
 })
+eventBus.on('OptionsForm.setCurveType', (v) => {plotParameters.curveType = v})
 
 eventBus.on('ExportForm.exportRequest', handleExportRequest)
 eventBus.on('FilterElement.deleteFilter', deleteFilter)
@@ -192,11 +194,18 @@ function lineGenerator(d) {
 	const lengthPreFilter = dataArray.length
 	dataArray = dataArray.filter((obj) => { return obj != null })
 	const lengthPostFilter = dataArray.length
+
+	let d3CurveType = d3.curveMonotoneX
+	if (plotParameters.curveType === 'curve') {
+		d3CurveType = d3.curveMonotoneX
+	} else if (plotParameters.curveType === 'line') {
+		d3CurveType = d3.curveLinear
+	}
 	
 	return d3.line([])
 		.x((de) => {return de.x})
 		.y((de) => {return de.y})
-		.curve(d3.curveMonotoneX)
+		.curve(d3CurveType)
 		(dataArray)
 }
 
