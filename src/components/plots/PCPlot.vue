@@ -110,7 +110,7 @@ const plotParameters = reactive({
 	filteredDataOpacity: 0.05,
 	filterMinDragTime: 125, // ms
 	hideFiltered: false,
-	curveType: 'line'
+	curveType: 'curve'
 })
 const plotVariables = reactive({
 	mousedown: false,
