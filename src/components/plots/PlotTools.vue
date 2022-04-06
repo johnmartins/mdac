@@ -15,24 +15,8 @@
                 </div>
             </div>
         </div>
-        <div class="card mt-3" v-if="selectedCategoryChanged">
-            <div class="control-group p-2">
-                <strong>Selected category</strong>
 
-                <TextInput :value="selectedCategory.title.toString()">Title</TextInput>
-                <TextInput :value="selectedCategory.lb" @change="(v) => {selectedCategoryChanged.lb=parseFloat(v)}">LB</TextInput>
-                <TextInput :value="selectedCategory.ub" @change="(v) => {selectedCategoryChanged.ub=parseFloat(v)}">UB</TextInput>
-                <TextInput :value="selectedCategory.position" @change="(v) => {selectedCategoryChanged.position=parseInt(v)}">Position</TextInput>
-                <TextInput :value="selectedCategory.ticks" @change="(v) => {selectedCategoryChanged.ticks=parseInt(v)}">Ticks</TextInput>
-
-            </div>
-            <div class="btn-group px-2 mb-2">
-                <button class="btn btn-success btn-sm" @click="editCategory">Update</button>
-                <button class="btn btn-warning btn-sm" @click="resetCategory">Reset</button>
-                <button class="btn btn-danger btn-sm" @click="deleteCategory">Delete</button>
-            </div>
-
-        </div>
+        <EditCategoryForm />
 
         <div class="card mt-3">
             <div class="control-group p-2">
@@ -56,26 +40,18 @@
         <div class="card mt-3">
             <ExportForm />
         </div>
-
-
-
-
     </div>
 </template>
 
 <script setup>
 
-import { reactive, ref, onMounted, onUpdated, inject } from "vue"
-import TextInput from '@/components/inputs/TextInput.vue'
-import RangeInput from '@/components/inputs/RangeInput.vue'
+import { reactive, ref, inject } from "vue"
 import FilterElement from '@/components/plots/FilterElement'
 import ExportForm from '@/components/forms/ExportForm'
 import OptionsForm from '@/components/forms/OptionsForm'
-
-import Category from '@/models/plots/Category'
+import EditCategoryForm from '@/components/forms/EditCategoryForm'
 
 const selectedCategory = ref(null)
-const selectedCategoryChanged = ref(null)
 const filters = reactive([])
 
 // DOM references
@@ -84,17 +60,7 @@ const fileInput = ref(null)
 
 // Listeners
 const eventBus = inject('eventBus')
-eventBus.on('PCPlot.selectCategory', (c) => {
-    if (!c) {
-         selectedCategory.value = null
-         selectedCategoryChanged.value = null
-         return
-    }
-
-    selectedCategory.value = c
-    selectedCategoryChanged.value = new Category(
-        c.title, c.lb, c.ub, c.position, c.ticks)
-})
+eventBus.on('PCPlot.selectCategory', (c) => selectedCategory.value = c)
 eventBus.on('PCPlot.addFilter', (f) => {
     filters.push(f)
 })
@@ -113,33 +79,11 @@ function readFile () {
     eventBus.emit('PlotTools.readFile', {file: fileInput.value.files[0], delimiter: fileDelimiterSelect.value.value})
 }
 
-function deleteCategory () {
-    eventBus.emit('PlotTools.deleteCategory', selectedCategory.value)
-}
-
-function editCategory () {
-    eventBus.emit('PlotTools.editCategory', [selectedCategory.value, selectedCategoryChanged.value])
-}
-
-function resetCategory () {
-    const resetCat = selectedCategory.value;
-    selectedCategory.value = null
-
-    setTimeout(() => {selectedCategory.value = resetCat}, 100)   
-}
-
 </script>
 
 <style lang="scss" scoped>
     .plot-tools-container {
         font-size: 0.8rem;
         overflow-y: auto;
-
-        .control-group {
-            text-align: left;
-            input {
-                font-size: 0.8rem;
-            }
-        }
     }
 </style>
