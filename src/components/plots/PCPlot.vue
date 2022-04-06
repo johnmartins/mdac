@@ -69,7 +69,7 @@
 							:y="getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10)" 
 							class="title" 
 							:transform="`rotate(${plotParameters.axisTitleRotation} 0 ${getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10)})`">
-							{{c.title}}
+							{{c.titlePreviewed}}
 						</text>
 						
 						<!-- Axis vertical line -->
@@ -136,9 +136,6 @@ const selectedCategoryName = ref(null)
 const eventBus = inject('eventBus')
 eventBus.on('PlotTools.readFile', readFile)
 eventBus.on('PlotTools.deleteCategory', deleteCategory)
-eventBus.on('PlotTools.editCategory', (cAr) => {
-	editCategory(cAr[0], cAr[1])
-})
 
 eventBus.on('OptionsForm.setFilteredDataOpacity', (v) => {
 	plotParameters.filteredDataOpacity = v
@@ -173,6 +170,7 @@ defineExpose({
 });
 
 function lineGenerator(d) {
+	console.log("Generating lines!")
 	let dataCats = Object.keys(d)
 	let dataArray = Array(dataCats.length).fill(null)
 
@@ -218,11 +216,6 @@ function addCategory(c) {
 	updateHorizontalOffset()
 	categoryNameMap.set(c.title, c)
 	eventBus.emit('PCPlot.addCategory', c)
-}
-
-function editCategory(oldC, newC) {
-	const currentC = categoryNameMap.get(oldC.title)
-	currentC.morph(newC)
 }
 
 function deleteCategory(c) {

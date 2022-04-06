@@ -4,7 +4,8 @@ class Category {
 
     static count = 0
 
-    constructor (title, lb, ub, position=Category.count, ticks=5) {
+    constructor (title, lb, ub, position=Category.count, ticks=5, titlePreviewed=null) {
+        this.titlePreviewed = titlePreviewed === null ? title : titlePreviewed
         this.title = title
         this.lb = lb
         this.ub = ub
@@ -12,6 +13,7 @@ class Category {
         this.ticks = ticks
         this.magnitude = this.lb > 0 ? Math.floor(Math.log10(this.lb)) : 0
         this.id = Category.count
+        this.disabled = false
 
         Category.count++
     }
@@ -54,11 +56,13 @@ class Category {
     }
 
     morph (c) {
+        this.titlePreviewed = c.titlePreviewed
         this.title = c.title
         this.lb = c.lb
         this.ub = c.ub
         this.position = c.position
         this.ticks = c.ticks
+        this.disabled = c.disabled
     }
 }
 
