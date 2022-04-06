@@ -30,7 +30,6 @@ let selectedCategoryChanged = ref(null)
 
 const eventBus = inject('eventBus')
 eventBus.on('PCPlot.selectCategory', (c) => {
-    console.log("...")
     if (!c) {
          selectedCategory.value = null
          selectedCategoryChanged.value = null
@@ -48,8 +47,6 @@ function deleteCategory () {
 
 function editCategory () {
     selectedCategory.value.morph(selectedCategoryChanged.value)
-    console.log(selectedCategoryChanged.value)
-    console.log(selectedCategory.value)
 }
 
 function resetCategory () {

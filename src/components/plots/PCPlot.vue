@@ -170,7 +170,6 @@ defineExpose({
 });
 
 function lineGenerator(d) {
-	console.log("Generating lines!")
 	let dataCats = Object.keys(d)
 	let dataArray = Array(dataCats.length).fill(null)
 
