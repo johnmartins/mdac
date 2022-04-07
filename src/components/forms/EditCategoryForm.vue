@@ -36,21 +36,24 @@ eventBus.on('PCPlot.selectCategory', (c) => {
          return
     }
     selectedCategory.value = c
-    let newCat = new Category()
-    newCat.morph(c)
+
+    // Create a temporary new category, and copy all information from the selected category to the temporary category
+    let newCat = new Category("$$TEMPORARY_CATEGORY$$", 0, 1, {overwrite: true})
+    newCat.morph(c, {migrateReference: false})
     selectedCategoryChanged.value = newCat
 })
 
 function deleteCategory () {
-    eventBus.emit('PlotTools.deleteCategory', selectedCategory.value)
+    eventBus.emit('EditCategoryForm.deleteCategory', selectedCategory.value)
 }
 
 function editCategory () {
-    selectedCategory.value.morph(selectedCategoryChanged.value)
+    selectedCategory.value.morph(selectedCategoryChanged.value, {migrateReference: false})
+    eventBus.emit('EditCategoryForm.editCategory', selectedCategory.value)
 }
 
 function resetCategory () {
-    selectedCategoryChanged.value.morph(selectedCategory.value)
+    selectedCategoryChanged.value.morph(selectedCategory.value, {migrateReference: false})
 }
 
 

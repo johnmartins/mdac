@@ -10,8 +10,8 @@
         <div>
             <span v-if="thresholdA <= thresholdB">&le;</span> <span v-else>&ge;</span>
         </div>
-        <div class="property-container">
-            {{filter.property}}
+        <div class="category-container">
+            <span v-if="categoryInfo.sourceObject">{{categoryInfo.displayTitle}}</span>
         </div>
         <div>
             <span v-if="thresholdA <= thresholdB">&le;</span> <span v-else>&ge;</span>
@@ -31,18 +31,28 @@
 </template>
 
 <script setup>
-import { inject, ref, onMounted } from "vue"
+import { inject, ref, onMounted, reactive } from "vue"
 import DataFilter from '@/models/plots/DataFilter'
+import Category from '@/models/plots/Category'
 
     const props = defineProps({
         filter: Object
     })
     const eventBus = inject('eventBus')
+    eventBus.on('EditCategoryForm.editCategory', (c) => {
+        if (c.id == categoryInfo.sourceObject.id) {
+            categoryInfo.displayTitle = c.titlePreviewed
+        }
+    })
 
     const inputThresholdA = ref(null)
     const inputThresholdB = ref(null)
     const thresholdA = ref(0)
     const thresholdB = ref(1)
+    const categoryInfo = reactive({
+        sourceObject: null,
+        displayTitle: null
+    })
 
     const componentParameters = {
         stepSize: Math.pow(10, Math.floor(Math.log10(props.filter.thresholdA)))/100,
@@ -53,7 +63,8 @@ import DataFilter from '@/models/plots/DataFilter'
         inputThresholdB.value.value = Math.round(props.filter.thresholdB*100)/100
         thresholdA.value = Math.round(props.filter.thresholdA*100)/100
         thresholdB.value = Math.round(props.filter.thresholdB*100)/100
-
+        categoryInfo.sourceObject = Category.lookup(props.filter.targetCategoryTitle)
+        categoryInfo.displayTitle = categoryInfo.sourceObject.titlePreviewed
     })
 
     function deleteFilter () {
@@ -68,7 +79,7 @@ import DataFilter from '@/models/plots/DataFilter'
         thresholdB.value = tB
 
         const of = props.filter
-        const nf = new DataFilter(of.property, tA, tB)
+        const nf = new DataFilter(of.targetCategoryTitle, tA, tB)
 
         eventBus.emit('FilterElement.editFilter', [of, nf])
     }
@@ -81,7 +92,7 @@ import DataFilter from '@/models/plots/DataFilter'
         display: grid;
         grid-template-columns: 25% 8px auto 8px 25% 5px; 
 
-        .property-container {
+        .category-container {
             font-weight: bold;
             text-align: center;
             overflow: hidden;

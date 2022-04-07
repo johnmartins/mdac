@@ -3,8 +3,18 @@ import * as d3 from "d3"
 class Category {
 
     static count = 0
+    static lookupTable = new Map()
 
-    constructor (title, lb, ub, position=Category.count, ticks=5, titlePreviewed=null) {
+    constructor (title, lb, ub, 
+        {ticks=5, titlePreviewed=null, overwrite=false, position=Category.lookupTable.size} = {}) { 
+
+        // Validate input
+        if (Category.lookupTable.get(title) && !overwrite) {
+            throw new Error(`Data category with title "${title}" already exists. 
+            For the plot to function as intended, the header may only contain unique titles.`)
+        } 
+
+        // Configure instance
         this.titlePreviewed = titlePreviewed === null ? title : titlePreviewed
         this.title = title
         this.lb = lb
@@ -15,7 +25,9 @@ class Category {
         this.id = Category.count
         this.disabled = false
 
+        // Manage static variables
         Category.count++
+        Category.lookupTable.set(this.title, this)
     }
 
     getTickString (value) {
@@ -55,14 +67,27 @@ class Category {
         return ta
     }
 
-    morph (c) {
+    morph (c, {migrateReference = false} = {}) {
         this.titlePreviewed = c.titlePreviewed
         this.title = c.title
+        this.id = c.id
         this.lb = c.lb
         this.ub = c.ub
         this.position = c.position
         this.ticks = c.ticks
         this.disabled = c.disabled
+
+        if (migrateReference) { 
+            Category.lookupTable.set(this.title, this)
+        }
+    }
+
+    static wipeLookupTable () {
+        Category.lookupTable.clear()
+    }
+
+    static lookup (title) {
+        return Category.lookupTable.get(title)
     }
 }
 
