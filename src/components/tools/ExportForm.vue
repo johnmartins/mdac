@@ -1,15 +1,17 @@
 <template>
-    <div class="control-group p-2">
-        <strong>Export</strong>
-        <div class="labeled-form">
-            <span>Format: </span>
-            <select ref="formatSelector">
-                <option value="png">Image (PNG)</option>
-                <option value="svg">Vector (SVG)</option>
-            </select>
-        </div>
-        <div class="d-grid gap-2 mt-2">
-            <button class="btn btn-sm btn-primary" @click="exportRequest">Download</button>
+    <div class="card mt-3">
+        <div class="control-group p-2">
+            <strong>Export</strong>
+            <div class="labeled-form">
+                <span>Format: </span>
+                <select ref="formatSelector">
+                    <option value="png">Image (PNG)</option>
+                    <option value="svg">Vector (SVG)</option>
+                </select>
+            </div>
+            <div class="d-grid gap-2 mt-2">
+                <button class="btn btn-sm btn-primary" @click="exportRequest">Download</button>
+            </div>
         </div>
     </div>
 </template>

@@ -1,26 +1,28 @@
 <template>
-    <div class="control-group p-2">
-        <strong>Graphical options</strong>
+    <div class="card mt-3">
+        <div class="control-group p-2">
+            <strong>Graphical options</strong>
 
-        <RangeInput :value="0.8" @change="setDataOpacity">Data opacity</RangeInput>
-        <RangeInput :value="0.05" @change="setFilteredDataOpacity">Filtered data opacity</RangeInput>
+            <RangeInput :value="0.8" @change="setDataOpacity">Data opacity</RangeInput>
+            <RangeInput :value="0.05" @change="setFilteredDataOpacity">Filtered data opacity</RangeInput>
 
-        <div class="labeled-form mb-2" @change="setCurveType">
-            <span>Curve type: </span>
-            <select ref="lineFormatSelector">
-                <option value="curve">Curve</option>
-                <option value="line">Line</option>
-            </select>
+            <div class="labeled-form mb-2" @change="setCurveType">
+                <span>Curve type: </span>
+                <select ref="lineFormatSelector">
+                    <option value="curve">Curve</option>
+                    <option value="line">Line</option>
+                </select>
+            </div>
+
+            <div class="labeled-form">
+                <span>Title size:</span>
+                <input class="me-2" type="number" step="0.1" value="0.8" max="5" min="0" @change="setTitleSize"/>
+                <span>Tick size:</span>
+                <input type="number" step="0.1" value="0.6" max="5" min="0" @change="setTickSize"/>
+            </div>
+
+
         </div>
-
-        <div class="labeled-form">
-            <span>Title size:</span>
-            <input class="me-2" type="number" step="0.1" value="0.8" max="5" min="0" @change="setTitleSize"/>
-            <span>Tick size:</span>
-            <input type="number" step="0.1" value="0.6" max="5" min="0" @change="setTickSize"/>
-        </div>
-
-
     </div>
 </template>
 
