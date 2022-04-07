@@ -2,8 +2,8 @@
     <div class="card mt-3" v-if="selectedCategoryChanged">
         <div class="control-group p-2">
             <strong>Edit selected category</strong>
-            <TextInput :value="selectedCategoryChanged.titlePreviewed.toString()"
-                @change="(v) => {selectedCategoryChanged.titlePreviewed=v}">Title</TextInput>
+            <TextInput :value="selectedCategoryChanged.displayTitle.toString()"
+                @change="(v) => {selectedCategoryChanged.displayTitle=v}">Title</TextInput>
             <TextInput :value="selectedCategoryChanged.ub" 
                 @change="(v) => {selectedCategoryChanged.ub=parseFloat(v)}">UB</TextInput>
             <TextInput :value="selectedCategoryChanged.lb" 

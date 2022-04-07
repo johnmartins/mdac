@@ -69,7 +69,7 @@
 							:y="getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10)" 
 							class="title" 
 							:transform="`rotate(${plotParameters.axisTitleRotation} 0 ${getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10)})`">
-							{{c.titlePreviewed}}
+							{{c.displayTitle}}
 						</text>
 						
 						<!-- Axis vertical line -->

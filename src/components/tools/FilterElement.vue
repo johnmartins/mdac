@@ -41,7 +41,7 @@ import Category from '@/models/plots/Category'
     const eventBus = inject('eventBus')
     eventBus.on('EditCategoryForm.editCategory', (c) => {
         if (c.id == categoryInfo.sourceObject.id) {
-            categoryInfo.displayTitle = c.titlePreviewed
+            categoryInfo.displayTitle = c.displayTitle
         }
     })
 
@@ -64,7 +64,7 @@ import Category from '@/models/plots/Category'
         thresholdA.value = Math.round(props.filter.thresholdA*100)/100
         thresholdB.value = Math.round(props.filter.thresholdB*100)/100
         categoryInfo.sourceObject = Category.lookup(props.filter.targetCategoryTitle)
-        categoryInfo.displayTitle = categoryInfo.sourceObject.titlePreviewed
+        categoryInfo.displayTitle = categoryInfo.sourceObject.displayTitle
     })
 
     function deleteFilter () {

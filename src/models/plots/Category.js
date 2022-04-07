@@ -6,7 +6,7 @@ class Category {
     static lookupTable = new Map()
 
     constructor (title, lb, ub, 
-        {ticks=5, titlePreviewed=null, overwrite=false, position=Category.lookupTable.size} = {}) { 
+        {ticks=5, displayTitle=null, overwrite=false, position=Category.lookupTable.size} = {}) { 
 
         // Validate input
         if (Category.lookupTable.get(title) && !overwrite) {
@@ -15,7 +15,7 @@ class Category {
         } 
 
         // Configure instance
-        this.titlePreviewed = titlePreviewed === null ? title : titlePreviewed
+        this.displayTitle = displayTitle === null ? title : displayTitle
         this.title = title
         this.lb = lb
         this.ub = ub
@@ -68,7 +68,7 @@ class Category {
     }
 
     morph (c, {migrateReference = false} = {}) {
-        this.titlePreviewed = c.titlePreviewed
+        this.displayTitle = c.displayTitle
         this.title = c.title
         this.id = c.id
         this.lb = c.lb
