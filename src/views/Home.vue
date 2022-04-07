@@ -25,8 +25,8 @@
 <script setup>
 import { reactive, ref, onMounted, onUpdated } from "vue"
 
-import PCPlot from '@/components/plots/PCPlot.vue'
-import PlotTools from '@/components/plots/PlotTools'
+import PCPlot from '@/components/plot-layouts/PCPlot/PCPlot.vue'
+import PlotTools from '@/components/plot-layouts/PCPlot/PCPSideMenu'
 import DataList from '@/components/DataList'
 
 const pcdContainer = ref(null)

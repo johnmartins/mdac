@@ -28,8 +28,6 @@
                 <div v-else>
                     <span style="font-size: 0.8em;">No filters have been applied</span>
                 </div>
-                
-
             </div>
         </div>
 
@@ -46,10 +44,10 @@
 <script setup>
 
 import { reactive, ref, inject } from "vue"
-import FilterElement from '@/components/plots/FilterElement'
-import ExportForm from '@/components/forms/ExportForm'
-import OptionsForm from '@/components/forms/OptionsForm'
-import EditCategoryForm from '@/components/forms/EditCategoryForm'
+import FilterElement from '@/components/tools/FilterElement'
+import ExportForm from '@/components/tools/ExportForm'
+import OptionsForm from '@/components/tools/OptionsForm'
+import EditCategoryForm from '@/components/tools/EditCategoryForm'
 
 const selectedCategory = ref(null)
 const filters = reactive([])
