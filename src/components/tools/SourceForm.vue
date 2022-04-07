@@ -27,7 +27,7 @@ const fileInput = ref(null)
 const eventBus = inject('eventBus')
 
 function readFile () {
-    eventBus.emit('PlotTools.readFile', {file: fileInput.value.files[0], delimiter: fileDelimiterSelect.value.value})
+    eventBus.emit('SourceForm.readFile', {file: fileInput.value.files[0], delimiter: fileDelimiterSelect.value.value})
 }
 </script>
 

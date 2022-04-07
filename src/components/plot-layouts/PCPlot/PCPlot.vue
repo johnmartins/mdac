@@ -134,7 +134,7 @@ const selectedCategoryName = ref(null)
 
 // Event buss listeners and triggers
 const eventBus = inject('eventBus')
-eventBus.on('PlotTools.readFile', readFile)
+eventBus.on('SourceForm.readFile', readFile)
 eventBus.on('EditCategoryForm.deleteCategory', deleteCategory)
 
 eventBus.on('OptionsForm.setFilteredDataOpacity', (v) => {
