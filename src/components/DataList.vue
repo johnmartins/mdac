@@ -32,7 +32,7 @@ const data = ref([])
 eventBus.on('PCPlot.readData', setData)
 eventBus.on('PCPlot.addCategory', (c) => categories.value.push(c))
 eventBus.on('PCPlot.onFilterChange', setData)
-eventBus.on('PlotTools.readFile', clearCategories)
+eventBus.on('SourceForm.readFile', clearCategories)
 
 function clearCategories () {
     categories.value = []

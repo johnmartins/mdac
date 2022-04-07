@@ -69,7 +69,7 @@
 							:y="getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10)" 
 							class="title" 
 							:transform="`rotate(${plotParameters.axisTitleRotation} 0 ${getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10)})`">
-							{{c.titlePreviewed}}
+							{{c.displayTitle}}
 						</text>
 						
 						<!-- Axis vertical line -->
@@ -134,8 +134,8 @@ const selectedCategoryName = ref(null)
 
 // Event buss listeners and triggers
 const eventBus = inject('eventBus')
-eventBus.on('PlotTools.readFile', readFile)
-eventBus.on('PlotTools.deleteCategory', deleteCategory)
+eventBus.on('SourceForm.readFile', readFile)
+eventBus.on('EditCategoryForm.deleteCategory', deleteCategory)
 
 eventBus.on('OptionsForm.setFilteredDataOpacity', (v) => {
 	plotParameters.filteredDataOpacity = v
@@ -376,10 +376,10 @@ function onFilterChange() {
 }
 
 function addFilter(f) {
-	if (!filters[f.property]) {
-		filters[f.property] = []
+	if (!filters[f.targetCategoryTitle]) {
+		filters[f.targetCategoryTitle] = []
 	}
-	filters[f.property].push(f)
+	filters[f.targetCategoryTitle].push(f)
 
 	eventBus.emit('PCPlot.addFilter', f)
 	onFilterChange();
@@ -387,8 +387,8 @@ function addFilter(f) {
 
 function deleteFilter(filterToDelete) {
 	let deleteIndex = -1
-	for (let i = 0; i < filters[filterToDelete.property].length; i++) {
-		const f = filters[filterToDelete.property][i]
+	for (let i = 0; i < filters[filterToDelete.targetCategoryTitle].length; i++) {
+		const f = filters[filterToDelete.targetCategoryTitle][i]
 		if (f.id === filterToDelete.id) {
 			deleteIndex = i
 			break;
@@ -398,7 +398,7 @@ function deleteFilter(filterToDelete) {
 		console.error('Failed to identify filter to delete.')
 	}
 
-	filters[filterToDelete.property].splice(deleteIndex, 1)
+	filters[filterToDelete.targetCategoryTitle].splice(deleteIndex, 1)
 	eventBus.emit('PCPlot.deleteFilter', filterToDelete)
 	onFilterChange()
 }
@@ -408,8 +408,8 @@ function editFilter (changeArray) {
 	const newFilter = changeArray[1]
 
 	let changeIndex = -1
-	for (let i = 0; i < filters[oldFilter.property].length; i++) {
-		const f = filters[oldFilter.property][i]
+	for (let i = 0; i < filters[oldFilter.targetCategoryTitle].length; i++) {
+		const f = filters[oldFilter.targetCategoryTitle][i]
 
 		if (f.id == oldFilter.id) {
 			changeIndex = i
@@ -418,7 +418,7 @@ function editFilter (changeArray) {
 	}
 
 	if (changeIndex >= 0) {
-		const f = filters[oldFilter.property][changeIndex]
+		const f = filters[oldFilter.targetCategoryTitle][changeIndex]
 		f.thresholdA = newFilter.thresholdA
 		f.thresholdB = newFilter.thresholdB
 	}
@@ -455,6 +455,7 @@ function readFile ({file, delimiter} = object) {
 	if (delimiter === "\\t") delimiter = "\t";
 
 	// Clear any existing state
+	Category.wipeLookupTable()
 	data.value = []
 	categories.value = []
 	categoryNameMap.clear()
