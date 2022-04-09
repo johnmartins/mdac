@@ -134,6 +134,7 @@ const selectedCategoryName = ref(null)
 
 // Event buss listeners and triggers
 const eventBus = inject('eventBus')
+eventBus.on('Layout.contentResize', updateContainerSize)
 eventBus.on('SourceForm.readFile', readFile)
 eventBus.on('EditCategoryForm.deleteCategory', deleteCategory)
 
@@ -162,12 +163,6 @@ eventBus.on('OptionsForm.setCurveType', (v) => {plotParameters.curveType = v})
 eventBus.on('ExportForm.exportRequest', handleExportRequest)
 eventBus.on('FilterElement.deleteFilter', deleteFilter)
 eventBus.on('FilterElement.editFilter', editFilter)
-
-
-// Expose methods from this container to parent containers
-defineExpose({
-	updateContainerSize,
-});
 
 function lineGenerator(d) {
 	let dataCats = Object.keys(d)

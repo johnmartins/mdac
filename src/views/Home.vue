@@ -5,18 +5,27 @@
 				MDAC
 			</div>
 			<div class="nav-container">
-				<span class="link" @click="setView('plot')">Plot</span>
-				<span class="link" @click="setView('data')">Data</span>
+				<span class="link" @click="setView('pcp')" :class="{active: activeView === 'pcp'}">PCP</span>
+				<span class="link" @click="setView('scatter')" :class="{active: activeView === 'scatter'}">Scatter</span>
+				<span class="link" @click="setView('data')" :class="{active: activeView === 'data'}">Data</span>
 			</div>
 		</div>
 		<div class="content-container">
-			<div class="pcd-tab-container" ref="pcdContainer">
-				<PlotTools/>
-				<div id="menu-resize-border" class="resize-border-v" @mousedown="resizeMenu"></div>
-				<PCPlot ref="plot"/>
+			<div ref="pcpContainer" class="fill-content">
+				<SidebarLayout ref="pcpContainer">
+					<template #sidebar><PlotTools /></template>
+					<PCPlot ref="plot"/>
+				</SidebarLayout>
 			</div>
-			<div class="data-tab-container" ref="dataContainer" style="display: none;">
-				<DataList/>
+			<div  ref="dataContainer" class="fill-content" style="display: none;">
+				<BoxLayout>
+					<DataList/>
+				</BoxLayout>
+			</div>
+			<div ref="scatterContainer" class="fill-content" style="display: none;">
+				<BoxLayout>
+					Blah
+				</BoxLayout>
 			</div>
 		</div>
 	</div>
@@ -25,53 +34,41 @@
 <script setup>
 import { reactive, ref, onMounted, onUpdated } from "vue"
 
+// Layouts
+import SidebarLayout from '@/components/layouts/SidebarLayout'
+import BoxLayout from '@/components/layouts/BoxLayout'
+
 import PCPlot from '@/components/plot-layouts/PCPlot/PCPlot.vue'
 import PlotTools from '@/components/plot-layouts/PCPlot/PCPSideMenu'
 import DataList from '@/components/DataList'
 
-const pcdContainer = ref(null)
+const pcpContainer = ref(null)
+const scatterContainer = ref(null)
 const dataContainer = ref(null)
 const plot = ref(null)
 
-let resizing = false
+const activeView = ref('pcp')
 
 function setView (viewName) {
-	pcdContainer.value.style.display="none"
+	pcpContainer.value.style.display="none"
+	scatterContainer.value.style.display="none"
 	dataContainer.value.style.display="none"
 	switch(viewName) {
-		case "plot":
-			pcdContainer.value.style.display="grid"
-			break;
+		case "pcp":
+			pcpContainer.value.style.display="grid"
+			break
+		case "scatter":
+			scatterContainer.value.style.display="grid"
+			break
 		case "data":
 			dataContainer.value.style.display="block"
-			break;
+			break
 		default:
 			console.error('No such view')
-			break;
+			return
 	}
+	activeView.value = viewName
 }
-
-function resizeMenu () {
-	resizing = true
-
-	document.body.onmouseup = () => {
-		resizing = false
-		document.body.onmousemove = null
-	}
-
-	document.body.onmousemove = (evt) => {
-		const minWidth = 220 // px
-		if (!resizing) return
-		let mouseX = evt.clientX
-		if (mouseX < minWidth) mouseX = minWidth
-		pcdContainer.value.style.gridTemplateColumns = `${mouseX}px 4px auto`
-
-		// Resize child component
-		plot.value.updateContainerSize()
-	}
-}
-
-
 </script>
 
 <style lang="scss" scoped>
@@ -99,33 +96,20 @@ function resizeMenu () {
 			.link:hover {
 				color: blue;
 			}
+
+			.active {
+				font-weight: bold;
+			}
 		}
+	}
+
+	.fill-content {
+		width: 100%;
+		height: 100%;
 	}
 
 	.content-container {
 		width: 100%;
 		height: calc(100% - $header-height);
 	}
-
-	.pcd-tab-container {
-		height: 100%;
-		display: grid;
-		grid-template-columns: 290px 4px auto;      // Menu, resize-border, workspace
-
-		.resize-border-v {
-			width: 4px;
-			cursor: w-resize;
-			height: 100%;
-			background-color: whitesmoke;
-		}
-	}
-
-	.data-tab-container {
-		height: 100%;
-		width: 100%;
-	}
-
-
-
-
 </style>
