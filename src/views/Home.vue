@@ -24,7 +24,7 @@
 			</div>
 			<div ref="scatterContainer" class="fill-content" style="display: none;">
 				<BoxLayout>
-					Blah
+					<ScatterPlot/>
 				</BoxLayout>
 			</div>
 		</div>
@@ -41,6 +41,7 @@ import BoxLayout from '@/components/layouts/BoxLayout'
 import PCPlot from '@/components/plot-layouts/PCPlot/PCPlot.vue'
 import PlotTools from '@/components/plot-layouts/PCPlot/PCPSideMenu'
 import DataList from '@/components/DataList'
+import ScatterPlot from '@/components/plot-layouts/ScatterPlot/ScatterPlot'
 
 const pcpContainer = ref(null)
 const scatterContainer = ref(null)
