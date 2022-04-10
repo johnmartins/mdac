@@ -437,12 +437,8 @@ function updateHorizontalOffset () {
 }
 
 function updateContainerSize () {
-	const svg = plotCanvas.value
-	const x = componentContainer.value.clientWidth;
-	const y = componentContainer.value.clientHeight;
-	svg.style.width=x+"px"
-	svg.style.height=y+"px"
-
+	// Ensures that the axises in the PCP are spread out and 
+	// utilize all available horizontal space
 	updateHorizontalOffset()
 }
 
@@ -533,11 +529,6 @@ function exportPNG () {
 	const csvElement = plotCanvas.value
 	saveSvgAsPng(csvElement, 'PCPlot.png', {encoderOptions: 1, backgroundColor: 'white', scale: 2})
 }
-
-onMounted( () => {
-	// Add listener for resize
-	window.onresize = updateContainerSize
-})
 
 </script>
 

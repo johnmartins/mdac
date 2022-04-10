@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, onUpdated } from "vue"
+import { reactive, ref, onMounted, onUpdated, inject } from "vue"
 
 // Layouts
 import SidebarLayout from '@/components/layouts/SidebarLayout'
@@ -49,6 +49,7 @@ const dataContainer = ref(null)
 const plot = ref(null)
 
 const activeView = ref('pcp')
+const eventBus = inject('eventBus')
 
 function setView (viewName) {
 	pcpContainer.value.style.display="none"
@@ -69,7 +70,15 @@ function setView (viewName) {
 			return
 	}
 	activeView.value = viewName
+	eventBus.emit('Router.TabChange', viewName)
 }
+
+onMounted( () => {
+	// Add listener for resize
+	window.onresize = () => {
+		eventBus.emit('Layout.contentResize')
+	}
+})
 </script>
 
 <style lang="scss" scoped>
