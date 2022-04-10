@@ -63,13 +63,11 @@ eventBus.on('Layout.contentResize', updateContainerSize)
 
 function getPlotYBounds () {
 	const array = [plotParameters.padding, plotCanvas.value.getBoundingClientRect().height - plotParameters.padding]
-    console.log(array)
 	return array
 }
 
 function getPlotXBounds () {
 	const array = [plotParameters.padding, plotCanvas.value.getBoundingClientRect().width - plotParameters.padding]
-	console.log(array)
     return array
 }
 
