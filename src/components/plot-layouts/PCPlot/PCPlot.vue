@@ -163,6 +163,11 @@ eventBus.on('OptionsForm.setCurveType', (v) => {plotParameters.curveType = v})
 eventBus.on('ExportForm.exportRequest', handleExportRequest)
 eventBus.on('FilterElement.deleteFilter', deleteFilter)
 eventBus.on('FilterElement.editFilter', editFilter)
+eventBus.on('Router.TabChange', (viewName) => {
+    if (viewName === 'pcp') {
+        updateContainerSize()
+    }
+})
 
 function lineGenerator(d) {
 	let dataCats = Object.keys(d)
