@@ -1,5 +1,5 @@
 <template>
-    <div class="component-container" ref="componentContainer">
+    <div class="component-container">
         <div class="svg-container">
             <svg
             height="100%" 
@@ -38,7 +38,6 @@
 import { ref, reactive, onMounted, inject } from "vue"
 import * as d3 from "d3"
 
-const componentContainer = ref(null)
 const plotCanvas = ref(null)
 
 const plotParameters = reactive({
@@ -48,8 +47,8 @@ const plotParameters = reactive({
 
 const plotVariables = reactive({
     hasRendered: false,
-    xBounds: [],
-    yBounds: []
+    xBounds: [],    // 2D vector with x limits
+    yBounds: []     // 2D vector with y limits
 })
 
 const eventBus = inject('eventBus')

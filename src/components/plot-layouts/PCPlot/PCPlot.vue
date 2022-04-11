@@ -1,5 +1,5 @@
 <template>
-	<div class="component-container" ref="componentContainer">
+	<div class="component-container">
 		<div style="height: 100%;" class="svg-container">
 			<svg 
 			class="pcp-plot svg-content-responsive" 
@@ -99,7 +99,6 @@ import dataUtils from "@/utils/data-utils"
 
 // Layout references
 const plotCanvas = ref(null)
-const componentContainer = ref(null)
 
 const plotParameters = reactive({
 	padding: 50,
