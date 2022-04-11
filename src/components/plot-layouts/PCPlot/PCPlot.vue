@@ -92,10 +92,15 @@ import { reactive, ref, onMounted, onUpdated, inject } from "vue"
 import * as d3 from "d3"
 import { saveAs } from "file-saver"
 import { saveSvgAsPng } from "save-svg-as-png"
+import { storeToRefs } from "pinia"
 
+import {useDataStore} from "../../../store/index"
 import Category from "@/models/plots/Category"
 import DataFilter from "@/models/plots/DataFilter"
 import dataUtils from "@/utils/data-utils"
+
+const dataStore = useDataStore()
+const {data} = storeToRefs(dataStore)
 
 // Layout references
 const plotCanvas = ref(null)
@@ -123,7 +128,6 @@ const plotVariables = reactive({
 // Data structures
 const categoryNameMap = new Map()
 const categories = ref([])
-const data = ref([])
 const filters = reactive({}) // "categoryName" -> [filterA, filterB, ..]
 const settings = reactive({
 	colorScaleCategory: null,
@@ -451,7 +455,7 @@ function readFile ({file, delimiter} = object) {
 
 	// Clear any existing state
 	Category.wipeLookupTable()
-	data.value = []
+	dataStore.wipeAllData()
 	categories.value = []
 	categoryNameMap.clear()
 	Category.count = 0;
@@ -497,7 +501,7 @@ function readFile ({file, delimiter} = object) {
 			addCategory(new Category(col, minValMap.get(col), maxValMap.get(col)))
 		}
 
-		data.value.push(...dataToPlot)
+		dataStore.setData(dataToPlot)
 		eventBus.emit('PCPlot.readData', data.value)
 	}
 }
