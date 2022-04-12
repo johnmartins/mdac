@@ -23,7 +23,6 @@ export const useDataStore = defineStore('data', {
             // Reset static class data
             Category.wipeLookupTable()
             Category.count = 0;
-
         },
         setData (data) {
             this.data = data
