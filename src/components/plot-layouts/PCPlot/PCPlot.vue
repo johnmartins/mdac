@@ -147,7 +147,6 @@ const selectedCategoryName = ref(null)
 
 // Event buss listeners and triggers
 const eventBus = inject('eventBus')
-eventBus.on('SourceForm.readFile', readFile)
 eventBus.on('OptionsForm.setFilteredDataOpacity', (v) => {
 	plotParameters.filteredDataOpacity = v
 	plotParameters.hideFiltered = false
@@ -172,7 +171,7 @@ eventBus.on('OptionsForm.setCurveType', (v) => {plotParameters.curveType = v})
 eventBus.on('ExportForm.exportRequest', handleExportRequest)
 
 // Update container size if certain events occur
-eventBus.on('PCPlot.readData', updateContainerSize)
+eventBus.on('SourceForm.readData', updateContainerSize)
 eventBus.on('Layout.contentResize', updateContainerSize)
 eventBus.on('Router.TabChange', (viewName) => {
     if (viewName === 'pcp') {
@@ -326,56 +325,6 @@ function selectCategory (c) {
 	selectedCategoryName.value = c ? c.title : null
 	setColorScale(c)
 	eventBus.emit('PCPlot.selectCategory', c)
-}
-
-function readFile ({file, delimiter} = object) {
-	if (delimiter === "\\t") delimiter = "\t";
-	dataStore.wipeAllData()
-
-	// Read the CSV file
-	const reader = new FileReader()
-	reader.readAsText(new Blob([file], {"type": file.type}))	
-	reader.onloadend = (e) => {
-		const dataFormat = d3.dsvFormat(delimiter)
-		let csvData = dataFormat.parse(e.target.result)
-
-		const dataToPlot = []
-
-		let maxValMap = new Map()
-		let minValMap = new Map()
-
-		for (let row of csvData) {
-			let dataPoint = {}
-			for (let col of csvData.columns) {
-				let value = row[col]
-
-				if (isNaN(parseFloat(value))) {
-					// Not numeric
-					continue
-				} else {
-					// Numeric
-					value = parseFloat(value)
-					
-
-					if (isNaN(maxValMap.get(col))) maxValMap.set(col, value)
-					if (isNaN(minValMap.get(col))) minValMap.set(col, value)
-
-					if (maxValMap.get(col) < value) maxValMap.set(col, value)
-					else if (minValMap.get(col) > value) minValMap.set(col, value)
-				}
-
-				dataPoint[col] = value
-			}
-			dataToPlot.push(dataPoint)
-		}
-
-		for (let col of csvData.columns) {
-			dataStore.addCategory(new Category(col, minValMap.get(col), maxValMap.get(col)))
-		}
-
-		dataStore.setData(dataToPlot)
-		eventBus.emit('PCPlot.readData', data.value)
-	}
 }
 
 function handleExportRequest (format) {

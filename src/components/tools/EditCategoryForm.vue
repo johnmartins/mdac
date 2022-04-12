@@ -21,9 +21,14 @@
 
 <script setup>
 import { reactive, ref, onMounted, onUpdated, inject } from "vue"
+import { storeToRefs } from "pinia"
+
+import {useDataStore} from "@/store/DataStore"
 
 import TextInput from '@/components/inputs/TextInput'
 import Category from '@/models/plots/Category'
+
+const dataStore = useDataStore()
 
 let selectedCategory = ref(null)
 let selectedCategoryChanged = ref(null)
@@ -44,7 +49,7 @@ eventBus.on('PCPlot.selectCategory', (c) => {
 })
 
 function deleteCategory () {
-    eventBus.emit('EditCategoryForm.deleteCategory', selectedCategory.value)
+    dataStore.deleteCategory(selectedCategory.value)
 }
 
 function editCategory () {
