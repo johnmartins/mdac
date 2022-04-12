@@ -21,7 +21,7 @@
 					<g stroke-width="1" fill="transparent">
 						<g v-for="(d, index) in data" :key="index">
 							<path 
-							v-if="dataPointFilterCheck(d) || !plotParameters.hideFiltered"
+							v-if="dataStore.dataPointFilterCheck(d) || !plotParameters.hideFiltered"
 							:stroke="getLineColor(d)"
 							:stroke-opacity="getLineOpacity(d)"
 							:transform="`translate(0 ${getPlotYBounds()[0]})`"
@@ -94,13 +94,14 @@ import { saveAs } from "file-saver"
 import { saveSvgAsPng } from "save-svg-as-png"
 import { storeToRefs } from "pinia"
 
-import {useDataStore} from "../../../store/index"
+import {useDataStore} from "../../../store/DataStore"
 import Category from "@/models/plots/Category"
 import DataFilter from "@/models/plots/DataFilter"
 import dataUtils from "@/utils/data-utils"
 
 const dataStore = useDataStore()
-const {data} = storeToRefs(dataStore)
+const {data, filters} = storeToRefs(dataStore)
+
 
 // Layout references
 const plotCanvas = ref(null)
@@ -128,7 +129,6 @@ const plotVariables = reactive({
 // Data structures
 const categoryNameMap = new Map()
 const categories = ref([])
-const filters = reactive({}) // "categoryName" -> [filterA, filterB, ..]
 const settings = reactive({
 	colorScaleCategory: null,
 	colorScale: () => {return "black"}
@@ -140,7 +140,6 @@ const eventBus = inject('eventBus')
 eventBus.on('Layout.contentResize', updateContainerSize)
 eventBus.on('SourceForm.readFile', readFile)
 eventBus.on('EditCategoryForm.deleteCategory', deleteCategory)
-
 eventBus.on('OptionsForm.setFilteredDataOpacity', (v) => {
 	plotParameters.filteredDataOpacity = v
 	plotParameters.hideFiltered = false
@@ -162,10 +161,7 @@ eventBus.on('OptionsForm.setTitleSize', (v) => {
 	}
 })
 eventBus.on('OptionsForm.setCurveType', (v) => {plotParameters.curveType = v})
-
 eventBus.on('ExportForm.exportRequest', handleExportRequest)
-eventBus.on('FilterElement.deleteFilter', deleteFilter)
-eventBus.on('FilterElement.editFilter', editFilter)
 eventBus.on('Router.TabChange', (viewName) => {
     if (viewName === 'pcp') {
         updateContainerSize()
@@ -265,36 +261,12 @@ function getLineColor (dataPoint) {
 }
 
 function getLineOpacity (dataPoint) {
-	if (dataPointFilterCheck(dataPoint)) {
+	if (dataStore.dataPointFilterCheck(dataPoint)) {
 		return plotParameters.defaultDataOpacity
 	} 
 
 	return plotParameters.filteredDataOpacity
 }
-
-function dataPointFilterCheck (dataPoint) {
-	/**
-	 * Returns true if the data point passes the filter
-	 */
-	for (let key of Object.keys(filters)) {
-		let passed = false
-
-		if (filters[key].length === 0) { 
-			passed = true 
-		}
-
-		for (let filter of filters[key]) {
-			if (filter.filter(dataPoint[key])) {
-				passed = true
-			} 
-		}
-		
-		if (!passed) return false
-	}
-
-	return true
-}
-
 
 function setColorScale (category) {
 	if (!category) {
@@ -360,73 +332,11 @@ function dragFilterDone() {
 	// Create and add filter
 	if (!outOfBounds && !insufficientRange) {
 		const filter = new DataFilter(c.title, thresholdA, thresholdB)
-		addFilter(filter)
+		dataStore.addFilter(filter)
 	}
 
 	plotVariables.currentFilterCategory = null
 	plotVariables.currentFilterStartValue = 0
-}
-
-function onFilterChange() {
-	let filteredData = []
-	for (let d of data.value) {
-		if (dataPointFilterCheck(d)) {
-			filteredData.push(d)
-		}
-	}
-
-	eventBus.emit('PCPlot.onFilterChange', filteredData)
-}
-
-function addFilter(f) {
-	if (!filters[f.targetCategoryTitle]) {
-		filters[f.targetCategoryTitle] = []
-	}
-	filters[f.targetCategoryTitle].push(f)
-
-	eventBus.emit('PCPlot.addFilter', f)
-	onFilterChange();
-}
-
-function deleteFilter(filterToDelete) {
-	let deleteIndex = -1
-	for (let i = 0; i < filters[filterToDelete.targetCategoryTitle].length; i++) {
-		const f = filters[filterToDelete.targetCategoryTitle][i]
-		if (f.id === filterToDelete.id) {
-			deleteIndex = i
-			break;
-		}
-	}
-	if (deleteIndex === -1) {
-		console.error('Failed to identify filter to delete.')
-	}
-
-	filters[filterToDelete.targetCategoryTitle].splice(deleteIndex, 1)
-	eventBus.emit('PCPlot.deleteFilter', filterToDelete)
-	onFilterChange()
-}
-
-function editFilter (changeArray) {
-	const oldFilter = changeArray[0]
-	const newFilter = changeArray[1]
-
-	let changeIndex = -1
-	for (let i = 0; i < filters[oldFilter.targetCategoryTitle].length; i++) {
-		const f = filters[oldFilter.targetCategoryTitle][i]
-
-		if (f.id == oldFilter.id) {
-			changeIndex = i
-			break
-		}
-	}
-
-	if (changeIndex >= 0) {
-		const f = filters[oldFilter.targetCategoryTitle][changeIndex]
-		f.thresholdA = newFilter.thresholdA
-		f.thresholdB = newFilter.thresholdB
-	}
-
-	onFilterChange()
 }
 
 function selectCategory (c) {

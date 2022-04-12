@@ -23,23 +23,22 @@
 <script setup>
 
 import { reactive, ref, onMounted, onUpdated, inject } from "vue"
+import { storeToRefs } from "pinia"
+
+import {useDataStore} from "@/store/DataStore"
+
+const dataStore = useDataStore()
+const {data, filters} = storeToRefs(dataStore)
 
 const eventBus = inject('eventBus')
 const categories = ref([])
-const data = ref([])
 
 // Event bus
-eventBus.on('PCPlot.readData', setData)
 eventBus.on('PCPlot.addCategory', (c) => categories.value.push(c))
-eventBus.on('PCPlot.onFilterChange', setData)
 eventBus.on('SourceForm.readFile', clearCategories)
 
 function clearCategories () {
     categories.value = []
-}
-
-function setData(d) {
-    data.value = d
 }
 
 </script>

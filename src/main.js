@@ -11,7 +11,7 @@ import { createPinia } from 'pinia'
 const eventBus = mitt()
 
 const app = createApp(App)
+app.provide('eventBus', eventBus)
 app.use(createPinia())
 app.use(router)
-app.provide('eventBus', eventBus)
 app.mount('#app')

@@ -3,8 +3,10 @@
         <div class="control-group p-2">
             <strong>Filters</strong>
             
-            <div v-if="filters.length > 0">
-                <FilterElement v-for="filter in filters" :key="filter.id" :filter="filter"/>
+            <div v-if="Object.keys(filters).length > 0">
+                <div v-for="(filterKey, index) in Object.keys(filters)" :key="index">
+                    <FilterElement v-for="filter in filters[filterKey]" :key="filter.id" :filter="filter"/>
+                </div>
             </div>
             <div v-else>
                 <span style="font-size: 0.8em;">No filters have been applied</span>
@@ -15,25 +17,14 @@
 
 <script setup>
 import { reactive, ref, inject } from "vue"
+import { storeToRefs } from "pinia"
 
+import {useDataStore} from "@/store/DataStore"
 import FilterElement from '@/components/tools/FilterElement'
 
-const eventBus = inject('eventBus')
-eventBus.on('PCPlot.addFilter', (f) => {
-    filters.push(f)
-})
-eventBus.on('PCPlot.deleteFilter', (f) => {
-    let deleteIndex = -1
-    for (let i = 0; i < filters.length; i++) {
-        if (filters[i].id === f.id) {
-            deleteIndex = i
-            break
-        }
-    }
-    filters.splice(deleteIndex, 1)
-})
+const dataStore = useDataStore()
+const {data, filters} = storeToRefs(dataStore)
 
-const filters = reactive([])
 
 </script>
 
