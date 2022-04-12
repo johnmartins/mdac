@@ -9,7 +9,7 @@
                 </tr>
             </thead>
             <tbody class="table-bordered">
-                <tr v-for="(d, index) in data" :key="index">
+                <tr v-for="(d, index) in data.filter(dataStore.dataPointFilterCheck)" :key="index">
                     <td v-for="c in categories" :key="c.id">
                         {{d[c.title]}}
                     </td>
