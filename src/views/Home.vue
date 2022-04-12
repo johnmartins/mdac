@@ -12,8 +12,8 @@
 		</div>
 		<div class="content-container">
 			<div ref="pcpContainer" class="fill-content">
-				<SidebarLayout ref="pcpContainer">
-					<template #sidebar><PlotTools /></template>
+				<SidebarLayout>
+					<template #sidebar><PCPSideMenu /></template>
 					<PCPlot ref="plot"/>
 				</SidebarLayout>
 			</div>
@@ -23,9 +23,10 @@
 				</BoxLayout>
 			</div>
 			<div ref="scatterContainer" class="fill-content" style="display: none;">
-				<BoxLayout>
+				<SidebarLayout>
+					<template #sidebar><ScatterSideMenu /></template>
 					<ScatterPlot/>
-				</BoxLayout>
+				</SidebarLayout>
 			</div>
 		</div>
 	</div>
@@ -39,9 +40,10 @@ import SidebarLayout from '@/components/layouts/SidebarLayout'
 import BoxLayout from '@/components/layouts/BoxLayout'
 
 import PCPlot from '@/components/plot-layouts/PCPlot/PCPlot.vue'
-import PlotTools from '@/components/plot-layouts/PCPlot/PCPSideMenu'
+import PCPSideMenu from '@/components/plot-layouts/PCPlot/PCPSideMenu'
 import DataList from '@/components/DataList'
 import ScatterPlot from '@/components/plot-layouts/ScatterPlot/ScatterPlot'
+import ScatterSideMenu from '@/components/plot-layouts/ScatterPlot/ScatterSideMenu'
 
 const pcpContainer = ref(null)
 const scatterContainer = ref(null)
