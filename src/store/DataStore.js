@@ -1,17 +1,29 @@
 import { defineStore } from 'pinia'
 import { inject } from 'vue'
+import Category from "@/models/plots/Category"
 
 
 export const useDataStore = defineStore('data', {
     state: () => ({
             data: [],
             categories: [],
+            categoryNameMap: new Map(),
             filters: {}         // "categoryName" -> [filterA, filterB, ..]
         }),
     getters: {},
     actions: {
         wipeAllData () {
             this.data = []
+            this.categories = []
+            this.categoryNameMap.clear()
+            for (let categoryName in this.filters) {
+                delete this.filters[categoryName];
+            }
+
+            // Reset static class data
+            Category.wipeLookupTable()
+            Category.count = 0;
+
         },
         setData (data) {
             this.data = data
@@ -59,11 +71,35 @@ export const useDataStore = defineStore('data', {
                 f.thresholdB = newFilter.thresholdB
             }
         },
-        addCategory (category) {
-
+        addCategory (c) {
+            let position = 0
+            if (this.categories.length > 0) {
+                position = this.categories[this.categories.length - 1].position + 1
+            }
+            this.categories.push(c)
+            this.categoryNameMap.set(c.title, c)
         },
-        deleteCategory (category) {
-
+        getCategoryWithName (categoryName) {
+            return this.categoryNameMap.get(categoryName)
+        },
+        deleteCategory (c) {
+            if (!c) return
+            // Delete category from category list
+            let deleteIndex = -1
+            for (let i = 0; i < this.categories.length; i++) {
+                const cat = this.categories[i]
+                if (c.title !== cat.title) continue
+                deleteIndex = i
+                break
+            }
+            this.categoryNameMap.set(c.title, null)
+            this.categories.splice(deleteIndex, 1)
+        
+            // Adjust positions of other categories
+            for (let i=deleteIndex; i < this.categories.length; i++) {
+                const cat = this.categories[i]
+                cat.position--
+            }
         },
         dataPointFilterCheck (dataPoint) {
             /**

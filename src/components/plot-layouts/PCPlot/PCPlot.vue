@@ -10,7 +10,7 @@
 			style="font-size: 1em;"
 			@mousemove="dragFilterBox"
 			@mouseup="dragFilterDone"
-			@keydown.delete="deleteCategory(categoryNameMap.get(selectedCategoryName))"
+			@keydown.delete="dataStore.deleteCategory(dataStore.getCategoryWithName(selectedCategoryName))"
 			>
 				
 				<!-- Full graphics group -->
@@ -37,7 +37,7 @@
 					@mousedown.prevent="dragFilterStart($event, c)"
 					v-bind:class="{highlighted: selectedCategoryName == c.title}"
 					:key="c.position" 
-					:transform="`translate(${c.position*plotParameters.horizontalOffset} ${getPlotYBounds()[0]})`">	
+					:transform="`translate(${c.position*horizontalOffset} ${getPlotYBounds()[0]})`">	
 
 						<!-- Hitbox -->
 						<rect 
@@ -88,7 +88,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, onUpdated, inject } from "vue"
+import { reactive, ref, onMounted, onUpdated, inject, computed } from "vue"
 import * as d3 from "d3"
 import { saveAs } from "file-saver"
 import { saveSvgAsPng } from "save-svg-as-png"
@@ -100,7 +100,7 @@ import DataFilter from "@/models/plots/DataFilter"
 import dataUtils from "@/utils/data-utils"
 
 const dataStore = useDataStore()
-const {data, filters} = storeToRefs(dataStore)
+const {data, filters, categories} = storeToRefs(dataStore)
 
 
 // Layout references
@@ -108,7 +108,6 @@ const plotCanvas = ref(null)
 
 const plotParameters = reactive({
 	padding: 50,
-	horizontalOffset: 200,
 	axisTitlePadding: 150,
 	axisTitleRotation: 45,
 	defaultDataOpacity: 0.8,
@@ -123,12 +122,23 @@ const plotVariables = reactive({
 	currentFilterDeltaTime: 0,
 	currentFilterCategory: null,
 	currentFilterStartValue: 0,
-	currentFilterEndValue: 0
+	currentFilterEndValue: 0,
+	hasRendered: false,
+	xBounds: [0, 500],    // 2D vector with x limits
+    yBounds: [0, 500]     // 2D vector with y limits
 })
 
+const horizontalOffset = computed( () => {
+	if (categories.value.length < 2) return 50;
+	return plotVariables.xBounds[1]/Math.max(1,(categories.value.length-1))
+})
+
+function updateContainerSize () {
+    plotVariables.xBounds = getPlotXBounds()
+    plotVariables.yBounds = getPlotYBounds()
+}
+
 // Data structures
-const categoryNameMap = new Map()
-const categories = ref([])
 const settings = reactive({
 	colorScaleCategory: null,
 	colorScale: () => {return "black"}
@@ -137,9 +147,7 @@ const selectedCategoryName = ref(null)
 
 // Event buss listeners and triggers
 const eventBus = inject('eventBus')
-eventBus.on('Layout.contentResize', updateContainerSize)
 eventBus.on('SourceForm.readFile', readFile)
-eventBus.on('EditCategoryForm.deleteCategory', deleteCategory)
 eventBus.on('OptionsForm.setFilteredDataOpacity', (v) => {
 	plotParameters.filteredDataOpacity = v
 	plotParameters.hideFiltered = false
@@ -162,8 +170,13 @@ eventBus.on('OptionsForm.setTitleSize', (v) => {
 })
 eventBus.on('OptionsForm.setCurveType', (v) => {plotParameters.curveType = v})
 eventBus.on('ExportForm.exportRequest', handleExportRequest)
+
+// Update container size if certain events occur
+eventBus.on('PCPlot.readData', updateContainerSize)
+eventBus.on('Layout.contentResize', updateContainerSize)
 eventBus.on('Router.TabChange', (viewName) => {
     if (viewName === 'pcp') {
+        plotVariables.hasRendered = true
         updateContainerSize()
     }
 })
@@ -173,12 +186,12 @@ function lineGenerator(d) {
 	let dataArray = Array(dataCats.length).fill(null)
 
 	for (let i = 0; i < dataCats.length; i++) {
-		let c = categoryNameMap.get(dataCats[i])
+		let c = dataStore.getCategoryWithName(dataCats[i])
 
 		if (!c)  {
 			continue
 		}
-		const x = dataUtils.mercilessDecimalDeleter(c.position*plotParameters.horizontalOffset, 1)
+		const x = dataUtils.mercilessDecimalDeleter(c.position*horizontalOffset.value, 1)
 		const y = dataUtils.mercilessDecimalDeleter(c.scaleLinear(d[c.title])*getAxisLength(), 1)
 
 		dataArray[c.position] = {
@@ -203,41 +216,6 @@ function lineGenerator(d) {
 		.y((de) => {return de.y})
 		.curve(d3CurveType)
 		(dataArray)
-}
-
-function addCategory(c) {
-	let position = 0
-	if (categories.value.length > 0) {
-		position = categories.value[categories.value.length - 1].position + 1
-	}
-	categories.value.push(c)
-	updateHorizontalOffset()
-	categoryNameMap.set(c.title, c)
-	eventBus.emit('PCPlot.addCategory', c)
-}
-
-function deleteCategory(c) {
-	if (!c) return
-	// Delete category from category list
-	let deleteIndex = -1
-	for (let i = 0; i < categories.value.length; i++) {
-		const cat = categories.value[i]
-		if (c.title !== cat.title) continue
-		deleteIndex = i
-		break
-	}
-	categoryNameMap.set(c.title, null)
-	categories.value.splice(deleteIndex, 1)
-
-	// Adjust positions of other categories
-	for (let i=deleteIndex; i < categories.value.length; i++) {
-		const cat = categories.value[i]
-		cat.position--
-	}
-
-	// Adjust plot horizontal layout
-	plotParameters.horizontalOffset = getPlotXBounds()[1]/Math.max(1,(categories.value.length-1))	
-	eventBus.emit('PCPlot.deleteCategory', c)
 }
 
 function getAxisLength () {
@@ -350,25 +328,9 @@ function selectCategory (c) {
 	eventBus.emit('PCPlot.selectCategory', c)
 }
 
-function updateHorizontalOffset () {
-	plotParameters.horizontalOffset = getPlotXBounds()[1]/Math.max(1,(categories.value.length-1))	
-}
-
-function updateContainerSize () {
-	// Ensures that the axises in the PCP are spread out and 
-	// utilize all available horizontal space
-	updateHorizontalOffset()
-}
-
 function readFile ({file, delimiter} = object) {
 	if (delimiter === "\\t") delimiter = "\t";
-
-	// Clear any existing state
-	Category.wipeLookupTable()
 	dataStore.wipeAllData()
-	categories.value = []
-	categoryNameMap.clear()
-	Category.count = 0;
 
 	// Read the CSV file
 	const reader = new FileReader()
@@ -408,7 +370,7 @@ function readFile ({file, delimiter} = object) {
 		}
 
 		for (let col of csvData.columns) {
-			addCategory(new Category(col, minValMap.get(col), maxValMap.get(col)))
+			dataStore.addCategory(new Category(col, minValMap.get(col), maxValMap.get(col)))
 		}
 
 		dataStore.setData(dataToPlot)
