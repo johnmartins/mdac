@@ -5,6 +5,7 @@ class ScatterPlotConfig {
         this.title = `Plot ${this.id + 1}`
         this.xAxisCategoryName = null
         this.yAxisCategoryName = null
+        this.titleOverride = false
         
         ScatterPlotConfig.counter++
     }

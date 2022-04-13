@@ -10,6 +10,13 @@
             >
                 <!-- Full plot group -->
                 <g v-if="plotVariables.hasRendered">
+                    <g v-if="selectedPlot">
+                        <text 
+                        :x="(plotVariables.xBounds[1] + plotParameters.padding)/2 "
+                        :y="plotVariables.yBounds[0]-plotParameters.axisTitlePadding"
+                        >
+                        {{selectedPlot.title}}</text>
+                    </g>
                     <!-- x-axis group -->
                     <g>
                         <line 
