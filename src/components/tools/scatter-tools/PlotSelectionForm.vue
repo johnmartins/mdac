@@ -29,12 +29,10 @@ const {plots, selectedPlotID} = storeToRefs(scatterStore)
 const plotSelector = ref(null)
 
 function changePlot () {
-    console.log("Changing scatter plot")
     scatterStore.setSelectedPlot(plotSelector.value.value)
 }
 
 function newPlot () {
-    console.log("Create new plot")
     const newPlot = new ScatterPlotConfig()
     scatterStore.addPlot(newPlot)
 
