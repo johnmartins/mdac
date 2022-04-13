@@ -13,14 +13,26 @@
                 <g v-if="plotVariables.hasRendered">
                     <!-- x-axis group -->
                     <g>
-                        <line :x1="plotVariables.xBounds[0]" :x2="plotVariables.xBounds[1]" 
+                        <line 
+                        :x1="plotVariables.xBounds[0]" :x2="plotVariables.xBounds[1]" 
                         :y1="plotVariables.yBounds[1]" :y2="plotVariables.yBounds[1]" />
+                        <text class="scatter-axis-title-x" 
+                        :x="plotVariables.xBounds[1]/2 + plotParameters.axisTitlePadding" 
+                        :y="plotVariables.yBounds[1] + plotParameters.axisTitlePadding"
+                        >Blah</text>
                     </g>
 
                     <!-- y-axis group -->
                     <g>
-                        <line :x1="plotVariables.xBounds[0]" :x2="plotVariables.xBounds[0]" 
-                        :y1="plotVariables.yBounds[0]" :y2="plotVariables.yBounds[1]" />
+                        <line 
+                        :x1="plotVariables.xBounds[0]" :x2="plotVariables.xBounds[0]" 
+                        :y1="plotVariables.yBounds[0]" :y2="plotVariables.yBounds[1]" 
+                        />
+                        <text class="scatter-axis-title-y" 
+                        :x="plotVariables.xBounds[0] - plotParameters.axisTitlePadding*2" 
+                        :y="plotVariables.yBounds[1]/2"
+                        :transform="`rotate(-90 ${plotVariables.xBounds[0] - plotParameters.axisTitlePadding} ${plotVariables.yBounds[1]/2})`"
+                        >Blah</text>
                     </g>
 
                     <!-- data group -->
@@ -42,7 +54,7 @@ const plotCanvas = ref(null)
 
 const plotParameters = reactive({
     padding: 50,
-    axisTitlePadding: 20,
+    axisTitlePadding: 25,
 })
 
 const plotVariables = reactive({
@@ -94,6 +106,12 @@ function updateContainerSize () {
     line {
         stroke: black;
         fill: transparent;
+    }
+    text {
+        fill: black;
+        stroke: transparent;
+        dominant-baseline: middle; // Used for vertical alignment
+        text-anchor: middle;
     }
 }
 
