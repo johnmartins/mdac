@@ -4,8 +4,10 @@
     font-size: 0.9em;
     align-items: center;
     span {
+        display: inline-block;
         margin-right: 8px;
         white-space: nowrap;
+        min-width: 50px;
     }
     select {
         width: 100%;

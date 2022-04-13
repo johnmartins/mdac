@@ -419,7 +419,6 @@ function exportPNG () {
 			text-anchor: end;
 			dominant-baseline: middle;
 			font-weight: bold;
-
 		}
 	}
 

@@ -8,7 +8,6 @@
             ref="plotCanvas"
             class="scatter-plot svg-content-responsive"
             >
-
                 <!-- Full plot group -->
                 <g v-if="plotVariables.hasRendered">
                     <!-- x-axis group -->
@@ -94,7 +93,6 @@ function updateContainerSize () {
 .component-container {
 	height: 100%;
 	overflow: hidden;
-    border: 2px solid red;
 }
 
 .svg-container {

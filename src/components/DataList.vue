@@ -14,7 +14,6 @@
                         {{d[c.title]}}
                     </td>
                 </tr>
-
             </tbody>
         </table>
     </div>
