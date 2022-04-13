@@ -22,7 +22,6 @@ export const useScatterStore = defineStore('scatter', {
                 this.selectedPlot = null
                 return
             }
-            console.log(`selecting plot ${plotID}: ${this.plotIDMap.get(plotID)}`)
             this.selectedPlotID = plotID
             this.selectedPlot = this.plotIDMap.get(plotID)
         },

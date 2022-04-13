@@ -15,10 +15,15 @@
                         <line 
                         :x1="plotVariables.xBounds[0]" :x2="plotVariables.xBounds[1]" 
                         :y1="plotVariables.yBounds[1]" :y2="plotVariables.yBounds[1]" />
-                        <text class="scatter-axis-title-x" 
-                        :x="plotVariables.xBounds[1]/2 + plotParameters.axisTitlePadding" 
-                        :y="plotVariables.yBounds[1] + plotParameters.axisTitlePadding"
-                        >Blah</text>
+                        <g v-if="checkAxisIsDefined('x')">
+                            <text class="scatter-axis-title-x" 
+                            v-if="dataStore.getCategoryWithName(selectedPlot.xAxisCategoryName) !== null"
+                            :x="plotVariables.xBounds[1]/2 + plotParameters.axisTitlePadding" 
+                            :y="plotVariables.yBounds[1] + plotParameters.axisTitlePadding"
+                            >
+                            {{dataStore.getCategoryWithName(selectedPlot.xAxisCategoryName).displayTitle}}
+                            </text>
+                        </g>
                     </g>
 
                     <!-- y-axis group -->
@@ -27,15 +32,27 @@
                         :x1="plotVariables.xBounds[0]" :x2="plotVariables.xBounds[0]" 
                         :y1="plotVariables.yBounds[0]" :y2="plotVariables.yBounds[1]" 
                         />
-                        <text class="scatter-axis-title-y" 
-                        :x="plotVariables.xBounds[0] - plotParameters.axisTitlePadding*2" 
-                        :y="plotVariables.yBounds[1]/2"
-                        :transform="`rotate(-90 ${plotVariables.xBounds[0] - plotParameters.axisTitlePadding} ${plotVariables.yBounds[1]/2})`"
-                        >Blah</text>
+                        <g v-if="selectedPlot">
+                            <text class="scatter-axis-title-y" 
+                            v-if="checkAxisIsDefined('y')"
+                            :x="plotVariables.xBounds[0] - plotParameters.axisTitlePadding*2" 
+                            :y="plotVariables.yBounds[1]/2"
+                            :transform="`rotate(-90 ${plotVariables.xBounds[0] - plotParameters.axisTitlePadding} ${plotVariables.yBounds[1]/2})`"
+                            >
+                            {{dataStore.getCategoryWithName(selectedPlot.yAxisCategoryName).displayTitle}}
+                            </text>
+                        </g>
                     </g>
 
                     <!-- data group -->
-                    <g></g>
+                    <g v-if="selectedPlot">
+                        <g v-for="(d, index) in data" :key="index">
+                            <circle 
+                            :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
+                            :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
+                            r="5" />
+                        </g>
+                    </g>
                 </g>
 
             </svg>
@@ -48,6 +65,14 @@
 <script setup>
 import { ref, reactive, onMounted, inject } from "vue"
 import * as d3 from "d3"
+import { storeToRefs } from "pinia"
+import {useDataStore} from "@/store/DataStore"
+import {useScatterStore} from "@/store/ScatterStore"
+
+const dataStore = useDataStore()
+const {data, filters, categories} = storeToRefs(dataStore)
+const scatterStore = useScatterStore()
+const {selectedPlot} = storeToRefs(scatterStore)
 
 const plotCanvas = ref(null)
 
@@ -85,6 +110,55 @@ function updateContainerSize () {
     plotVariables.xBounds = getPlotXBounds()
     plotVariables.yBounds = getPlotYBounds()
 }
+
+function getScaledCoordinate (data, categoryName, axis) {
+    const c = dataStore.getCategoryWithName(categoryName)
+    const value = data[categoryName]
+
+    if (!value) {
+        if (axis !== 'x' && axis !== 'y') {
+            throw new Error('Unknown axis setting')
+        }
+        return axis === 'x' ? plotVariables.xBounds[0] : plotVariables.yBounds[1]
+    }
+
+    const valueScaled = c.scaleLinear(value)
+
+    let coordinate = 0
+    if (axis === 'x') {
+        coordinate = plotVariables.xBounds[1] - valueScaled * (plotVariables.xBounds[1] - plotVariables.xBounds[0])
+    } else if (axis === 'y') {
+        coordinate = plotVariables.yBounds[0] + valueScaled * (plotVariables.yBounds[1] - plotVariables.yBounds[0])
+        // coordinate = valueScaled * (plotVariables.yBounds[1] - plotVariables.yBounds[0]) - plotVariables.yBounds[0]
+    } else {
+        throw new Error('Unknown axis setting')
+    }
+
+    if (isNaN(coordinate)) return 0
+
+    return coordinate
+}
+
+function checkAxisIsDefined (axis) {
+    if (axis !== 'x' && axis !== 'y') {
+        throw new Error('No such axis')
+    }
+
+    if (!selectedPlot.value) return false
+
+    if (axis === 'x') {
+        if (!selectedPlot.value.xAxisCategoryName) return false
+        if (!dataStore.getCategoryWithName(selectedPlot.value.xAxisCategoryName).displayTitle) return false
+
+    } else if (axis === 'y') {
+        if (!selectedPlot.value.yAxisCategoryName) return false
+        if (!dataStore.getCategoryWithName(selectedPlot.value.yAxisCategoryName).displayTitle) return false
+    }
+
+    return true
+}
+
+
 
 </script>
 
