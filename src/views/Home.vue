@@ -64,10 +64,10 @@ function setView (viewName) {
 	dataContainer.value.style.display="none"
 	switch(viewName) {
 		case "pcp":
-			pcpContainer.value.style.display="grid"
+			pcpContainer.value.style.display="block"
 			break
 		case "scatter":
-			scatterContainer.value.style.display="grid"
+			scatterContainer.value.style.display="block"
 			break
 		case "data":
 			dataContainer.value.style.display="block"
