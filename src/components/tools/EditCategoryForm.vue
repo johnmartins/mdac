@@ -10,20 +10,26 @@
                 @change="(v) => {selectedCategoryChanged.lb=parseFloat(v)}">LB</TextInput>
             <TextInput :value="selectedCategoryChanged.ticks" 
                 @change="(v) => {selectedCategoryChanged.ticks=parseInt(v)}">Ticks</TextInput>
-        </div>
-        <div class="btn-group px-2 mb-2">
-            <button class="btn btn-success btn-sm" @click="editCategory">Update</button>
-            <button class="btn btn-warning btn-sm" @click="resetCategory">Reset</button>
-            <button class="btn btn-danger btn-sm" @click="deleteCategory">Delete</button>
+
+            <div class="btn-group" style="width: 100%">
+                <button class="btn btn-success btn-sm" @click="editCategory">Update</button>
+                <button class="btn btn-warning btn-sm" @click="resetCategory">Reset</button>
+                <button class="btn btn-danger btn-sm" @click="deleteCategory">Delete</button>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup>
 import { reactive, ref, onMounted, onUpdated, inject } from "vue"
+import { storeToRefs } from "pinia"
+
+import {useDataStore} from "@/store/DataStore"
 
 import TextInput from '@/components/inputs/TextInput'
 import Category from '@/models/plots/Category'
+
+const dataStore = useDataStore()
 
 let selectedCategory = ref(null)
 let selectedCategoryChanged = ref(null)
@@ -44,7 +50,7 @@ eventBus.on('PCPlot.selectCategory', (c) => {
 })
 
 function deleteCategory () {
-    eventBus.emit('EditCategoryForm.deleteCategory', selectedCategory.value)
+    dataStore.deleteCategory(selectedCategory.value)
 }
 
 function editCategory () {

@@ -1,5 +1,5 @@
 <template>
-    <div class="container plot-tools-container">
+    <div class="container side-menu-container">
 
         <SourceForm />
         <EditCategoryForm />
@@ -21,8 +21,5 @@ import SourceForm from '@/components/tools/SourceForm'
 </script>
 
 <style lang="scss" scoped>
-    .plot-tools-container {
-        font-size: 0.8rem;
-        overflow-y: auto;
-    }
+
 </style>

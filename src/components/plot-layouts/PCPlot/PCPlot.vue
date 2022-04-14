@@ -1,5 +1,5 @@
 <template>
-	<div class="component-container" ref="componentContainer">
+	<div class="component-container">
 		<div style="height: 100%;" class="svg-container">
 			<svg 
 			class="pcp-plot svg-content-responsive" 
@@ -10,7 +10,7 @@
 			style="font-size: 1em;"
 			@mousemove="dragFilterBox"
 			@mouseup="dragFilterDone"
-			@keydown.delete="deleteCategory(categoryNameMap.get(selectedCategoryName))"
+			@keydown.delete="dataStore.deleteCategory(dataStore.getCategoryWithName(selectedCategoryName))"
 			>
 				
 				<!-- Full graphics group -->
@@ -21,7 +21,7 @@
 					<g stroke-width="1" fill="transparent">
 						<g v-for="(d, index) in data" :key="index">
 							<path 
-							v-if="dataPointFilterCheck(d) || !plotParameters.hideFiltered"
+							v-if="dataStore.dataPointFilterCheck(d) || !plotParameters.hideFiltered"
 							:stroke="getLineColor(d)"
 							:stroke-opacity="getLineOpacity(d)"
 							:transform="`translate(0 ${getPlotYBounds()[0]})`"
@@ -37,7 +37,7 @@
 					@mousedown.prevent="dragFilterStart($event, c)"
 					v-bind:class="{highlighted: selectedCategoryName == c.title}"
 					:key="c.position" 
-					:transform="`translate(${c.position*plotParameters.horizontalOffset} ${getPlotYBounds()[0]})`">	
+					:transform="`translate(${c.position*horizontalOffset} ${getPlotYBounds()[0]})`">	
 
 						<!-- Hitbox -->
 						<rect 
@@ -88,22 +88,28 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, onUpdated, inject } from "vue"
+import { reactive, ref, onMounted, onUpdated, inject, computed } from "vue"
 import * as d3 from "d3"
 import { saveAs } from "file-saver"
 import { saveSvgAsPng } from "save-svg-as-png"
+import { storeToRefs } from "pinia"
 
+import {useDataStore} from "../../../store/DataStore"
+import {useLayoutStore} from "../../../store/LayoutStore"
 import Category from "@/models/plots/Category"
 import DataFilter from "@/models/plots/DataFilter"
 import dataUtils from "@/utils/data-utils"
 
+const dataStore = useDataStore()
+const {data, filters, categories} = storeToRefs(dataStore)
+const layoutStore = useLayoutStore()
+const {activeView} = storeToRefs(layoutStore)
+
 // Layout references
 const plotCanvas = ref(null)
-const componentContainer = ref(null)
 
 const plotParameters = reactive({
 	padding: 50,
-	horizontalOffset: 200,
 	axisTitlePadding: 150,
 	axisTitleRotation: 45,
 	defaultDataOpacity: 0.8,
@@ -118,14 +124,24 @@ const plotVariables = reactive({
 	currentFilterDeltaTime: 0,
 	currentFilterCategory: null,
 	currentFilterStartValue: 0,
-	currentFilterEndValue: 0
+	currentFilterEndValue: 0,
+	hasRendered: false,
+	xBounds: [0, 500],    // 2D vector with x limits
+    yBounds: [0, 500]     // 2D vector with y limits
 })
 
+const horizontalOffset = computed( () => {
+	if (categories.value.length < 2) return 50;
+	return plotVariables.xBounds[1]/Math.max(1,(categories.value.length-1))
+})
+
+function updateContainerSize () {
+	if (activeView.value !== 'pcp') return
+	plotVariables.xBounds = getPlotXBounds()
+	plotVariables.yBounds = getPlotYBounds()
+}
+
 // Data structures
-const categoryNameMap = new Map()
-const categories = ref([])
-const data = ref([])
-const filters = reactive({}) // "categoryName" -> [filterA, filterB, ..]
 const settings = reactive({
 	colorScaleCategory: null,
 	colorScale: () => {return "black"}
@@ -134,9 +150,6 @@ const selectedCategoryName = ref(null)
 
 // Event buss listeners and triggers
 const eventBus = inject('eventBus')
-eventBus.on('SourceForm.readFile', readFile)
-eventBus.on('EditCategoryForm.deleteCategory', deleteCategory)
-
 eventBus.on('OptionsForm.setFilteredDataOpacity', (v) => {
 	plotParameters.filteredDataOpacity = v
 	plotParameters.hideFiltered = false
@@ -158,28 +171,29 @@ eventBus.on('OptionsForm.setTitleSize', (v) => {
 	}
 })
 eventBus.on('OptionsForm.setCurveType', (v) => {plotParameters.curveType = v})
-
 eventBus.on('ExportForm.exportRequest', handleExportRequest)
-eventBus.on('FilterElement.deleteFilter', deleteFilter)
-eventBus.on('FilterElement.editFilter', editFilter)
 
-
-// Expose methods from this container to parent containers
-defineExpose({
-	updateContainerSize,
-});
+// Update container size if certain events occur
+eventBus.on('SourceForm.readData', updateContainerSize)
+eventBus.on('Layout.contentResize', updateContainerSize)
+eventBus.on('Router.TabChange', (viewName) => {
+    if (viewName === 'pcp') {
+        plotVariables.hasRendered = true
+        updateContainerSize()
+    }
+})
 
 function lineGenerator(d) {
 	let dataCats = Object.keys(d)
 	let dataArray = Array(dataCats.length).fill(null)
 
 	for (let i = 0; i < dataCats.length; i++) {
-		let c = categoryNameMap.get(dataCats[i])
+		let c = dataStore.getCategoryWithName(dataCats[i])
 
 		if (!c)  {
 			continue
 		}
-		const x = dataUtils.mercilessDecimalDeleter(c.position*plotParameters.horizontalOffset, 1)
+		const x = dataUtils.mercilessDecimalDeleter(c.position*horizontalOffset.value, 1)
 		const y = dataUtils.mercilessDecimalDeleter(c.scaleLinear(d[c.title])*getAxisLength(), 1)
 
 		dataArray[c.position] = {
@@ -206,41 +220,6 @@ function lineGenerator(d) {
 		(dataArray)
 }
 
-function addCategory(c) {
-	let position = 0
-	if (categories.value.length > 0) {
-		position = categories.value[categories.value.length - 1].position + 1
-	}
-	categories.value.push(c)
-	updateHorizontalOffset()
-	categoryNameMap.set(c.title, c)
-	eventBus.emit('PCPlot.addCategory', c)
-}
-
-function deleteCategory(c) {
-	if (!c) return
-	// Delete category from category list
-	let deleteIndex = -1
-	for (let i = 0; i < categories.value.length; i++) {
-		const cat = categories.value[i]
-		if (c.title !== cat.title) continue
-		deleteIndex = i
-		break
-	}
-	categoryNameMap.set(c.title, null)
-	categories.value.splice(deleteIndex, 1)
-
-	// Adjust positions of other categories
-	for (let i=deleteIndex; i < categories.value.length; i++) {
-		const cat = categories.value[i]
-		cat.position--
-	}
-
-	// Adjust plot horizontal layout
-	plotParameters.horizontalOffset = getPlotXBounds()[1]/Math.max(1,(categories.value.length-1))	
-	eventBus.emit('PCPlot.deleteCategory', c)
-}
-
 function getAxisLength () {
 	return getPlotYBounds()[1]-(plotParameters.axisTitlePadding)
 }
@@ -262,36 +241,12 @@ function getLineColor (dataPoint) {
 }
 
 function getLineOpacity (dataPoint) {
-	if (dataPointFilterCheck(dataPoint)) {
+	if (dataStore.dataPointFilterCheck(dataPoint)) {
 		return plotParameters.defaultDataOpacity
 	} 
 
 	return plotParameters.filteredDataOpacity
 }
-
-function dataPointFilterCheck (dataPoint) {
-	/**
-	 * Returns true if the data point passes the filter
-	 */
-	for (let key of Object.keys(filters)) {
-		let passed = false
-
-		if (filters[key].length === 0) { 
-			passed = true 
-		}
-
-		for (let filter of filters[key]) {
-			if (filter.filter(dataPoint[key])) {
-				passed = true
-			} 
-		}
-		
-		if (!passed) return false
-	}
-
-	return true
-}
-
 
 function setColorScale (category) {
 	if (!category) {
@@ -357,73 +312,11 @@ function dragFilterDone() {
 	// Create and add filter
 	if (!outOfBounds && !insufficientRange) {
 		const filter = new DataFilter(c.title, thresholdA, thresholdB)
-		addFilter(filter)
+		dataStore.addFilter(filter)
 	}
 
 	plotVariables.currentFilterCategory = null
 	plotVariables.currentFilterStartValue = 0
-}
-
-function onFilterChange() {
-	let filteredData = []
-	for (let d of data.value) {
-		if (dataPointFilterCheck(d)) {
-			filteredData.push(d)
-		}
-	}
-
-	eventBus.emit('PCPlot.onFilterChange', filteredData)
-}
-
-function addFilter(f) {
-	if (!filters[f.targetCategoryTitle]) {
-		filters[f.targetCategoryTitle] = []
-	}
-	filters[f.targetCategoryTitle].push(f)
-
-	eventBus.emit('PCPlot.addFilter', f)
-	onFilterChange();
-}
-
-function deleteFilter(filterToDelete) {
-	let deleteIndex = -1
-	for (let i = 0; i < filters[filterToDelete.targetCategoryTitle].length; i++) {
-		const f = filters[filterToDelete.targetCategoryTitle][i]
-		if (f.id === filterToDelete.id) {
-			deleteIndex = i
-			break;
-		}
-	}
-	if (deleteIndex === -1) {
-		console.error('Failed to identify filter to delete.')
-	}
-
-	filters[filterToDelete.targetCategoryTitle].splice(deleteIndex, 1)
-	eventBus.emit('PCPlot.deleteFilter', filterToDelete)
-	onFilterChange()
-}
-
-function editFilter (changeArray) {
-	const oldFilter = changeArray[0]
-	const newFilter = changeArray[1]
-
-	let changeIndex = -1
-	for (let i = 0; i < filters[oldFilter.targetCategoryTitle].length; i++) {
-		const f = filters[oldFilter.targetCategoryTitle][i]
-
-		if (f.id == oldFilter.id) {
-			changeIndex = i
-			break
-		}
-	}
-
-	if (changeIndex >= 0) {
-		const f = filters[oldFilter.targetCategoryTitle][changeIndex]
-		f.thresholdA = newFilter.thresholdA
-		f.thresholdB = newFilter.thresholdB
-	}
-
-	onFilterChange()
 }
 
 function selectCategory (c) {
@@ -435,76 +328,6 @@ function selectCategory (c) {
 	selectedCategoryName.value = c ? c.title : null
 	setColorScale(c)
 	eventBus.emit('PCPlot.selectCategory', c)
-}
-
-function updateHorizontalOffset () {
-	plotParameters.horizontalOffset = getPlotXBounds()[1]/Math.max(1,(categories.value.length-1))	
-}
-
-function updateContainerSize () {
-	const svg = plotCanvas.value
-	const x = componentContainer.value.clientWidth;
-	const y = componentContainer.value.clientHeight;
-	svg.style.width=x+"px"
-	svg.style.height=y+"px"
-
-	updateHorizontalOffset()
-}
-
-function readFile ({file, delimiter} = object) {
-	if (delimiter === "\\t") delimiter = "\t";
-
-	// Clear any existing state
-	Category.wipeLookupTable()
-	data.value = []
-	categories.value = []
-	categoryNameMap.clear()
-	Category.count = 0;
-
-	// Read the CSV file
-	const reader = new FileReader()
-	reader.readAsText(new Blob([file], {"type": file.type}))	
-	reader.onloadend = (e) => {
-		const dataFormat = d3.dsvFormat(delimiter)
-		let csvData = dataFormat.parse(e.target.result)
-
-		const dataToPlot = []
-
-		let maxValMap = new Map()
-		let minValMap = new Map()
-
-		for (let row of csvData) {
-			let dataPoint = {}
-			for (let col of csvData.columns) {
-				let value = row[col]
-
-				if (isNaN(parseFloat(value))) {
-					// Not numeric
-					continue
-				} else {
-					// Numeric
-					value = parseFloat(value)
-					
-
-					if (isNaN(maxValMap.get(col))) maxValMap.set(col, value)
-					if (isNaN(minValMap.get(col))) minValMap.set(col, value)
-
-					if (maxValMap.get(col) < value) maxValMap.set(col, value)
-					else if (minValMap.get(col) > value) minValMap.set(col, value)
-				}
-
-				dataPoint[col] = value
-			}
-			dataToPlot.push(dataPoint)
-		}
-
-		for (let col of csvData.columns) {
-			addCategory(new Category(col, minValMap.get(col), maxValMap.get(col)))
-		}
-
-		data.value.push(...dataToPlot)
-		eventBus.emit('PCPlot.readData', data.value)
-	}
 }
 
 function handleExportRequest (format) {
@@ -538,11 +361,6 @@ function exportPNG () {
 	const csvElement = plotCanvas.value
 	saveSvgAsPng(csvElement, 'PCPlot.png', {encoderOptions: 1, backgroundColor: 'white', scale: 2})
 }
-
-onMounted( () => {
-	// Add listener for resize
-	window.onresize = updateContainerSize
-})
 
 </script>
 
@@ -604,7 +422,6 @@ onMounted( () => {
 			text-anchor: end;
 			dominant-baseline: middle;
 			font-weight: bold;
-
 		}
 	}
 

@@ -9,12 +9,11 @@
                 </tr>
             </thead>
             <tbody class="table-bordered">
-                <tr v-for="(d, index) in data" :key="index">
+                <tr v-for="(d, index) in data.filter(dataStore.dataPointFilterCheck)" :key="index">
                     <td v-for="c in categories" :key="c.id">
                         {{d[c.title]}}
                     </td>
                 </tr>
-
             </tbody>
         </table>
     </div>
@@ -22,25 +21,13 @@
 
 <script setup>
 
-import { reactive, ref, onMounted, onUpdated, inject } from "vue"
+import { reactive, ref, onMounted, onUpdated } from "vue"
+import { storeToRefs } from "pinia"
 
-const eventBus = inject('eventBus')
-const categories = ref([])
-const data = ref([])
+import {useDataStore} from "@/store/DataStore"
 
-// Event bus
-eventBus.on('PCPlot.readData', setData)
-eventBus.on('PCPlot.addCategory', (c) => categories.value.push(c))
-eventBus.on('PCPlot.onFilterChange', setData)
-eventBus.on('SourceForm.readFile', clearCategories)
-
-function clearCategories () {
-    categories.value = []
-}
-
-function setData(d) {
-    data.value = d
-}
+const dataStore = useDataStore()
+const {data, filters, categories} = storeToRefs(dataStore)
 
 </script>
 
