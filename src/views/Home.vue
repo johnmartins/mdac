@@ -45,12 +45,17 @@ import DataList from '@/components/DataList'
 import ScatterPlot from '@/components/plot-layouts/ScatterPlot/ScatterPlot'
 import ScatterSideMenu from '@/components/plot-layouts/ScatterPlot/ScatterSideMenu'
 
+import { storeToRefs } from "pinia"
+import {useLayoutStore} from "@/store/LayoutStore"
+
+const layoutStore = useLayoutStore()
+const {activeView} = storeToRefs(layoutStore)
+
 const pcpContainer = ref(null)
 const scatterContainer = ref(null)
 const dataContainer = ref(null)
 const plot = ref(null)
 
-const activeView = ref('pcp')
 const eventBus = inject('eventBus')
 
 function setView (viewName) {
@@ -71,7 +76,7 @@ function setView (viewName) {
 			console.error('No such view')
 			return
 	}
-	activeView.value = viewName
+	layoutStore.setView(viewName)
 	eventBus.emit('Router.TabChange', viewName)
 }
 

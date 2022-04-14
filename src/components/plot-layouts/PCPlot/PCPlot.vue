@@ -95,13 +95,15 @@ import { saveSvgAsPng } from "save-svg-as-png"
 import { storeToRefs } from "pinia"
 
 import {useDataStore} from "../../../store/DataStore"
+import {useLayoutStore} from "../../../store/LayoutStore"
 import Category from "@/models/plots/Category"
 import DataFilter from "@/models/plots/DataFilter"
 import dataUtils from "@/utils/data-utils"
 
 const dataStore = useDataStore()
 const {data, filters, categories} = storeToRefs(dataStore)
-
+const layoutStore = useLayoutStore()
+const {activeView} = storeToRefs(layoutStore)
 
 // Layout references
 const plotCanvas = ref(null)
@@ -134,8 +136,9 @@ const horizontalOffset = computed( () => {
 })
 
 function updateContainerSize () {
-    plotVariables.xBounds = getPlotXBounds()
-    plotVariables.yBounds = getPlotYBounds()
+	if (activeView.value !== 'pcp') return
+	plotVariables.xBounds = getPlotXBounds()
+	plotVariables.yBounds = getPlotYBounds()
 }
 
 // Data structures

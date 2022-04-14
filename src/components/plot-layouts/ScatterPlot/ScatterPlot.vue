@@ -20,7 +20,6 @@
                     <!-- x-axis group -->
                     <g
                     :transform="`translate(${plotParameters.padding} ${plotParameters.padding})`"> 
-                    >
                         <line 
                         x1="0" :x2="getXAxisLength()" 
                         :y1="getYAxisLength()" :y2="getYAxisLength()" />
@@ -84,13 +83,10 @@
                             :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
                             r="3" />
                         </g>
-
                     </g>
                 </g>
-
             </svg>
         </div>
-
     </div>
 
 </template>

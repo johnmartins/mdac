@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import ScatterPlotConfig from '@/models/plots/ScatterPlotConfig'
 
 export const useScatterStore = defineStore('scatter', {
     state: () => {
