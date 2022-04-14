@@ -70,12 +70,21 @@
 
                     <!-- data group -->
                     <g v-if="selectedPlot">
-                        <g v-for="(d, index) in data" :key="index">
+                        <!-- Excluded data (through user applied filters) -->
+                        <g v-for="(d, index) in data.filter(de => !dataStore.dataPointFilterCheck(de))" :key="index" style="fill: black; opacity: 0.4;">
                             <circle 
                             :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
                             :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
                             r="3" />
                         </g>
+                        <!-- Included data -->
+                        <g v-for="(d, index) in data.filter(dataStore.dataPointFilterCheck)" :key="index" style="fill: blue;">
+                            <circle 
+                            :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
+                            :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
+                            r="3" />
+                        </g>
+
                     </g>
                 </g>
 
