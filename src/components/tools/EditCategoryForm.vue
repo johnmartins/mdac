@@ -10,11 +10,12 @@
                 @change="(v) => {selectedCategoryChanged.lb=parseFloat(v)}">LB</TextInput>
             <TextInput :value="selectedCategoryChanged.ticks" 
                 @change="(v) => {selectedCategoryChanged.ticks=parseInt(v)}">Ticks</TextInput>
-        </div>
-        <div class="btn-group px-2 mb-2">
-            <button class="btn btn-success btn-sm" @click="editCategory">Update</button>
-            <button class="btn btn-warning btn-sm" @click="resetCategory">Reset</button>
-            <button class="btn btn-danger btn-sm" @click="deleteCategory">Delete</button>
+
+            <div class="btn-group" style="width: 100%">
+                <button class="btn btn-success btn-sm" @click="editCategory">Update</button>
+                <button class="btn btn-warning btn-sm" @click="resetCategory">Reset</button>
+                <button class="btn btn-danger btn-sm" @click="deleteCategory">Delete</button>
+            </div>
         </div>
     </div>
 </template>

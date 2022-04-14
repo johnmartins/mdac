@@ -1,19 +1,19 @@
 <template>
     <div class="card mt-3" v-if="selectedPlot">
         <div class="control-group p-2">
-            <strong>Category source selection</strong>
+            <strong>Plot configuration</strong>
             <div class="labeled-form">                
                 <span>Title:</span>
                 <input type="text" ref="yAxisSelector" v-model="selectedPlot.title" @change="onTitleChange">
             </div>
-            <div class="labeled-form">                
+            <div class="labeled-form mt-1">                
                 <span>X-axis:</span>
                 <select ref="xAxisSelector" v-model="selectedPlot.xAxisCategoryName" @change="onAxisChange">
                     <option :value="null" selected>None</option>
                     <option v-for="category in categories" :value="category.title" :key="category.id"> {{category.displayTitle}}</option>
                 </select>
             </div>
-            <div class="labeled-form">                
+            <div class="labeled-form mt-1">                
                 <span>Y-axis:</span>
                 <select ref="yAxisSelector" v-model="selectedPlot.yAxisCategoryName" @change="onAxisChange">
                     <option :value="null" selected>None</option>

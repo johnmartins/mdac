@@ -13,41 +13,58 @@
                     <g v-if="selectedPlot">
                         <text 
                         :x="(plotVariables.xBounds[1] + plotParameters.padding)/2 "
-                        :y="plotVariables.yBounds[0]-plotParameters.axisTitlePadding"
+                        :y="plotVariables.yBounds[0]-plotParameters.xAxisTitlePadding"
                         >
                         {{selectedPlot.title}}</text>
                     </g>
                     <!-- x-axis group -->
-                    <g>
+                    <g
+                    :transform="`translate(${plotParameters.padding} ${plotParameters.padding})`"> 
+                    >
                         <line 
-                        :x1="plotVariables.xBounds[0]" :x2="plotVariables.xBounds[1]" 
-                        :y1="plotVariables.yBounds[1]" :y2="plotVariables.yBounds[1]" />
+                        x1="0" :x2="getXAxisLength()" 
+                        :y1="getYAxisLength()" :y2="getYAxisLength()" />
                         <g v-if="checkAxisIsDefined('x')">
+
+                            <!-- title -->
                             <text class="scatter-axis-title-x" 
-                            v-if="dataStore.getCategoryWithName(selectedPlot.xAxisCategoryName) !== null"
-                            :x="plotVariables.xBounds[1]/2 + plotParameters.axisTitlePadding" 
-                            :y="plotVariables.yBounds[1] + plotParameters.axisTitlePadding"
+                            :x="getXAxisLength()/2" 
+                            :y="getYAxisLength() + plotParameters.xAxisTitlePadding"
                             >
-                            {{dataStore.getCategoryWithName(selectedPlot.xAxisCategoryName).displayTitle}}
+                            {{cx.displayTitle}}
                             </text>
+
+                            <!-- ticks -->
+                            <g class="tick" v-for="(tick, index) in cx.getTickArray()" :key="index"> <!-- Tick group -->
+                                <text :x="getXAxisLength() - cx.scaleLinear(tick)*getXAxisLength()" :y="getYAxisLength()+ 20" class="tick-string">{{cx.getTickString(tick)}}</text>
+                                <line :x1="cx.scaleLinear(tick)*getXAxisLength()" :y1="getYAxisLength()" :x2="cx.scaleLinear(tick)*getXAxisLength()" :y2="getYAxisLength()+5"/>	<!-- Top tick -->
+                            </g>
                         </g>
                     </g>
 
                     <!-- y-axis group -->
-                    <g>
+                    <g
+                    :transform="`translate(${plotParameters.padding} ${plotParameters.padding})`"> 
+                    >
                         <line 
-                        :x1="plotVariables.xBounds[0]" :x2="plotVariables.xBounds[0]" 
-                        :y1="plotVariables.yBounds[0]" :y2="plotVariables.yBounds[1]" 
+                        x1="0" :x2="0" 
+                        :y1="0" :y2="getYAxisLength()" 
                         />
-                        <g v-if="selectedPlot">
+                        <g v-if="checkAxisIsDefined('y')">
+                            <!-- title -->
                             <text class="scatter-axis-title-y" 
-                            v-if="checkAxisIsDefined('y')"
-                            :x="plotVariables.xBounds[0] - plotParameters.axisTitlePadding*2" 
-                            :y="plotVariables.yBounds[1]/2"
-                            :transform="`rotate(-90 ${plotVariables.xBounds[0] - plotParameters.axisTitlePadding} ${plotVariables.yBounds[1]/2})`"
+                            :x="- plotParameters.yAxisTitlePadding" 
+                            :y="getYAxisLength()/2"
+                            :transform="`rotate(-90 ${- plotParameters.yAxisTitlePadding} ${getYAxisLength()/2})`"
                             >
-                            {{dataStore.getCategoryWithName(selectedPlot.yAxisCategoryName).displayTitle}}
+                            {{cy.displayTitle}}
                             </text>
+
+                            <!-- ticks -->
+                            <g class="tick" v-for="(tick, index) in cy.getTickArray()" :key="index"> <!-- Tick group -->
+                                <text :x="- 7" :y="+ cy.scaleLinear(tick)*getYAxisLength()" class="tick-string" style="text-anchor: end;">{{cy.getTickString(tick)}}</text>
+                                <line x1="0" :y1="cy.scaleLinear(tick)*getYAxisLength()" x2="-5" :y2="cy.scaleLinear(tick)*getYAxisLength()"/>	<!-- Top tick -->
+                            </g>
                         </g>
                     </g>
 
@@ -57,7 +74,7 @@
                             <circle 
                             :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
                             :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
-                            r="5" />
+                            r="3" />
                         </g>
                     </g>
                 </g>
@@ -70,7 +87,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, inject } from "vue"
+import { ref, reactive, onMounted, inject, computed } from "vue"
 import * as d3 from "d3"
 import { storeToRefs } from "pinia"
 import {useDataStore} from "@/store/DataStore"
@@ -81,13 +98,16 @@ const {data, filters, categories} = storeToRefs(dataStore)
 const scatterStore = useScatterStore()
 const {selectedPlot} = storeToRefs(scatterStore)
 
+
+// Plot references
 const plotCanvas = ref(null)
-
+const cx = computed (() => selectedPlot.value ? dataStore.getCategoryWithName(selectedPlot.value.xAxisCategoryName) : null)
+const cy = computed (() => selectedPlot.value ? dataStore.getCategoryWithName(selectedPlot.value.yAxisCategoryName) : null)
 const plotParameters = reactive({
-    padding: 50,
-    axisTitlePadding: 25,
+    padding: 120,
+    xAxisTitlePadding: 40,
+    yAxisTitlePadding: 80,
 })
-
 const plotVariables = reactive({
     hasRendered: false,
     xBounds: [],    // 2D vector with x limits
@@ -111,6 +131,14 @@ function getPlotYBounds () {
 function getPlotXBounds () {
 	const array = [plotParameters.padding, plotCanvas.value.getBoundingClientRect().width - plotParameters.padding]
     return array
+}
+
+function getXAxisLength () {
+    return plotVariables.xBounds[1] - plotParameters.padding
+}
+
+function getYAxisLength () {
+    return plotVariables.yBounds[1] - plotParameters.padding
 }
 
 function updateContainerSize () {

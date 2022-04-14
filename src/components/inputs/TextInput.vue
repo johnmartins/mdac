@@ -1,5 +1,5 @@
 <template>
-    <div class="input-group input-group-sm mb-2">
+    <div class="input-group input-group-sm mb-1">
         <div class="input-group-prepend">
             <span class="input-group-text" id="inputGroup-sizing-sm"><slot></slot></span>
         </div>

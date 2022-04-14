@@ -13,16 +13,17 @@
         width: 100%;
         padding-top: 0;
         padding-bottom: 0;
+        height: 1.8em;
     }
     input {
         width: 100%;
+        padding-top: 0;
+        padding-bottom: 0;
+        height: 1.8em;
     }
 }
 
 .control-group {
     user-select: none;
     text-align: left;
-    input {
-        font-size: 0.8rem;
-    }
 }
