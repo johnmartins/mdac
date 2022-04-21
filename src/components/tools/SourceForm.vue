@@ -7,7 +7,8 @@
             <div class="labeled-form">                
                 <span>Delimiter:</span>
                 <select name="delimiter" id="formFileDelimiter" ref="fileDelimiterSelect" @change="readFile">
-                    <option value="," selected>Comma ","</option>
+                    <option value="auto" selected>Auto (default)</option>
+					<option value=",">Comma ","</option>
                     <option value=";">Semi-colon ";"</option>
                     <option value="\t">Tab "\t"</option>
                 </select>
@@ -35,9 +36,39 @@ const {data, filters, categories} = storeToRefs(dataStore)
 // Listeners
 const eventBus = inject('eventBus')
 
+function detectDelimiter (data) {
+	const rows = data.split('\n')
+	const defaultSearchLength = 10
+	const searchLength = rows.length < defaultSearchLength ? rows.length : defaultSearchLength
+
+	const getMatches = function (row, re) {
+		let matchArray = row.match(re)
+		if (!matchArray) return 0
+		return matchArray.length
+	}
+
+	let [commas, tabs, semicolons] = [0, 0, 0]
+
+	for (let i = 0; i < searchLength; i++) {
+		let row = rows[i]
+		commas += getMatches(row, /,/g)
+		tabs += getMatches(row, /\t/g)
+		semicolons += getMatches(row, /;/g)
+	}
+
+	// Find most recurring delimiter and return it
+	let mostRecurring = Math.max(commas, tabs, semicolons)
+	if (mostRecurring === commas) return ","
+	if (mostRecurring === tabs) return "\t"
+	if (mostRecurring === semicolons) return ";"
+	
+	console.error("Failed to identify delimitor. Defaulting to comma.")
+	return ","
+}
+
 function readFile () {
     const file = fileInput.value.files[0] 
-    const delimiter = fileDelimiterSelect.value.value
+    let delimiter = fileDelimiterSelect.value.value
     
 	if (delimiter === "\\t") delimiter = "\t";
 	dataStore.wipeAllData()
@@ -46,6 +77,9 @@ function readFile () {
 	const reader = new FileReader()
 	reader.readAsText(new Blob([file], {"type": file.type}))	
 	reader.onloadend = (e) => {
+		// If auto delimit detection, parse and return likely delimiter
+		if (delimiter === "auto") delimiter = detectDelimiter(e.target.result)
+		// Parse CSV based on selected delimiter
 		const dataFormat = d3.dsvFormat(delimiter)
 		let csvData = dataFormat.parse(e.target.result)
 
