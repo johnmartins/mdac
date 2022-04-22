@@ -7,6 +7,9 @@
             tabindex="0"
             ref="plotCanvas"
             class="scatter-plot svg-content-responsive"
+            @mousedown.prevent="dragFilterStart"
+            @mouseup.prevent="dragFilterEnd"
+            @mousemove="dragFilter"
             >
                 <!-- Full plot group -->
                 <g v-if="plotVariables.hasRendered">
@@ -17,6 +20,21 @@
                         >
                         {{selectedPlot.title}}</text>
                     </g>
+                    <!-- filter group -->
+                    <g
+                    :transform="`translate(${plotParameters.padding} ${plotParameters.padding})`"
+                    > 
+
+                        <rect
+                        v-if="filterVariables.mousedown"
+                        x="0"
+                        y="0"
+                        height="200"
+                        width="200"
+                        />
+
+                    </g>
+
                     <!-- x-axis group -->
                     <g
                     :transform="`translate(${plotParameters.padding} ${plotParameters.padding})`"> 
@@ -44,7 +62,6 @@
                     <!-- y-axis group -->
                     <g
                     :transform="`translate(${plotParameters.padding} ${plotParameters.padding})`"> 
-                    >
                         <line 
                         x1="0" :x2="0" 
                         :y1="0" :y2="getYAxisLength()" 
@@ -68,7 +85,8 @@
                     </g>
 
                     <!-- data group -->
-                    <g v-if="selectedPlot">
+                    <g v-if="selectedPlot"
+                    :transform="`translate(${plotParameters.padding} ${plotParameters.padding})`">
                         <!-- Excluded data (through user applied filters) -->
                         <g v-for="(d, index) in data.filter(de => !dataStore.dataPointFilterCheck(de))" :key="index" style="fill: black; opacity: 0.4;">
                             <circle 
@@ -118,6 +136,14 @@ const plotVariables = reactive({
     xBounds: [],    // 2D vector with x limits
     yBounds: []     // 2D vector with y limits
 })
+const filterVariables = reactive({
+    mousedown: false,
+    startTime: 0,
+    deltaTime: 0,
+    startValue: {},
+    endValue: {}
+
+})
 
 const eventBus = inject('eventBus')
 eventBus.on('Router.TabChange', (viewName) => {
@@ -127,6 +153,20 @@ eventBus.on('Router.TabChange', (viewName) => {
     }
 })
 eventBus.on('Layout.contentResize', updateContainerSize)
+
+function dragFilterStart (evt) {
+    console.log(">>>Drag filter start")
+    filterVariables.mousedown = true
+}
+
+function dragFilterEnd () {
+    console.log(">>>Drag filter end")
+    filterVariables.mousedown = false
+}
+
+function dragFilter () {
+    //console.log("drag filter")
+}
 
 function getPlotYBounds () {
 	const array = [plotParameters.padding, plotCanvas.value.getBoundingClientRect().height - plotParameters.padding]
@@ -159,17 +199,16 @@ function getScaledCoordinate (data, categoryName, axis) {
         if (axis !== 'x' && axis !== 'y') {
             throw new Error('Unknown axis setting')
         }
-        return axis === 'x' ? plotVariables.xBounds[0] : plotVariables.yBounds[1]
+        return axis === 'x' ? 0 : getYAxisLength()
     }
 
     const valueScaled = c.scaleLinear(value)
 
     let coordinate = 0
     if (axis === 'x') {
-        coordinate = plotVariables.xBounds[1] - valueScaled * (plotVariables.xBounds[1] - plotVariables.xBounds[0])
+        coordinate = getXAxisLength() - valueScaled * (plotVariables.xBounds[1] - plotVariables.xBounds[0])
     } else if (axis === 'y') {
-        coordinate = plotVariables.yBounds[0] + valueScaled * (plotVariables.yBounds[1] - plotVariables.yBounds[0])
-        // coordinate = valueScaled * (plotVariables.yBounds[1] - plotVariables.yBounds[0]) - plotVariables.yBounds[0]
+        coordinate = valueScaled * (plotVariables.yBounds[1] - plotVariables.yBounds[0])
     } else {
         throw new Error('Unknown axis setting')
     }
