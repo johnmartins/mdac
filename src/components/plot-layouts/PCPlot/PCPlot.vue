@@ -8,8 +8,8 @@
 			ref="plotCanvas"
 			tabindex="0"
 			style="font-size: 1em;"
-			@mousemove="dragFilterBox"
-			@mouseup="dragFilterDone"
+			@mousemove.prevent="dragFilterBox"
+			@mouseup.prevent="dragFilterDone"
 			@keydown.delete="dataStore.deleteCategory(dataStore.getCategoryWithName(selectedCategoryName))"
 			>
 				
@@ -125,6 +125,7 @@ const plotVariables = reactive({
 	currentFilterCategory: null,
 	currentFilterStartValue: 0,
 	currentFilterEndValue: 0,
+	clickOnCooldown: false,
 	hasRendered: false,
 	xBounds: [0, 500],    // 2D vector with x limits
     yBounds: [0, 500]     // 2D vector with y limits
@@ -259,7 +260,15 @@ function setColorScale (category) {
 	settings.colorScale = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateRgbBasis(["red", "green", "blue"]))
 }
 
-function dragFilterBox(evt) {
+function resetFilterDrag () {
+	plotVariables.mousedown = false
+	plotVariables.currentFilterCategory = null
+	plotVariables.currentFilterStartValue = 0
+	plotVariables.currentFilterDeltaTime = 0
+	plotVariables.currentFilterEndValue = 0
+}
+
+function dragFilterBox (evt) {
 	if (!plotVariables.mousedown) return
 	plotVariables.currentFilterEndValue = evt.layerY
 	plotVariables.currentFilterDeltaTime = Date.now() - plotVariables.currentFilterStartTime
@@ -273,9 +282,27 @@ function dragFilterStart (evt, c) {
 	plotVariables.currentFilterDeltaTime = 0
 }
 
-function dragFilterDone() {
-	if (!plotVariables.mousedown) return
-	plotVariables.mousedown = false
+function triggerClickCooldown () {
+	// This method prevents the end of filter mousedrags to be perceived as clicks
+	plotVariables.clickOnCooldown = true
+	setTimeout(() => {
+		plotVariables.clickOnCooldown = false
+	}, 250)
+}
+
+function dragFilterDone () {
+	let ignoreRequest = false
+	if (!plotVariables.mousedown) ignoreRequest = true
+	if (plotVariables.currentFilterDeltaTime < 250) ignoreRequest = true	
+
+	if (ignoreRequest) {
+		// This filter was likely unintentional.
+		resetFilterDrag()
+		return
+	} else {
+		// This filter was likely intentional. Prevent follow up click
+		triggerClickCooldown()
+	}
 
 	if (Date.now() - plotVariables.currentFilterStartTime < plotParameters.filterMinDragTime) return
 
@@ -315,11 +342,13 @@ function dragFilterDone() {
 		dataStore.addFilter(filter)
 	}
 
-	plotVariables.currentFilterCategory = null
-	plotVariables.currentFilterStartValue = 0
+	resetFilterDrag()
 }
 
 function selectCategory (c) {
+	if (plotVariables.clickOnCooldown) return;
+	if (plotVariables.mousedown === true) return;
+	
 	if (selectedCategoryName.value === c.title) {
 		c = null
 	}
