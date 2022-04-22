@@ -2,7 +2,14 @@
     <div class="card mt-3">
         <div class="control-group p-2">
             <strong>Data source</strong>
-            <input class="form-control form-control-sm mb-2" id="formFileSm" type="file" ref="fileInput" @change="readFile">
+			<input 
+			style="width: 100%;"
+			class="mb-2" 
+			id="formFileSm" 
+			type="file" 
+			accept=".csv"
+			ref="fileInput" 
+			@change="readFile">
 
             <div class="labeled-form">                
                 <span>Delimiter:</span>
@@ -67,12 +74,12 @@ function detectDelimiter (data) {
 }
 
 function readFile () {
+	// Parse form data
     const file = fileInput.value.files[0] 
     let delimiter = fileDelimiterSelect.value.value
-    
 	if (delimiter === "\\t") delimiter = "\t";
+	// Reset existing data state (in case another file was previously loaded)
 	dataStore.wipeAllData()
-
 	// Read the CSV file
 	const reader = new FileReader()
 	reader.readAsText(new Blob([file], {"type": file.type}))	
@@ -82,40 +89,38 @@ function readFile () {
 		// Parse CSV based on selected delimiter
 		const dataFormat = d3.dsvFormat(delimiter)
 		let csvData = dataFormat.parse(e.target.result)
-
+		// Allocate variables for CSV data parsing
 		const dataToPlot = []
-
 		let maxValMap = new Map()
 		let minValMap = new Map()
-
+		// Loop through rows and columns in CSV and handle the data
 		for (let row of csvData) {
 			let dataPoint = {}
 			for (let col of csvData.columns) {
 				let value = row[col]
-
 				if (isNaN(parseFloat(value))) {
 					// Not numeric
 					continue
 				} else {
 					// Numeric
 					value = parseFloat(value)
-
+					// Set initial min/max values (if it has not yet been set)
 					if (isNaN(maxValMap.get(col))) maxValMap.set(col, value)
 					if (isNaN(minValMap.get(col))) minValMap.set(col, value)
-
+					// Update min/max values if necessary
 					if (maxValMap.get(col) < value) maxValMap.set(col, value)
 					else if (minValMap.get(col) > value) minValMap.set(col, value)
 				}
-
+				// Update data point with value from currently parsed column
 				dataPoint[col] = value
 			}
 			dataToPlot.push(dataPoint)
 		}
-
+		// Loop through columns and create Categories used by the plots
 		for (let col of csvData.columns) {
 			dataStore.addCategory(new Category(col, minValMap.get(col), maxValMap.get(col)))
 		}
-
+		// Commit the extracted data to the data store. This triggers the visualization.
 		dataStore.setData(dataToPlot)
 		eventBus.emit('SourceForm.readData', data.value)
 	}
@@ -123,6 +128,6 @@ function readFile () {
 
 </script>
 
-<style>
+<style lang="scss" scoped>
 
 </style>
