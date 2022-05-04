@@ -178,8 +178,6 @@ function dragFilterStart (evt) {
     filterVariables.mousedown = true
     filterVariables.startValue.x = evt.layerX 
     filterVariables.startValue.y = evt.layerY
-
-    console.log(filterVariables.startValue)
 }
 
 function dragFilterEnd (evt) {

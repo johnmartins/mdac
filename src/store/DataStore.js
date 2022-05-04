@@ -31,6 +31,9 @@ export const useDataStore = defineStore('data', {
             this.filters[f.targetCategoryTitle].push(f)
             this.filterIDMap.set(f.id, f)
         },
+        getFilterByID (id) {
+            return this.filterIDMap.get(id)
+        },
         deleteFilter (filterToDelete) {
             let deleteIndex = -1
             for (let i = 0; i < this.filters[filterToDelete.targetCategoryTitle].length; i++) {
