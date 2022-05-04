@@ -2,6 +2,7 @@
     <div class="container side-menu-container">
         <PlotSelectionForm />
         <PlotConfigForm />
+        <FiltersPanel />
     </div>
 </template>
 
@@ -12,6 +13,7 @@ import {useDataStore} from "@/store/DataStore"
 
 import PlotConfigForm from '@/components/tools/scatter-tools/PlotConfigForm'
 import PlotSelectionForm from '@/components/tools/scatter-tools/PlotSelectionForm'
+import FiltersPanel from '@/components/tools/FiltersPanel'
 
 const dataStore = useDataStore()
 const {data, filters, categories} = storeToRefs(dataStore)

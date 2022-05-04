@@ -6,7 +6,8 @@ export const useDataStore = defineStore('data', {
             data: [],
             categories: [],
             categoryNameMap: new Map(),
-            filters: {}         // "categoryName" -> [filterA, filterB, ..]
+            filters: {},         // "categoryName" -> [filterA, filterB, ..]
+            filterIDMap: new Map()
         }),
     getters: {},
     actions: {
@@ -14,9 +15,7 @@ export const useDataStore = defineStore('data', {
             this.data = []
             this.categories = []
             this.categoryNameMap.clear()
-            for (let categoryName in this.filters) {
-                delete this.filters[categoryName];
-            }
+            this.clearFilters()
 
             // Reset static class data
             Category.wipeLookupTable()
@@ -30,6 +29,7 @@ export const useDataStore = defineStore('data', {
                 this.filters[f.targetCategoryTitle] = []
             }
             this.filters[f.targetCategoryTitle].push(f)
+            this.filterIDMap.set(f.id, f)
         },
         deleteFilter (filterToDelete) {
             let deleteIndex = -1
@@ -50,6 +50,7 @@ export const useDataStore = defineStore('data', {
             if (this.filters[filterToDelete.targetCategoryTitle].length === 0) {
                 delete this.filters[filterToDelete.targetCategoryTitle]
             }
+            this.filterIDMap.delete(filterToDelete.id)
         },
         editFilter (oldFilter, newFilter) {
             let changeIndex = -1
@@ -67,6 +68,12 @@ export const useDataStore = defineStore('data', {
                 f.thresholdA = newFilter.thresholdA
                 f.thresholdB = newFilter.thresholdB
             }
+        },
+        clearFilters () {
+            for (let categoryName in this.filters) {
+                delete this.filters[categoryName];
+            }
+            this.filterIDMap.clear()
         },
         addCategory (c) {
             let position = 0

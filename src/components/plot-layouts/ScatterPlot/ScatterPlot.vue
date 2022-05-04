@@ -26,11 +26,12 @@
                     > 
 
                         <rect
+                        class="filter-box-proto"
                         v-if="filterVariables.mousedown"
-                        x="0"
-                        y="0"
-                        height="200"
-                        width="200"
+                        :x="protoFilterRectAttrs.x"
+                        :y="protoFilterRectAttrs.y"
+                        :width="protoFilterRectAttrs.width"
+                        :height="protoFilterRectAttrs.height"
                         />
 
                     </g>
@@ -48,7 +49,7 @@
                             :x="getXAxisLength()/2" 
                             :y="getYAxisLength() + plotParameters.xAxisTitlePadding"
                             >
-                            {{cx.displayTitle}}
+                                {{cx.displayTitle}}
                             </text>
 
                             <!-- ticks -->
@@ -73,7 +74,7 @@
                             :y="getYAxisLength()/2"
                             :transform="`rotate(-90 ${- plotParameters.yAxisTitlePadding} ${getYAxisLength()/2})`"
                             >
-                            {{cy.displayTitle}}
+                                {{cy.displayTitle}}
                             </text>
 
                             <!-- ticks -->
@@ -115,6 +116,7 @@ import * as d3 from "d3"
 import { storeToRefs } from "pinia"
 import {useDataStore} from "@/store/DataStore"
 import {useScatterStore} from "@/store/ScatterStore"
+import DataFilter from "@/models/plots/DataFilter"
 
 const dataStore = useDataStore()
 const {data, filters, categories} = storeToRefs(dataStore)
@@ -140,10 +142,26 @@ const filterVariables = reactive({
     mousedown: false,
     startTime: 0,
     deltaTime: 0,
-    startValue: {},
-    endValue: {}
-
+    startValue: {x:0, y:0},
+    endValue: {x:0, y:0}
 })
+
+const protoFilterRectAttrs = computed( () => {
+    // X axis
+    const x = Math.min(filterVariables.startValue.x, filterVariables.endValue.x) - getPlotXBounds()[0]
+    const width = Math.abs(filterVariables.startValue.x - filterVariables.endValue.x)
+    // Y Axis
+    const y = Math.min(filterVariables.startValue.y, filterVariables.endValue.y) - getPlotYBounds()[0]
+    const height = Math.abs(filterVariables.startValue.y - filterVariables.endValue.y)
+
+    return {
+        x: x, 
+        y: y,
+        width: width,
+        height: height
+    }
+})
+
 
 const eventBus = inject('eventBus')
 eventBus.on('Router.TabChange', (viewName) => {
@@ -155,17 +173,61 @@ eventBus.on('Router.TabChange', (viewName) => {
 eventBus.on('Layout.contentResize', updateContainerSize)
 
 function dragFilterStart (evt) {
-    console.log(">>>Drag filter start")
+    if (!selectedPlot.value) return;
+    if (!cx.value || !cy.value) return;
     filterVariables.mousedown = true
+    filterVariables.startValue.x = evt.layerX 
+    filterVariables.startValue.y = evt.layerY
+
+    console.log(filterVariables.startValue)
 }
 
-function dragFilterEnd () {
-    console.log(">>>Drag filter end")
+function dragFilterEnd (evt) {
+    if (!filterVariables.mousedown) return;
+
+    // First of, delete all existing filters
+    dataStore.clearFilters()
+
+    // Categories
+    const cx = dataStore.getCategoryWithName(selectedPlot.value.xAxisCategoryName)
+    const cy = dataStore.getCategoryWithName(selectedPlot.value.yAxisCategoryName)
+
+    // Proto filter coordinates
+	const x1 = filterVariables.startValue.x - plotParameters.padding
+	const x2 = filterVariables.endValue.x - plotParameters.padding
+    let x1Ratio = 1-(x1 / getXAxisLength())
+	let x2Ratio = 1-(x2 / getXAxisLength())
+    const y1 = filterVariables.startValue.y - plotParameters.padding
+	const y2 = filterVariables.endValue.y - plotParameters.padding
+    let y1Ratio = (y1 / getYAxisLength())
+	let y2Ratio = (y2 / getYAxisLength())
+
+    // Convert to category values
+    const xThresholdA = cx.getScale().invert(x1Ratio)
+    const xThresholdB = cx.getScale().invert(x2Ratio)
+    const yThresholdA = cy.getScale().invert(y1Ratio)
+    const yThresholdB = cy.getScale().invert(y2Ratio)
+
+    // Create filters
+    const xFilter = new DataFilter(cx.title, xThresholdA, xThresholdB)
+    const yFilter = new DataFilter(cy.title, yThresholdA, yThresholdB)
+    dataStore.addFilter(xFilter)
+    dataStore.addFilter(yFilter)
+
+    dragFilterReset()
+}
+
+function dragFilter (evt) {
+    filterVariables.endValue.x = evt.layerX 
+    filterVariables.endValue.y = evt.layerY
+}
+
+function dragFilterReset () {
     filterVariables.mousedown = false
-}
-
-function dragFilter () {
-    //console.log("drag filter")
+    filterVariables.startTime = 0
+    filterVariables.endTime = 0
+    filterVariables.startValue = {x: 0, y: 0}
+    filterVariables.endValue = {x: 0, y: 0}
 }
 
 function getPlotYBounds () {
@@ -227,11 +289,11 @@ function checkAxisIsDefined (axis) {
 
     if (axis === 'x') {
         if (!selectedPlot.value.xAxisCategoryName) return false
-        if (!dataStore.getCategoryWithName(selectedPlot.value.xAxisCategoryName).displayTitle) return false
+        if (!dataStore.getCategoryWithName(selectedPlot.value.xAxisCategoryName)) return false
 
     } else if (axis === 'y') {
         if (!selectedPlot.value.yAxisCategoryName) return false
-        if (!dataStore.getCategoryWithName(selectedPlot.value.yAxisCategoryName).displayTitle) return false
+        if (!dataStore.getCategoryWithName(selectedPlot.value.yAxisCategoryName)) return false
     }
 
     return true
@@ -263,6 +325,12 @@ function checkAxisIsDefined (axis) {
         stroke: transparent;
         dominant-baseline: middle; // Used for vertical alignment
         text-anchor: middle;
+    }
+    .scatter-proto-filter {
+        stroke: black;
+        stroke-opacity: 0.8;
+        fill: yellow;
+        fill-opacity: 0.8;
     }
 }
 
