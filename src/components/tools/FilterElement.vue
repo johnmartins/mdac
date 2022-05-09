@@ -4,7 +4,6 @@
             <input type="number" 
             v-model="filter.thresholdA"
             :step="componentParameters.stepSize"
-            ref="inputThresholdA"
             />
         </div>
         <div>
@@ -20,7 +19,6 @@
             <input type="number" 
             v-model="filter.thresholdB"
             :step="componentParameters.stepSize"
-            ref="inputThresholdB"
             />
             
         </div>
@@ -31,11 +29,9 @@
 </template>
 
 <script setup>
-import { inject, ref, onMounted, reactive, computed } from "vue"
-import { storeToRefs } from "pinia"
+import { inject, ref, onMounted, reactive } from "vue"
 
 import {useDataStore} from "@/store/DataStore"
-import DataFilter from '@/models/plots/DataFilter'
 import Category from '@/models/plots/Category'
 
 const dataStore = useDataStore()
@@ -53,8 +49,6 @@ eventBus.on('EditCategoryForm.editCategory', (c) => {
     }
 })
 
-const inputThresholdA = ref(null)
-const inputThresholdB = ref(null)
 const categoryInfo = reactive({
     sourceObject: null,
     displayTitle: null
