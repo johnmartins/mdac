@@ -7,6 +7,9 @@
             tabindex="0"
             ref="plotCanvas"
             class="scatter-plot svg-content-responsive"
+            @mousedown.prevent="dragFilterStart"
+            @mouseup.prevent="dragFilterEnd"
+            @mousemove="dragFilter"
             >
                 <!-- Full plot group -->
                 <g v-if="plotVariables.hasRendered">
@@ -17,6 +20,22 @@
                         >
                         {{selectedPlot.title}}</text>
                     </g>
+                    <!-- filter group -->
+                    <g
+                    :transform="`translate(${plotParameters.padding} ${plotParameters.padding})`"
+                    > 
+
+                        <rect
+                        class="filter-box-proto"
+                        v-if="filterVariables.mousedown"
+                        :x="protoFilterRectAttrs.x"
+                        :y="protoFilterRectAttrs.y"
+                        :width="protoFilterRectAttrs.width"
+                        :height="protoFilterRectAttrs.height"
+                        />
+
+                    </g>
+
                     <!-- x-axis group -->
                     <g
                     :transform="`translate(${plotParameters.padding} ${plotParameters.padding})`"> 
@@ -30,7 +49,7 @@
                             :x="getXAxisLength()/2" 
                             :y="getYAxisLength() + plotParameters.xAxisTitlePadding"
                             >
-                            {{cx.displayTitle}}
+                                {{cx.displayTitle}}
                             </text>
 
                             <!-- ticks -->
@@ -44,7 +63,6 @@
                     <!-- y-axis group -->
                     <g
                     :transform="`translate(${plotParameters.padding} ${plotParameters.padding})`"> 
-                    >
                         <line 
                         x1="0" :x2="0" 
                         :y1="0" :y2="getYAxisLength()" 
@@ -56,7 +74,7 @@
                             :y="getYAxisLength()/2"
                             :transform="`rotate(-90 ${- plotParameters.yAxisTitlePadding} ${getYAxisLength()/2})`"
                             >
-                            {{cy.displayTitle}}
+                                {{cy.displayTitle}}
                             </text>
 
                             <!-- ticks -->
@@ -68,7 +86,8 @@
                     </g>
 
                     <!-- data group -->
-                    <g v-if="selectedPlot">
+                    <g v-if="selectedPlot"
+                    :transform="`translate(${plotParameters.padding} ${plotParameters.padding})`">
                         <!-- Excluded data (through user applied filters) -->
                         <g v-for="(d, index) in data.filter(de => !dataStore.dataPointFilterCheck(de))" :key="index" style="fill: black; opacity: 0.4;">
                             <circle 
@@ -97,6 +116,7 @@ import * as d3 from "d3"
 import { storeToRefs } from "pinia"
 import {useDataStore} from "@/store/DataStore"
 import {useScatterStore} from "@/store/ScatterStore"
+import DataFilter from "@/models/plots/DataFilter"
 
 const dataStore = useDataStore()
 const {data, filters, categories} = storeToRefs(dataStore)
@@ -118,6 +138,30 @@ const plotVariables = reactive({
     xBounds: [],    // 2D vector with x limits
     yBounds: []     // 2D vector with y limits
 })
+const filterVariables = reactive({
+    mousedown: false,
+    startTime: 0,
+    deltaTime: 0,
+    startValue: {x:0, y:0},
+    endValue: {x:0, y:0}
+})
+
+const protoFilterRectAttrs = computed( () => {
+    // X axis
+    const x = Math.min(filterVariables.startValue.x, filterVariables.endValue.x) - getPlotXBounds()[0]
+    const width = Math.abs(filterVariables.startValue.x - filterVariables.endValue.x)
+    // Y Axis
+    const y = Math.min(filterVariables.startValue.y, filterVariables.endValue.y) - getPlotYBounds()[0]
+    const height = Math.abs(filterVariables.startValue.y - filterVariables.endValue.y)
+
+    return {
+        x: x, 
+        y: y,
+        width: width,
+        height: height
+    }
+})
+
 
 const eventBus = inject('eventBus')
 eventBus.on('Router.TabChange', (viewName) => {
@@ -127,6 +171,62 @@ eventBus.on('Router.TabChange', (viewName) => {
     }
 })
 eventBus.on('Layout.contentResize', updateContainerSize)
+
+function dragFilterStart (evt) {
+    if (!selectedPlot.value) return;
+    if (!cx.value || !cy.value) return;
+    filterVariables.mousedown = true
+    filterVariables.startValue.x = evt.layerX 
+    filterVariables.startValue.y = evt.layerY
+}
+
+function dragFilterEnd (evt) {
+    if (!filterVariables.mousedown) return;
+
+    // First of, delete all existing filters
+    dataStore.clearFilters()
+
+    // Categories
+    const cx = dataStore.getCategoryWithName(selectedPlot.value.xAxisCategoryName)
+    const cy = dataStore.getCategoryWithName(selectedPlot.value.yAxisCategoryName)
+
+    // Proto filter coordinates
+	const x1 = filterVariables.startValue.x - plotParameters.padding
+	const x2 = filterVariables.endValue.x - plotParameters.padding
+    let x1Ratio = 1-(x1 / getXAxisLength())
+	let x2Ratio = 1-(x2 / getXAxisLength())
+    const y1 = filterVariables.startValue.y - plotParameters.padding
+	const y2 = filterVariables.endValue.y - plotParameters.padding
+    let y1Ratio = (y1 / getYAxisLength())
+	let y2Ratio = (y2 / getYAxisLength())
+
+    // Convert to category values
+    const xThresholdA = cx.getScale().invert(x1Ratio)
+    const xThresholdB = cx.getScale().invert(x2Ratio)
+    const yThresholdA = cy.getScale().invert(y1Ratio)
+    const yThresholdB = cy.getScale().invert(y2Ratio)
+
+    // Create filters
+    const xFilter = new DataFilter(cx.title, xThresholdA, xThresholdB)
+    const yFilter = new DataFilter(cy.title, yThresholdA, yThresholdB)
+    dataStore.addFilter(xFilter)
+    dataStore.addFilter(yFilter)
+
+    dragFilterReset()
+}
+
+function dragFilter (evt) {
+    filterVariables.endValue.x = evt.layerX 
+    filterVariables.endValue.y = evt.layerY
+}
+
+function dragFilterReset () {
+    filterVariables.mousedown = false
+    filterVariables.startTime = 0
+    filterVariables.endTime = 0
+    filterVariables.startValue = {x: 0, y: 0}
+    filterVariables.endValue = {x: 0, y: 0}
+}
 
 function getPlotYBounds () {
 	const array = [plotParameters.padding, plotCanvas.value.getBoundingClientRect().height - plotParameters.padding]
@@ -159,17 +259,16 @@ function getScaledCoordinate (data, categoryName, axis) {
         if (axis !== 'x' && axis !== 'y') {
             throw new Error('Unknown axis setting')
         }
-        return axis === 'x' ? plotVariables.xBounds[0] : plotVariables.yBounds[1]
+        return axis === 'x' ? 0 : getYAxisLength()
     }
 
     const valueScaled = c.scaleLinear(value)
 
     let coordinate = 0
     if (axis === 'x') {
-        coordinate = plotVariables.xBounds[1] - valueScaled * (plotVariables.xBounds[1] - plotVariables.xBounds[0])
+        coordinate = getXAxisLength() - valueScaled * (plotVariables.xBounds[1] - plotVariables.xBounds[0])
     } else if (axis === 'y') {
-        coordinate = plotVariables.yBounds[0] + valueScaled * (plotVariables.yBounds[1] - plotVariables.yBounds[0])
-        // coordinate = valueScaled * (plotVariables.yBounds[1] - plotVariables.yBounds[0]) - plotVariables.yBounds[0]
+        coordinate = valueScaled * (plotVariables.yBounds[1] - plotVariables.yBounds[0])
     } else {
         throw new Error('Unknown axis setting')
     }
@@ -188,11 +287,11 @@ function checkAxisIsDefined (axis) {
 
     if (axis === 'x') {
         if (!selectedPlot.value.xAxisCategoryName) return false
-        if (!dataStore.getCategoryWithName(selectedPlot.value.xAxisCategoryName).displayTitle) return false
+        if (!dataStore.getCategoryWithName(selectedPlot.value.xAxisCategoryName)) return false
 
     } else if (axis === 'y') {
         if (!selectedPlot.value.yAxisCategoryName) return false
-        if (!dataStore.getCategoryWithName(selectedPlot.value.yAxisCategoryName).displayTitle) return false
+        if (!dataStore.getCategoryWithName(selectedPlot.value.yAxisCategoryName)) return false
     }
 
     return true
@@ -224,6 +323,12 @@ function checkAxisIsDefined (axis) {
         stroke: transparent;
         dominant-baseline: middle; // Used for vertical alignment
         text-anchor: middle;
+    }
+    .scatter-proto-filter {
+        stroke: black;
+        stroke-opacity: 0.8;
+        fill: yellow;
+        fill-opacity: 0.8;
     }
 }
 

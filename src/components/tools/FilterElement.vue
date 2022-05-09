@@ -1,25 +1,25 @@
 <template>
-    <div class="filter-element-container">
+    <div class="filter-element-container" v-if="filter">
         <div>
             <input type="number" 
+            v-model="filter.thresholdA"
             :step="componentParameters.stepSize"
-            @change="editFilter($event, 'A')"
             ref="inputThresholdA"
             />
         </div>
         <div>
-            <span v-if="thresholdA <= thresholdB">&le;</span> <span v-else>&ge;</span>
+            <span v-if="filter.thresholdA <= filter.thresholdB">&le;</span> <span v-else>&ge;</span>
         </div>
         <div class="category-container">
             <span v-if="categoryInfo.sourceObject">{{categoryInfo.displayTitle}}</span>
         </div>
         <div>
-            <span v-if="thresholdA <= thresholdB">&le;</span> <span v-else>&ge;</span>
+            <span v-if="filter.thresholdA <= filter.thresholdB">&le;</span> <span v-else>&ge;</span>
         </div>
         <div>
             <input type="number" 
+            v-model="filter.thresholdB"
             :step="componentParameters.stepSize"
-            @change="editFilter($event, 'B')" 
             ref="inputThresholdB"
             />
             
@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { inject, ref, onMounted, reactive } from "vue"
+import { inject, ref, onMounted, reactive, computed } from "vue"
 import { storeToRefs } from "pinia"
 
 import {useDataStore} from "@/store/DataStore"
@@ -41,8 +41,11 @@ import Category from '@/models/plots/Category'
 const dataStore = useDataStore()
 
 const props = defineProps({
-    filter: Object
+    filterID: Number
 })
+
+const filter = ref(null)
+
 const eventBus = inject('eventBus')
 eventBus.on('EditCategoryForm.editCategory', (c) => {
     if (c.id == categoryInfo.sourceObject.id) {
@@ -52,41 +55,28 @@ eventBus.on('EditCategoryForm.editCategory', (c) => {
 
 const inputThresholdA = ref(null)
 const inputThresholdB = ref(null)
-const thresholdA = ref(0)
-const thresholdB = ref(1)
 const categoryInfo = reactive({
     sourceObject: null,
     displayTitle: null
 })
 
-const componentParameters = {
-    stepSize: Math.pow(10, Math.floor(Math.log10(props.filter.thresholdA)))/100,
-}
+const componentParameters = reactive({
+    stepSize: 0,
+})
 
 onMounted( () => {
-    inputThresholdA.value.value = Math.round(props.filter.thresholdA*100)/100
-    inputThresholdB.value.value = Math.round(props.filter.thresholdB*100)/100
-    thresholdA.value = Math.round(props.filter.thresholdA*100)/100
-    thresholdB.value = Math.round(props.filter.thresholdB*100)/100
-    categoryInfo.sourceObject = Category.lookup(props.filter.targetCategoryTitle)
+    const filterID = parseInt(props.filterID)
+    const f = dataStore.getFilterByID(filterID)
+    filter.value = f
+
+    categoryInfo.sourceObject = Category.lookup(filter.value.targetCategoryTitle)
     categoryInfo.displayTitle = categoryInfo.sourceObject.displayTitle
+    componentParameters.stepSize = Math.pow(10, Math.floor(Math.log10(filter.value.thresholdA)))/100
 })
 
 function deleteFilter () {
-    const f = props.filter
+    const f = filter.value
     dataStore.deleteFilter(f)
-}
-
-function editFilter (evt) {
-    const tA = parseFloat(inputThresholdA.value.value)
-    const tB = parseFloat(inputThresholdB.value.value)
-    thresholdA.value = tA
-    thresholdB.value = tB
-
-    const of = props.filter
-    const nf = new DataFilter(of.targetCategoryTitle, tA, tB)
-
-    dataStore.editFilter(of, nf)
 }
 
 </script>

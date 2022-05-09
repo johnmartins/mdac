@@ -424,10 +424,6 @@ function exportPNG () {
 		}
 
 		.filter-box-proto {
-			stroke: black;
-			stroke-opacity: 0.8;
-			fill: yellow;
-			fill-opacity: 0.8;
 			x: -8px;
 			width: 16px;
 		}
