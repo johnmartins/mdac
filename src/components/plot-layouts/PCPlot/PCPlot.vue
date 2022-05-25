@@ -14,19 +14,27 @@
 			>
 				
 				<!-- Full graphics group -->
-				<g
+				<g v-if="data.length > 0"
 				:transform="`translate(${plotParameters.padding} 0)`"> 
 				
 					<!-- Data line generator -->
-					<g stroke-width="1" fill="transparent">
-						<g v-for="(d, index) in data" :key="index">
+					<g stroke-width="1" fill="transparent" :transform="`translate(0 ${getPlotYBounds()[0]})`">
+						
+						<!-- Excluded data (through user applied filters) -->
+						<g v-if="!plotParameters.hideFiltered" stroke="#bfbfbf">
 							<path 
-							v-if="dataStore.dataPointFilterCheck(d) || !plotParameters.hideFiltered"
-							:stroke="getLineColor(d)"
+							v-for="(d, index) in data.filter(de => !dataStore.dataPointFilterCheck(de))" :key="index"
 							:stroke-opacity="getLineOpacity(d)"
-							:transform="`translate(0 ${getPlotYBounds()[0]})`"
-							:d="lineGenerator(d)" />
+							:d="lineGenerator(d)"
+							/>
 						</g>
+						
+						<!-- Included data -->
+						<path 
+						v-for="(d, index) in data.filter(de => dataStore.dataPointFilterCheck(de))" :key="index"
+						:stroke="getLineColor(d)"
+						:stroke-opacity="getLineOpacity(d)"
+						:d="lineGenerator(d)" />
 					</g>
 
 					<!-- Axis group -->
@@ -379,7 +387,7 @@ function exportCSV () {
 	style += '.title {font-size: 0.8rem; text-anchor: start; x: 0px;}'
 	style += '.tick-string {font-size: 0.8rem; text-anchor: end; dominant-baseline: middle;}'
 	style += 'line {stroke: black; fill: transparent;}'
-	style += '.filter-box {stroke: black;stroke-opacity: 0.5;fill: purple;fill-opacity: 0.3;x: -8px;width: 16px;}'
+	style += '.filter-box {stroke: white;stroke-opacity: 0.9;fill: purple;fill-opacity: 0.4;x: -8px;width: 16px;}'
 	style += '</style>'
 	var full_svg = head +  style + svgData + "</svg>"
 	var blob = new Blob([full_svg], {type: "image/svg+xml"});  
@@ -415,10 +423,6 @@ function exportPNG () {
 		}
 
 		.filter-box {
-			stroke: black;
-			stroke-opacity: 0.5;
-			fill: purple;
-			fill-opacity: 0.3;
 			x: -8px;
 			width: 16px; 
 		}
