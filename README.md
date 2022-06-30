@@ -1,6 +1,6 @@
 # Multidisciplinary Analysis Client
 
-[![DOI](https://zenodo.org/badge/459617015.svg)](https://zenodo.org/badge/latestdoi/459617015)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6784231.svg)](https://doi.org/10.5281/zenodo.6784231)
 
 ## How to use
 MDAC is an interactive data visualisation tool. It uses a parallel coordinates diagram to display the data, which the user can interact with by adding filters.
