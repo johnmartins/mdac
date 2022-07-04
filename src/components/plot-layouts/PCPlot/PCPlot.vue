@@ -245,7 +245,7 @@ function getPlotXBounds () {
 
 function getLineColor (dataPoint) {
 	if (!settings.colorScaleCategory) return "black"
-	if (!dataPoint[settings.colorScaleCategory]) return "black"
+	if (dataPoint[settings.colorScaleCategory] === null || dataPoint[settings.colorScaleCategory] === undefined) return "black"
 	return settings.colorScale(dataPoint[settings.colorScaleCategory])
 }
 
