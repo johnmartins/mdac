@@ -211,9 +211,7 @@ function lineGenerator(d) {
 		}
 	}
 
-	const lengthPreFilter = dataArray.length
 	dataArray = dataArray.filter((obj) => { return obj != null })
-	const lengthPostFilter = dataArray.length
 
 	let d3CurveType = d3.curveMonotoneX
 	if (plotParameters.curveType === 'curve') {
