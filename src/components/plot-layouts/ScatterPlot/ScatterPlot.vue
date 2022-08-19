@@ -117,6 +117,7 @@ import { storeToRefs } from "pinia"
 import {useDataStore} from "@/store/DataStore"
 import {useScatterStore} from "@/store/ScatterStore"
 import DataFilter from "@/models/plots/DataFilter"
+import {getTrueEventCoordinates} from "@/utils/svg-utils"
 
 const dataStore = useDataStore()
 const {data, filters, categories} = storeToRefs(dataStore)
@@ -175,9 +176,10 @@ eventBus.on('Layout.contentResize', updateContainerSize)
 function dragFilterStart (evt) {
     if (!selectedPlot.value) return;
     if (!cx.value || !cy.value) return;
+    const loc = getTrueEventCoordinates(evt, plotCanvas.value)
     filterVariables.mousedown = true
-    filterVariables.startValue.x = evt.layerX 
-    filterVariables.startValue.y = evt.layerY
+    filterVariables.startValue.x = loc.x 
+    filterVariables.startValue.y = loc.y
 }
 
 function dragFilterEnd (evt) {
@@ -216,8 +218,9 @@ function dragFilterEnd (evt) {
 }
 
 function dragFilter (evt) {
-    filterVariables.endValue.x = evt.layerX 
-    filterVariables.endValue.y = evt.layerY
+    const loc = getTrueEventCoordinates(evt, plotCanvas.value)
+    filterVariables.endValue.x = loc.x
+    filterVariables.endValue.y = loc.y
 }
 
 function dragFilterReset () {

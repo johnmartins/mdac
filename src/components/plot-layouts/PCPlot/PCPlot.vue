@@ -107,6 +107,7 @@ import {useLayoutStore} from "../../../store/LayoutStore"
 import Category from "@/models/plots/Category"
 import DataFilter from "@/models/plots/DataFilter"
 import dataUtils from "@/utils/data-utils"
+import {getTrueEventCoordinates} from "@/utils/svg-utils"
 
 const dataStore = useDataStore()
 const {data, filters, categories} = storeToRefs(dataStore)
@@ -275,15 +276,17 @@ function resetFilterDrag () {
 }
 
 function dragFilterBox (evt) {
+	const loc = getTrueEventCoordinates(evt, plotCanvas.value)
 	if (!plotVariables.mousedown) return
-	plotVariables.currentFilterEndValue = evt.layerY
+	plotVariables.currentFilterEndValue = loc.y
 	plotVariables.currentFilterDeltaTime = Date.now() - plotVariables.currentFilterStartTime
 }
 
 function dragFilterStart (evt, c) {
 	plotVariables.mousedown = true
+	const loc = getTrueEventCoordinates(evt, plotCanvas.value)
 	plotVariables.currentFilterCategory = c 
-	plotVariables.currentFilterStartValue = evt.layerY
+	plotVariables.currentFilterStartValue = loc.y
 	plotVariables.currentFilterStartTime = Date.now()
 	plotVariables.currentFilterDeltaTime = 0
 }
