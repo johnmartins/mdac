@@ -11,7 +11,7 @@ export const useOptionsStore = defineStore('options', {
         // PCP lines
         dataOpacity: 0.8,
         excludedDataOpacity: 0.1,
-        hideExcluded: true,
+        hideExcluded: false,
         curveType: 'line'
 
         }),
