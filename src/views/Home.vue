@@ -54,9 +54,12 @@ import ScatterSideMenu from '@/components/plot-layouts/ScatterPlot/ScatterSideMe
 
 import { storeToRefs } from "pinia"
 import {useLayoutStore} from "@/store/LayoutStore"
+import {useStateStore} from "@/store/StateStore"
 
+const stateStore = useStateStore()
 const layoutStore = useLayoutStore()
-const {activeView} = storeToRefs(layoutStore)
+
+const {activeView} = storeToRefs(stateStore)
 
 const pcpContainer = ref(null)
 const scatterContainer = ref(null)
@@ -84,7 +87,7 @@ function setView (viewName) {
 			console.error('No such view')
 			return
 	}
-	layoutStore.setView(viewName)
+	stateStore.setView(viewName)
 	eventBus.emit('Router.TabChange', viewName)
 }
 

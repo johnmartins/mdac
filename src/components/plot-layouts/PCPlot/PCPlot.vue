@@ -116,14 +116,16 @@ import {getTrueEventCoordinates} from "@/utils/svg-utils"
 import {useDataStore} from "../../../store/DataStore"
 import {useLayoutStore} from "../../../store/LayoutStore"
 import {useOptionsStore} from "../../../store/OptionsStore"
+import {useStateStore} from "../../../store/StateStore"
 
 // Store references
 const dataStore = useDataStore()
 const layoutStore = useLayoutStore()
 const optionsStore = useOptionsStore()
+const stateStore = useStateStore()
 
 const {data, filters, categories} = storeToRefs(dataStore)
-const {activeView} = storeToRefs(layoutStore)
+const {activeView} = storeToRefs(stateStore)
 
 // Layout references
 const plotCanvas = ref(null)
