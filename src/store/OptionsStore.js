@@ -10,10 +10,10 @@ export const useOptionsStore = defineStore('options', {
 
         // PCP lines
         dataOpacity: 0.8,
-        excludedDataOpacity: 0.05,
+        excludedDataOpacity: 0.1,
         hideExcluded: true,
         curveType: 'line'
-        
+
         }),
     getters: {},
     actions: {
