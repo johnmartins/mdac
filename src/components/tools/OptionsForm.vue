@@ -6,9 +6,9 @@
             <RangeInput :value="0.8" @change="setDataOpacity">Data opacity</RangeInput>
             <RangeInput :value="0.05" @change="setFilteredDataOpacity">Filtered data opacity</RangeInput>
 
-            <div class="labeled-form mb-2" @change="setCurveType">
+            <div class="labeled-form mb-2">
                 <span>Curve type: </span>
-                <select ref="lineFormatSelector">
+                <select ref="lineFormatSelector" v-model="optionsStore.curveType">
                     <option value="curve">Curve</option>
                     <option value="line">Line</option>
                 </select>
@@ -16,9 +16,9 @@
 
             <div class="labeled-form">
                 <span>Title size:</span>
-                <input class="me-2" type="number" step="0.1" value="0.8" max="5" min="0" @change="setTitleSize"/>
+                <input class="me-2" type="number" step="0.1" max="5" min="0" v-model="optionsStore.titleSize"/>
                 <span>Tick size:</span>
-                <input type="number" step="0.1" value="0.6" max="5" min="0" @change="setTickSize"/>
+                <input type="number" step="0.1" max="5" min="0" v-model="optionsStore.tickSize"/>
             </div>
 
 
@@ -28,24 +28,24 @@
 
 <script setup>
 import { reactive, ref, inject } from "vue"
+
+// Components
 import RangeInput from '@/components/inputs/RangeInput.vue'
+
+// State
+import {useOptionsStore} from "@/store/OptionsStore"
+
+// State references
+const optionsStore = useOptionsStore()
 
 const eventBus = inject('eventBus')
 
 function setDataOpacity (value) {
-    eventBus.emit('OptionsForm.setDataOpacity', value)
+    optionsStore.dataOpacity = parseFloat(value)
 }
 
 function setFilteredDataOpacity (value) {
-    eventBus.emit('OptionsForm.setFilteredDataOpacity', value)
-}
-
-function setTitleSize (evt) {
-    eventBus.emit('OptionsForm.setTitleSize', evt.target.value)
-}
-
-function setTickSize (evt) {
-    eventBus.emit('OptionsForm.setTickSize', evt.target.value)
+    optionsStore.setExcludedDataOpacity(parseFloat(value))
 }
 
 function setCurveType (evt) {
