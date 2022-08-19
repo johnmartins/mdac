@@ -148,8 +148,6 @@ const plotVariables = reactive({
     yBounds: [0, 500]     // 2D vector with y limits
 })
 
-console.log(process.env)
-
 const horizontalOffset = computed( () => {
 	if (categories.value.length < 2) return 50;
 	return plotVariables.xBounds[1]/Math.max(1,(categories.value.length-1))

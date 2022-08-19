@@ -4,11 +4,18 @@
 			<div class="title-container">
 				MDAC
 			</div>
+
 			<div class="nav-container">
 				<span class="link" @click="setView('pcp')" :class="{active: activeView === 'pcp'}">PCP</span>
 				<span class="link" @click="setView('scatter')" :class="{active: activeView === 'scatter'}">Scatter</span>
 				<span class="link" @click="setView('data')" :class="{active: activeView === 'data'}">Data</span>
+
 			</div>
+
+			<div class="version-container">
+				Version {{appVersion}}
+			</div>
+
 		</div>
 		<div class="content-container">
 			<div ref="pcpContainer" class="fill-content">
@@ -55,6 +62,7 @@ const pcpContainer = ref(null)
 const scatterContainer = ref(null)
 const dataContainer = ref(null)
 const plot = ref(null)
+const appVersion = ref(process.env.VUE_APP_VERSION)
 
 const eventBus = inject('eventBus')
 
@@ -95,7 +103,7 @@ onMounted( () => {
 	.mdac-header {
 		height: $header-height;
 		display: grid;
-		grid-template-columns: 100px auto;
+		grid-template-columns: 100px auto 120px;
 		text-align: left;
 		vertical-align: top;
 		border-bottom: 1px solid whitesmoke;
@@ -117,6 +125,13 @@ onMounted( () => {
 			.active {
 				font-weight: bold;
 			}
+		}
+
+		.version-container {
+			text-align: right;
+			color: darkgrey;
+			font-family: monospace;
+			font-size: 0.8em;
 		}
 	}
 
