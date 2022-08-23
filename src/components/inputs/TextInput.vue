@@ -3,20 +3,21 @@
         <div class="input-group-prepend">
             <span class="input-group-text" id="inputGroup-sizing-sm"><slot></slot></span>
         </div>
-        <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" :value="value" @keyup="onChange">
+        <input 
+        type="text" 
+        class="form-control" 
+        aria-label="Small" 
+        aria-describedby="inputGroup-sizing-sm" 
+        :value="modelValue"
+        @input="$emit('update:modelValue', $event.target.value)"
+        >
     </div>
   
 </template>
 
 <script setup>
-    const props = defineProps({
-        value: [Number, String]
-    })
-    const emit = defineEmits(['change'])
-
-    function onChange(evt) {
-        emit('change', evt.target.value)
-    }
+    defineProps(['modelValue'])
+    defineEmits(['update:modelValue'])
 
 </script>
 

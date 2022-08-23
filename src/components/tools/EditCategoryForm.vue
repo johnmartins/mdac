@@ -1,19 +1,14 @@
 <template>    
-    <div class="card mt-3" v-if="selectedCategoryChanged">
+    <div class="card mt-3" v-if="editedCategory">
         <div class="control-group p-2">
             <strong>Edit selected category</strong>
-            <TextInput :value="selectedCategoryChanged.displayTitle.toString()"
-                @change="(v) => {selectedCategoryChanged.displayTitle=v}">Title</TextInput>
-            <TextInput :value="selectedCategoryChanged.ub" 
-                @change="(v) => {selectedCategoryChanged.ub=parseFloat(v)}">UB</TextInput>
-            <TextInput :value="selectedCategoryChanged.lb" 
-                @change="(v) => {selectedCategoryChanged.lb=parseFloat(v)}">LB</TextInput>
-            <TextInput :value="selectedCategoryChanged.ticks" 
-                @change="(v) => {selectedCategoryChanged.ticks=parseInt(v)}">Ticks</TextInput>
+            <TextInput v-model="editedCategory.displayTitle">Title</TextInput>
+            <TextInput v-model.number="editedCategory.ub">UB</TextInput>
+            <TextInput v-model.number="editedCategory.lb" >LB</TextInput>
+            <TextInput v-model.number="editedCategory.ticks">Ticks</TextInput>
 
             <div class="btn-group" style="width: 100%">
                 <button class="btn btn-success btn-sm" @click="editCategory">Update</button>
-                <button class="btn btn-warning btn-sm" @click="resetCategory">Reset</button>
                 <button class="btn btn-danger btn-sm" @click="deleteCategory">Delete</button>
             </div>
         </div>
@@ -21,48 +16,46 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, onUpdated, inject, watch } from "vue"
-import { storeToRefs } from "pinia"
+    import { ref, watch } from "vue"
+    import { storeToRefs } from "pinia"
 
-import {useDataStore} from "@/store/DataStore"
-import {useStateStore} from "@/store/StateStore"
+    // Stores
+    import {useDataStore} from "@/store/DataStore"
+    import {useStateStore} from "@/store/StateStore"
 
-import TextInput from '@/components/inputs/TextInput'
-import Category from '@/models/plots/Category'
+    // Components
+    import TextInput from '@/components/inputs/TextInput'
+    
+    // Models
+    import Category from '@/models/plots/Category'
 
-const dataStore = useDataStore()
-const stateStore = useStateStore()
+    const dataStore = useDataStore()
+    const stateStore = useStateStore()
 
-const {selectedCategory} = storeToRefs(stateStore)
+    const {selectedCategory} = storeToRefs(stateStore)
+    const editedCategory = ref(null)
 
-let selectedCategoryChanged = ref(null)
+    watch(selectedCategory, () => {
+        if (!selectedCategory.value) {
+            editedCategory.value = null
+            return
+        }
 
-const eventBus = inject('eventBus')
+        // The reason we do this insead of using v-models directly on the inputs is because
+        // utilizing v-models for huge data sets can be very slow. Decoupling the edited and real variable
+        // allows the user to edit the category with normal speed regardless of data set size.
+        let newCat = new Category("$$TEMPORARY_CATEGORY$$", 0, 1, {overwrite: true})
+        newCat.morph(selectedCategory.value, {migrateReference: false})
+        editedCategory.value = newCat
+    })
 
-watch(selectedCategory, () => {
-    if (!selectedCategory.value) {
-        selectedCategoryChanged.value = null
-        return
+    function deleteCategory () {
+        dataStore.deleteCategory(selectedCategory.value)
     }
-    // Create a temporary new category, and copy all information from the selected category to the temporary category
-    let newCat = new Category("$$TEMPORARY_CATEGORY$$", 0, 1, {overwrite: true})
-    newCat.morph(selectedCategory.value, {migrateReference: false})
-    selectedCategoryChanged.value = newCat
-})
 
-function deleteCategory () {
-    dataStore.deleteCategory(selectedCategory.value)
-}
-
-function editCategory () {
-    selectedCategory.value.morph(selectedCategoryChanged.value, {migrateReference: false})
-    eventBus.emit('EditCategoryForm.editCategory', selectedCategory.value)
-}
-
-function resetCategory () {
-    selectedCategoryChanged.value.morph(selectedCategory.value, {migrateReference: false})
-}
-
+    function editCategory () {
+        selectedCategory.value.morph(editedCategory.value, {migrateReference: false})
+    }
 
 </script>
 
