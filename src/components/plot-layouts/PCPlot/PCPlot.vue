@@ -10,7 +10,7 @@
 			style="font-size: 1em;"
 			@mousemove.prevent="dragFilterBox"
 			@mouseup.prevent="dragFilterDone"
-			@keydown.delete="dataStore.deleteCategory(dataStore.getCategoryWithName(selectedCategoryName))"
+			@keydown.delete="dataStore.deleteCategory(selectedCategory)"
 			>
 				
 				<!-- Full graphics group -->
@@ -41,9 +41,9 @@
 					<g 
 					class="axis" 
 					v-for="c in categories" 
-					@click="selectCategory(c)"
+					@click="onClickAxis(c)"
 					@mousedown.prevent="dragFilterStart($event, c)"
-					v-bind:class="{highlighted: selectedCategoryName == c.title}"
+					v-bind:class="{highlighted: getSelectedCategoryTitle() == c.title}"
 					:key="c.position" 
 					:transform="`translate(${c.position*horizontalOffset} ${getPlotYBounds()[0]})`">	
 
@@ -97,7 +97,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, onUpdated, inject, computed } from "vue"
+import { reactive, ref, onMounted, onUpdated, inject, computed, watch } from "vue"
 import { storeToRefs } from "pinia"
 import * as d3 from "d3"
 
@@ -125,7 +125,7 @@ const optionsStore = useOptionsStore()
 const stateStore = useStateStore()
 
 const {data, filters, categories} = storeToRefs(dataStore)
-const {activeView} = storeToRefs(stateStore)
+const {activeView, selectedCategory} = storeToRefs(stateStore)
 
 // Layout references
 const plotCanvas = ref(null)
@@ -134,7 +134,6 @@ const plotParameters = reactive({
 	padding: 50,
 	axisTitlePadding: 150,
 	axisTitleRotation: 45,
-	defaultDataOpacity: 0.8,
 	filterMinDragTime: 125, // ms
 })
 const plotVariables = reactive({
@@ -166,7 +165,6 @@ const settings = reactive({
 	colorScaleCategory: null,
 	colorScale: () => {return "black"}
 })
-const selectedCategoryName = ref(null)
 
 // Event buss listeners and triggers
 const eventBus = inject('eventBus')
@@ -181,6 +179,11 @@ eventBus.on('Router.TabChange', (viewName) => {
         plotVariables.hasRendered = true
         updateContainerSize()
     }
+})
+
+// Listeners
+watch((selectedCategory), () => {
+	setColorScale(selectedCategory.value)
 })
 
 function lineGenerator(d) {
@@ -336,18 +339,21 @@ function dragFilterDone () {
 	resetFilterDrag()
 }
 
-function selectCategory (c) {
+function onClickAxis (c) {
 	if (plotVariables.clickOnCooldown) return;
 	if (plotVariables.mousedown === true) return;
-	
-	if (selectedCategoryName.value === c.title) {
+	if (selectedCategory.value && selectedCategory.value.title === c.title) {
 		c = null
-	}
+	}	
 	
+	// Remove focus from any form element to prevent erronious user input
 	plotCanvas.value.focus()
-	selectedCategoryName.value = c ? c.title : null
-	setColorScale(c)
-	eventBus.emit('PCPlot.selectCategory', c)
+
+	selectedCategory.value = c ? c : null
+}
+
+function getSelectedCategoryTitle () {
+	return selectedCategory.value ? selectedCategory.value.title : null
 }
 
 function handleExportRequest (format) {

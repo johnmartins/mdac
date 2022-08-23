@@ -21,31 +21,32 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, onUpdated, inject } from "vue"
+import { reactive, ref, onMounted, onUpdated, inject, watch } from "vue"
 import { storeToRefs } from "pinia"
 
 import {useDataStore} from "@/store/DataStore"
+import {useStateStore} from "@/store/StateStore"
 
 import TextInput from '@/components/inputs/TextInput'
 import Category from '@/models/plots/Category'
 
 const dataStore = useDataStore()
+const stateStore = useStateStore()
 
-let selectedCategory = ref(null)
+const {selectedCategory} = storeToRefs(stateStore)
+
 let selectedCategoryChanged = ref(null)
 
 const eventBus = inject('eventBus')
-eventBus.on('PCPlot.selectCategory', (c) => {
-    if (!c) {
-         selectedCategory.value = null
-         selectedCategoryChanged.value = null
-         return
-    }
-    selectedCategory.value = c
 
+watch(selectedCategory, () => {
+    if (!selectedCategory.value) {
+        selectedCategoryChanged.value = null
+        return
+    }
     // Create a temporary new category, and copy all information from the selected category to the temporary category
     let newCat = new Category("$$TEMPORARY_CATEGORY$$", 0, 1, {overwrite: true})
-    newCat.morph(c, {migrateReference: false})
+    newCat.morph(selectedCategory.value, {migrateReference: false})
     selectedCategoryChanged.value = newCat
 })
 
