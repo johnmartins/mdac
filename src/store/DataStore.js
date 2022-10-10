@@ -44,7 +44,7 @@ export const useDataStore = defineStore('data', {
                 }
             }
             if (deleteIndex === -1) {
-                console.error('Failed to identify filter to delete.')
+                throw new Error('Failed to identify filter to delete.')
             }
         
             this.filters[filterToDelete.targetCategoryTitle].splice(deleteIndex, 1)

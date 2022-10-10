@@ -16,3 +16,10 @@ app.provide('eventBus', eventBus)
 app.use(createPinia())
 app.use(router)
 app.mount('#app')
+
+
+// Handle errors globally. Send via event bus
+app.config.errorHandler = (err, instance, info) => {
+    eventBus.emit('main.error', err)
+    console.error(err)
+}

@@ -363,7 +363,7 @@ function handleExportRequest (format) {
 		exportPNG()
 	} 
 	else {
-		console.error('Unknown format in export request')
+		throw new Error('Unknown format in export request')
 	}
 }
 

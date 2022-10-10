@@ -59,13 +59,13 @@ function onClickOK () {
 <style lang="scss" scoped>
 
 $height: 80px;
-$width: 200px;
+$width: 300px;
 
 h1 {
     font-size: 1.2em;
     font-weight: bold;
     text-align: left;
-    margin-bottom: 0;
+    margin-bottom: 4px;
 }
 
 .popup-content {

@@ -1,6 +1,7 @@
 <template>
 	<div style="height: 100%;">
 		<div class="mdac-header pt-3 px-3">
+			
 			<div class="title-container">
 				MDAC
 			</div>
@@ -91,7 +92,7 @@ function setView (viewName) {
 			dataContainer.value.style.display="block"
 			break
 		default:
-			console.error('No such view')
+			throw new Error('No such view')
 			return
 	}
 	stateStore.setView(viewName)
@@ -104,6 +105,7 @@ onMounted( () => {
 		eventBus.emit('Layout.contentResize')
 	}
 })
+
 </script>
 
 <style lang="scss" scoped>
