@@ -10,7 +10,7 @@
             <span v-if="filter.thresholdA <= filter.thresholdB">&le;</span> <span v-else>&ge;</span>
         </div>
         <div class="category-container">
-            <span v-if="categoryInfo.sourceObject">{{categoryInfo.displayTitle}}</span>
+            <span v-if="targetCategory">{{targetCategory.displayTitle}}</span>
         </div>
         <div>
             <span v-if="filter.thresholdA <= filter.thresholdB">&le;</span> <span v-else>&ge;</span>
@@ -29,7 +29,7 @@
 </template>
 
 <script setup>
-import { inject, ref, onMounted, reactive } from "vue"
+import { ref, onMounted, reactive } from "vue"
 
 import {useDataStore} from "@/store/DataStore"
 import Category from '@/models/plots/Category'
@@ -41,18 +41,7 @@ const props = defineProps({
 })
 
 const filter = ref(null)
-
-const eventBus = inject('eventBus')
-eventBus.on('EditCategoryForm.editCategory', (c) => {
-    if (c.id == categoryInfo.sourceObject.id) {
-        categoryInfo.displayTitle = c.displayTitle
-    }
-})
-
-const categoryInfo = reactive({
-    sourceObject: null,
-    displayTitle: null
-})
+const targetCategory = ref(null)
 
 const componentParameters = reactive({
     stepSize: 0,
@@ -63,8 +52,7 @@ onMounted( () => {
     const f = dataStore.getFilterByID(filterID)
     filter.value = f
 
-    categoryInfo.sourceObject = Category.lookup(filter.value.targetCategoryTitle)
-    categoryInfo.displayTitle = categoryInfo.sourceObject.displayTitle
+    targetCategory.value = Category.lookup(filter.value.categoryID)
     componentParameters.stepSize = Math.pow(10, Math.floor(Math.log10(filter.value.thresholdA)))/100
 })
 

@@ -1,21 +1,23 @@
 <template>
-    <div style="overflow: auto;">
-        <table class="table table-sm table-striped">
-            <thead>
-                <tr>
-                    <th v-for="c in categories" :key="c.id">
-                        <div><span>{{c.title}}</span></div>
-                    </th>
-                </tr>
-            </thead>
-            <tbody class="table-bordered">
-                <tr v-for="(d, index) in data.filter(dataStore.dataPointFilterCheck)" :key="index">
-                    <td v-for="c in categories" :key="c.id">
-                        {{d[c.title]}}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <div style="overflow: auto; height: 100%;">
+        <div class="table-container">
+            <table class="table table-sm table-striped">
+                <thead>
+                    <tr>
+                        <th v-for="c in categories" :key="c.id">
+                            <div><span>{{c.title}}</span></div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="table-bordered">
+                    <tr v-for="(d, index) in data.filter(dataStore.dataPointFilterCheck)" :key="index">
+                        <td v-for="c in categories" :key="c.id">
+                            {{d[c.title]}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </template>
 
@@ -32,6 +34,11 @@ const {data, filters, categories} = storeToRefs(dataStore)
 </script>
 
 <style lang="scss" scoped>
+
+    .table-container {
+        padding: 8px;
+    }
+
     .table {
         font-size: 0.7em;
         border-spacing: collapse;

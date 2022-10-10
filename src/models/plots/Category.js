@@ -4,6 +4,7 @@ class Category {
 
     static count = 0
     static lookupTable = new Map()
+    static idLookupTable = new Map()
 
     constructor (title, lb, ub, 
         {ticks=5, displayTitle=null, overwrite=false, position=Category.lookupTable.size} = {}) { 
@@ -28,6 +29,7 @@ class Category {
         // Manage static variables
         Category.count++
         Category.lookupTable.set(this.title, this)
+        Category.idLookupTable.set(this.id, this)
     }
 
     getTickString (value) {
@@ -79,15 +81,21 @@ class Category {
 
         if (migrateReference) { 
             Category.lookupTable.set(this.title, this)
+            Category.idLookupTable.set(this.id, this)
         }
     }
 
     static wipeLookupTable () {
         Category.lookupTable.clear()
+        Category.idLookupTable.clear()
     }
 
     static lookup (title) {
         return Category.lookupTable.get(title)
+    }
+
+    static lookupID (id) {
+        return Category.idLookupTable.get(id)
     }
 }
 

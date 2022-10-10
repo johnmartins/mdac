@@ -10,7 +10,7 @@
 			style="font-size: 1em;"
 			@mousemove.prevent="dragFilterBox"
 			@mouseup.prevent="dragFilterDone"
-			@keydown.delete="dataStore.deleteCategory(dataStore.getCategoryWithName(selectedCategoryName))"
+			@keydown.delete="dataStore.deleteCategory(selectedCategory)"
 			>
 				
 				<!-- Full graphics group -->
@@ -21,10 +21,10 @@
 					<g stroke-width="1" fill="transparent" :transform="`translate(0 ${getPlotYBounds()[0]})`">
 						
 						<!-- Excluded data (through user applied filters) -->
-						<g v-if="!plotParameters.hideFiltered" stroke="#bfbfbf">
+						<g v-if="!optionsStore.hideExcluded" stroke="#bfbfbf">
 							<path 
 							v-for="(d, index) in data.filter(de => !dataStore.dataPointFilterCheck(de))" :key="index"
-							:stroke-opacity="getLineOpacity(d)"
+							:stroke-opacity="optionsStore.excludedDataOpacity"
 							:d="lineGenerator(d)"
 							/>
 						</g>
@@ -33,7 +33,7 @@
 						<path 
 						v-for="(d, index) in data.filter(de => dataStore.dataPointFilterCheck(de))" :key="index"
 						:stroke="getLineColor(d)"
-						:stroke-opacity="getLineOpacity(d)"
+						:stroke-opacity="optionsStore.dataOpacity"
 						:d="lineGenerator(d)" />
 					</g>
 
@@ -41,9 +41,9 @@
 					<g 
 					class="axis" 
 					v-for="c in categories" 
-					@click="selectCategory(c)"
+					@click="onClickAxis(c)"
 					@mousedown.prevent="dragFilterStart($event, c)"
-					v-bind:class="{highlighted: selectedCategoryName == c.title}"
+					v-bind:class="{highlighted: getSelectedCategoryTitle() == c.title}"
 					:key="c.position" 
 					:transform="`translate(${c.position*horizontalOffset} ${getPlotYBounds()[0]})`">	
 
@@ -76,6 +76,7 @@
 						<text 
 							:y="getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10)" 
 							class="title" 
+							:style="{fontSize: `${optionsStore.titleSize}em`}"
 							:transform="`rotate(${plotParameters.axisTitleRotation} 0 ${getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10)})`">
 							{{c.displayTitle}}
 						</text>
@@ -85,7 +86,7 @@
 						
 						<!-- Axis tick group -->
 						<g class="tick" v-for="(tick, index) in c.getTickArray()" :key="index"> <!-- Tick group -->
-							<text x="-10" :y="c.scaleLinear(tick)*getAxisLength()" class="tick-string">{{c.getTickString(tick)}}</text>
+							<text x="-10" :y="c.scaleLinear(tick)*getAxisLength()" class="tick-string" :style="{fontSize: `${optionsStore.tickSize}em`}">{{c.getTickString(tick)}}</text>
 							<line x1="0" :y1="c.scaleLinear(tick)*getAxisLength()" x2="-5" :y2="c.scaleLinear(tick)*getAxisLength()"/>	<!-- Top tick -->
 						</g>
 					</g>
@@ -96,23 +97,35 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, onUpdated, inject, computed } from "vue"
+import { reactive, ref, onMounted, onUpdated, inject, computed, watch } from "vue"
+import { storeToRefs } from "pinia"
 import * as d3 from "d3"
+
 import { saveAs } from "file-saver"
 import { saveSvgAsPng } from "save-svg-as-png"
-import { storeToRefs } from "pinia"
 
-import {useDataStore} from "../../../store/DataStore"
-import {useLayoutStore} from "../../../store/LayoutStore"
+// Models
 import Category from "@/models/plots/Category"
 import DataFilter from "@/models/plots/DataFilter"
+
+// Misc
 import dataUtils from "@/utils/data-utils"
 import {getTrueEventCoordinates} from "@/utils/svg-utils"
 
+// Stores
+import {useDataStore} from "../../../store/DataStore"
+import {useLayoutStore} from "../../../store/LayoutStore"
+import {useOptionsStore} from "../../../store/OptionsStore"
+import {useStateStore} from "../../../store/StateStore"
+
+// Store references
 const dataStore = useDataStore()
-const {data, filters, categories} = storeToRefs(dataStore)
 const layoutStore = useLayoutStore()
-const {activeView} = storeToRefs(layoutStore)
+const optionsStore = useOptionsStore()
+const stateStore = useStateStore()
+
+const {data, filters, categories} = storeToRefs(dataStore)
+const {activeView, selectedCategory} = storeToRefs(stateStore)
 
 // Layout references
 const plotCanvas = ref(null)
@@ -121,11 +134,7 @@ const plotParameters = reactive({
 	padding: 50,
 	axisTitlePadding: 150,
 	axisTitleRotation: 45,
-	defaultDataOpacity: 0.8,
-	filteredDataOpacity: 0.05,
 	filterMinDragTime: 125, // ms
-	hideFiltered: false,
-	curveType: 'curve'
 })
 const plotVariables = reactive({
 	mousedown: false,
@@ -156,31 +165,10 @@ const settings = reactive({
 	colorScaleCategory: null,
 	colorScale: () => {return "black"}
 })
-const selectedCategoryName = ref(null)
 
 // Event buss listeners and triggers
 const eventBus = inject('eventBus')
-eventBus.on('OptionsForm.setFilteredDataOpacity', (v) => {
-	plotParameters.filteredDataOpacity = v
-	plotParameters.hideFiltered = false
-	if (v < 0.01) {
-		plotParameters.hideFiltered = true
-	} 
-})
-eventBus.on('OptionsForm.setDataOpacity', (v) => {
-	plotParameters.defaultDataOpacity = v
-})
-eventBus.on('OptionsForm.setTickSize', (v) => {
-	for (let e of document.querySelectorAll('text.tick-string')) {
-		e.style.fontSize = `${v}em`
-	}
-})
-eventBus.on('OptionsForm.setTitleSize', (v) => {
-	for (let e of document.querySelectorAll('text.title')) {
-		e.style.fontSize = `${v}em`
-	}
-})
-eventBus.on('OptionsForm.setCurveType', (v) => {plotParameters.curveType = v})
+
 eventBus.on('ExportForm.exportRequest', handleExportRequest)
 
 // Update container size if certain events occur
@@ -191,6 +179,11 @@ eventBus.on('Router.TabChange', (viewName) => {
         plotVariables.hasRendered = true
         updateContainerSize()
     }
+})
+
+// Listeners
+watch((selectedCategory), () => {
+	setColorScale(selectedCategory.value)
 })
 
 function lineGenerator(d) {
@@ -215,9 +208,9 @@ function lineGenerator(d) {
 	dataArray = dataArray.filter((obj) => { return obj != null })
 
 	let d3CurveType = d3.curveMonotoneX
-	if (plotParameters.curveType === 'curve') {
+	if (optionsStore.curveType === 'curve') {
 		d3CurveType = d3.curveMonotoneX
-	} else if (plotParameters.curveType === 'line') {
+	} else if (optionsStore.curveType === 'line') {
 		d3CurveType = d3.curveLinear
 	}
 	
@@ -246,14 +239,6 @@ function getLineColor (dataPoint) {
 	if (!settings.colorScaleCategory) return "black"
 	if (dataPoint[settings.colorScaleCategory] === null || dataPoint[settings.colorScaleCategory] === undefined) return "black"
 	return settings.colorScale(dataPoint[settings.colorScaleCategory])
-}
-
-function getLineOpacity (dataPoint) {
-	if (dataStore.dataPointFilterCheck(dataPoint)) {
-		return plotParameters.defaultDataOpacity
-	} 
-
-	return plotParameters.filteredDataOpacity
 }
 
 function setColorScale (category) {
@@ -354,18 +339,21 @@ function dragFilterDone () {
 	resetFilterDrag()
 }
 
-function selectCategory (c) {
+function onClickAxis (c) {
 	if (plotVariables.clickOnCooldown) return;
 	if (plotVariables.mousedown === true) return;
-	
-	if (selectedCategoryName.value === c.title) {
+	if (selectedCategory.value && selectedCategory.value.title === c.title) {
 		c = null
-	}
+	}	
 	
+	// Remove focus from any form element to prevent erronious user input
 	plotCanvas.value.focus()
-	selectedCategoryName.value = c ? c.title : null
-	setColorScale(c)
-	eventBus.emit('PCPlot.selectCategory', c)
+
+	selectedCategory.value = c ? c : null
+}
+
+function getSelectedCategoryTitle () {
+	return selectedCategory.value ? selectedCategory.value.title : null
 }
 
 function handleExportRequest (format) {
@@ -375,7 +363,7 @@ function handleExportRequest (format) {
 		exportPNG()
 	} 
 	else {
-		console.error('Unknown format in export request')
+		throw new Error('Unknown format in export request')
 	}
 }
 
@@ -443,12 +431,10 @@ function exportPNG () {
 
 		.title {
 			x: 0px;
-			font-size: 0.8em;	
 			text-anchor: start;
 		}
 
 		.tick-string {
-			font-size: 0.6em;
 			text-anchor: end;
 			dominant-baseline: middle;
 			font-weight: bold;

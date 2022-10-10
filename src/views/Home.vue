@@ -1,14 +1,22 @@
 <template>
 	<div style="height: 100%;">
 		<div class="mdac-header pt-3 px-3">
+			
 			<div class="title-container">
 				MDAC
 			</div>
+
 			<div class="nav-container">
 				<span class="link" @click="setView('pcp')" :class="{active: activeView === 'pcp'}">PCP</span>
 				<span class="link" @click="setView('scatter')" :class="{active: activeView === 'scatter'}">Scatter</span>
 				<span class="link" @click="setView('data')" :class="{active: activeView === 'data'}">Data</span>
+
 			</div>
+
+			<div class="version-container">
+				Version {{appVersion}}
+			</div>
+
 		</div>
 		<div class="content-container">
 			<div ref="pcpContainer" class="fill-content">
@@ -29,6 +37,10 @@
 				</SidebarLayout>
 			</div>
 		</div>
+
+		<div v-for="popup in popups" :key="popup.id">
+			<PopupBox :popupID="popup.id" />
+		</div>
 	</div>
 </template>
 
@@ -38,6 +50,7 @@ import { reactive, ref, onMounted, onUpdated, inject } from "vue"
 // Layouts
 import SidebarLayout from '@/components/layouts/SidebarLayout'
 import BoxLayout from '@/components/layouts/BoxLayout'
+import PopupBox from '@/components/layouts/PopupBox'
 
 import PCPlot from '@/components/plot-layouts/PCPlot/PCPlot.vue'
 import PCPSideMenu from '@/components/plot-layouts/PCPlot/PCPSideMenu'
@@ -47,14 +60,20 @@ import ScatterSideMenu from '@/components/plot-layouts/ScatterPlot/ScatterSideMe
 
 import { storeToRefs } from "pinia"
 import {useLayoutStore} from "@/store/LayoutStore"
+import {useStateStore} from "@/store/StateStore"
+import Popup from "@/models/layout/Popup"
 
+const stateStore = useStateStore()
 const layoutStore = useLayoutStore()
-const {activeView} = storeToRefs(layoutStore)
+
+const {activeView} = storeToRefs(stateStore)
+const {popups} = storeToRefs(layoutStore)
 
 const pcpContainer = ref(null)
 const scatterContainer = ref(null)
 const dataContainer = ref(null)
 const plot = ref(null)
+const appVersion = ref(process.env.VUE_APP_VERSION)
 
 const eventBus = inject('eventBus')
 
@@ -73,10 +92,10 @@ function setView (viewName) {
 			dataContainer.value.style.display="block"
 			break
 		default:
-			console.error('No such view')
+			throw new Error('No such view')
 			return
 	}
-	layoutStore.setView(viewName)
+	stateStore.setView(viewName)
 	eventBus.emit('Router.TabChange', viewName)
 }
 
@@ -86,6 +105,7 @@ onMounted( () => {
 		eventBus.emit('Layout.contentResize')
 	}
 })
+
 </script>
 
 <style lang="scss" scoped>
@@ -95,7 +115,7 @@ onMounted( () => {
 	.mdac-header {
 		height: $header-height;
 		display: grid;
-		grid-template-columns: 100px auto;
+		grid-template-columns: 100px auto 120px;
 		text-align: left;
 		vertical-align: top;
 		border-bottom: 1px solid whitesmoke;
@@ -117,6 +137,13 @@ onMounted( () => {
 			.active {
 				font-weight: bold;
 			}
+		}
+
+		.version-container {
+			text-align: right;
+			color: darkgrey;
+			font-family: monospace;
+			font-size: 0.8em;
 		}
 	}
 

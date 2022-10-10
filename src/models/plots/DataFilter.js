@@ -2,8 +2,8 @@ class DataFilter {
 
     static counter = 0;
 
-    constructor (targetCategoryTitle, thresholdA, thresholdB) {
-        this.targetCategoryTitle = targetCategoryTitle    // Category name
+    constructor (categoryID, thresholdA, thresholdB) {
+        this.categoryID = categoryID
         this.thresholdA = thresholdA        
         this.thresholdB = thresholdB      
         this.id = DataFilter.counter

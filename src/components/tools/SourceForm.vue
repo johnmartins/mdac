@@ -69,8 +69,7 @@ function detectDelimiter (data) {
 	if (mostRecurring === tabs) return "\t"
 	if (mostRecurring === semicolons) return ";"
 	
-	console.error("Failed to identify delimitor. Defaulting to comma.")
-	return ","
+	throw new Error("Failed to identify delimitor automatically.")
 }
 
 function readFile () {
