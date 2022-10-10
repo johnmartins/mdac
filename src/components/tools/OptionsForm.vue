@@ -4,7 +4,7 @@
             <strong>Graphical options</strong>
 
             <RangeInput :value="0.8" @change="setDataOpacity">Data opacity</RangeInput>
-            <RangeInput :value="0.1" @change="setFilteredDataOpacity">Filtered data opacity</RangeInput>
+            <RangeInput :value="0" @change="setFilteredDataOpacity">Filtered data opacity</RangeInput>
 
             <div class="labeled-form mb-2">
                 <span>Curve type: </span>
