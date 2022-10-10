@@ -29,7 +29,7 @@
 </template>
 
 <script setup>
-import { inject, ref, onMounted, reactive } from "vue"
+import { ref, onMounted, reactive } from "vue"
 
 import {useDataStore} from "@/store/DataStore"
 import Category from '@/models/plots/Category'
@@ -41,13 +41,7 @@ const props = defineProps({
 })
 
 const filter = ref(null)
-
-const eventBus = inject('eventBus')
-eventBus.on('EditCategoryForm.editCategory', (c) => {
-    if (c.id == categoryInfo.sourceObject.id) {
-        categoryInfo.displayTitle = c.displayTitle
-    }
-})
+const targetCategory = ref(null)
 
 const categoryInfo = reactive({
     sourceObject: null,

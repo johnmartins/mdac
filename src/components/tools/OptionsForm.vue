@@ -27,7 +27,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, inject } from "vue"
+import { reactive, ref } from "vue"
 
 // Components
 import RangeInput from '@/components/inputs/RangeInput.vue'
@@ -37,8 +37,6 @@ import {useOptionsStore} from "@/store/OptionsStore"
 
 // State references
 const optionsStore = useOptionsStore()
-
-const eventBus = inject('eventBus')
 
 function setDataOpacity (value) {
     optionsStore.dataOpacity = parseFloat(value)
