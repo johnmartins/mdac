@@ -36,6 +36,10 @@
 				</SidebarLayout>
 			</div>
 		</div>
+
+		<div v-for="popup in popups" :key="popup.id">
+			<PopupBox :popupID="popup.id" />
+		</div>
 	</div>
 </template>
 
@@ -45,6 +49,7 @@ import { reactive, ref, onMounted, onUpdated, inject } from "vue"
 // Layouts
 import SidebarLayout from '@/components/layouts/SidebarLayout'
 import BoxLayout from '@/components/layouts/BoxLayout'
+import PopupBox from '@/components/layouts/PopupBox'
 
 import PCPlot from '@/components/plot-layouts/PCPlot/PCPlot.vue'
 import PCPSideMenu from '@/components/plot-layouts/PCPlot/PCPSideMenu'
@@ -55,11 +60,13 @@ import ScatterSideMenu from '@/components/plot-layouts/ScatterPlot/ScatterSideMe
 import { storeToRefs } from "pinia"
 import {useLayoutStore} from "@/store/LayoutStore"
 import {useStateStore} from "@/store/StateStore"
+import Popup from "@/models/layout/Popup"
 
 const stateStore = useStateStore()
 const layoutStore = useLayoutStore()
 
 const {activeView} = storeToRefs(stateStore)
+const {popups} = storeToRefs(layoutStore)
 
 const pcpContainer = ref(null)
 const scatterContainer = ref(null)
