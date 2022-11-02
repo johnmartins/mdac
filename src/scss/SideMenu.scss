@@ -1,0 +1,18 @@
+.information-box {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9em;
+    align-items: center;
+
+    .title {
+        display: inline-block;
+        white-space: nowrap;
+        min-width: 50px;
+    }
+
+    .value {
+        display: inline-block;
+        white-space: nowrap;
+        text-align: right;
+    }
+}
