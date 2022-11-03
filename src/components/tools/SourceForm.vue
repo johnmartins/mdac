@@ -97,8 +97,6 @@ function _parseNumericValue (value, col, minValMap, maxValMap) {
 }
 
 function _parseStringValue (value, col, categoricalDataMap) {
-	console.log(`Value: ${value}, in col: ${col}`)
-
 	if (!categoricalDataMap.get(col)) {
 		categoricalDataMap.set(col, new Set())
 	}
@@ -139,9 +137,10 @@ function parseCSV (fileReaderRes) {
 			} else if (dataUtils.isNumeric(value) && !categoricalColumnsSet.has(col)) {
 				_parseNumericValue(value, col, minValMap, maxValMap)
 				numericalColumnsSet.add(col)
-				
+
 			} else {
 				// If the data makes no sense then skip it to avoid problems downstream.
+				console.warn(`Ignored data in col = "${col}", with value = "${value}". Ambiguous column type (numeric or categoric?).`)
 				continue
 			}
 
@@ -155,7 +154,21 @@ function parseCSV (fileReaderRes) {
 	
 	// Loop through columns and create Categories used by the plots
 	for (let col of csvData.columns) {
-		dataStore.addCategory(new Category(col, minValMap.get(col), maxValMap.get(col)))
+		if (numericalColumnsSet.has(col)) {
+			dataStore.addCategory(new Category(col, minValMap.get(col), maxValMap.get(col)))
+		} else if (categoricalColumnsSet.has(col)) {
+			const categoricalDataCol = new Category(col, 0, 1, {
+				ticks: categoricalDataMap.get(col).length, 
+				usesCategoricalData: true,
+				categoricalDataSet: Array.from(categoricalDataMap.get(col))})
+			
+			dataStore.addCategory(categoricalDataCol)
+		} else {
+			// What's this? Ah.. it is probably not important. Let's launch it into space
+			console.warn(`Ignored column ${col}. Unknown column type (numeric or categoric?).`)
+			continue
+		}
+		
 	}
 
 	// Commit the extracted data to the data store. This triggers the visualization.

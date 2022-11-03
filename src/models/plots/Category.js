@@ -6,8 +6,14 @@ class Category {
     static lookupTable = new Map()
     static idLookupTable = new Map()
 
-    constructor (title, lb, ub, 
-        {ticks=5, displayTitle=null, overwrite=false, position=Category.lookupTable.size} = {}) { 
+    constructor (title, lb, ub, {
+        ticks=5, 
+        displayTitle=null, 
+        overwrite=false, 
+        position=Category.lookupTable.size, 
+        usesCategoricalData=false,
+        availableCategoricalValues=[]
+    } = {}) { 
 
         // Validate input
         if (Category.lookupTable.get(title) && !overwrite) {
@@ -27,17 +33,13 @@ class Category {
         this.disabled = false
 
         // Categorical data variables
-        this.usesCategoricalData = false
-        this.categoricalDataPoints = []
+        this.usesCategoricalData = usesCategoricalData
+        this.availableCategoricalValues = availableCategoricalValues
 
         // Manage static variables
         Category.count++
         Category.lookupTable.set(this.title, this)
         Category.idLookupTable.set(this.id, this)
-    }
-
-    markAsCategoricalData () {
-
     }
 
     getTickString (value) {
@@ -71,7 +73,7 @@ class Category {
     getScale () {
         if (this.usesCategoricalData) {
             // Categorical data
-            return d3.scalePoint().range([0,1]).domain(this.categoricalDataPoints)
+            return d3.scalePoint().range([0,1]).domain(this.availableCategoricalValues)
         } else {
             // Numeric data
             return d3.scaleLinear().range([0,1]).domain([this.ub, this.lb])
