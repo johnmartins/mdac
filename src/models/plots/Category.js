@@ -26,18 +26,30 @@ class Category {
         this.id = Category.count
         this.disabled = false
 
+        // Categorical data variables
+        this.usesCategoricalData = false
+        this.categoricalDataPoints = []
+
         // Manage static variables
         Category.count++
         Category.lookupTable.set(this.title, this)
         Category.idLookupTable.set(this.id, this)
     }
 
+    markAsCategoricalData () {
+
+    }
+
     getTickString (value) {
+        return !this.usesCategoricalData ? this.getTickStringNumeric(value) : value
+    }
+
+    getTickStringNumeric (value) {
         if (isNaN(parseFloat(value))) {
-            return "String"
+            throw new Error(`Encountered non-numeric data in a data series (${this.title}) that was expected to be numeric.`)
         }
 
-        let tickStr = "Whoops"
+        let tickStr
         
         if (this.magnitude < -1) {
             let rounded = Math.round(value * Math.pow(10,(Math.abs(this.magnitude)+3)))/Math.pow(10,3)
@@ -57,7 +69,14 @@ class Category {
     }
 
     getScale () {
-        return d3.scaleLinear().range([0,1]).domain([this.ub, this.lb])
+        if (this.usesCategoricalData) {
+            // Categorical data
+            return d3.scalePoint().range([0,1]).domain(this.categoricalDataPoints)
+        } else {
+            // Numeric data
+            return d3.scaleLinear().range([0,1]).domain([this.ub, this.lb])
+        }
+        
     }
 
     getTickArray () {
