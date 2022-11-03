@@ -160,7 +160,7 @@ function parseCSV (fileReaderRes) {
 			const categoricalDataCol = new Category(col, 0, 1, {
 				ticks: categoricalDataMap.get(col).length, 
 				usesCategoricalData: true,
-				categoricalDataSet: Array.from(categoricalDataMap.get(col))})
+				availableCategoricalValues: Array.from(categoricalDataMap.get(col))})
 			
 			dataStore.addCategory(categoricalDataCol)
 		} else {

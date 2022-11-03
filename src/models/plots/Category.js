@@ -78,10 +78,13 @@ class Category {
             // Numeric data
             return d3.scaleLinear().range([0,1]).domain([this.ub, this.lb])
         }
-        
     }
 
     getTickArray () {
+        if (this.usesCategoricalData) {
+            return this.availableCategoricalValues
+        }
+        
         let ta = [this.lb]
         const tickStep = (this.ub - this.lb)/(this.ticks-1)
         for (let i=0; i<(this.ticks-1); i++) {
