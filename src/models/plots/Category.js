@@ -80,6 +80,18 @@ class Category {
         }
     }
 
+    getOutputFromRatio (ratio) {
+        if (!this.usesCategoricalData) {
+            return this.getScale().invert(ratio)
+        } else {
+            const scale = this.getScale()
+            const domain = scale.domain(); 
+            const range = scale.range();
+            const rangePoints = d3.range(range[0], range[1], scale.step())
+            return domain[d3.bisect(rangePoints, ratio) -1];
+        }
+    }
+
     getTickArray () {
         if (this.usesCategoricalData) {
             return this.availableCategoricalValues

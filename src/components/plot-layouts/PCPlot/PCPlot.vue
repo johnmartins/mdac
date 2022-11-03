@@ -308,10 +308,10 @@ function dragFilterDone () {
 	let y2Ratio = (y2 / getAxisLength())
 
 	// Check if completely out of bounds
-	let outOfBounds = false
 	if ((y1Ratio > 1 || y1Ratio < 0) && (y2Ratio > 1 || y2Ratio < 0) ) {
-		outOfBounds = true
 		console.warn('Filter out of bounds. Ignoring.')
+		resetFilterDrag()
+		return
 	}
 
 	// Limit ratio to be within bounds
@@ -321,22 +321,63 @@ function dragFilterDone () {
 	if (y2Ratio < 0) y2Ratio = -0.01
 	
 	// Check that the range is large enough to be tangible
-	const minRange = 0.0001
-	let insufficientRange = false
+	const minRange = 0.001
 	if (Math.abs(y1Ratio - y2Ratio) < minRange) {
-		insufficientRange = true
+		console.log("too small")
+		resetFilterDrag()
+		return
 	}
 
-	const thresholdA = c.getScale().invert(y1Ratio)
-	const thresholdB = c.getScale().invert(y2Ratio)
-
-	// Create and add filter
-	if (!outOfBounds && !insufficientRange) {
-		const filter = new DataFilter(c.title, thresholdA, thresholdB)
-		dataStore.addFilter(filter)
+	if (c.usesCategoricalData) {
+		createCategoricFilterFromRatios(c, y1Ratio, y2Ratio)
+	} else {
+		createNumericFilterFromRatios(c, y1Ratio, y2Ratio)
 	}
 
 	resetFilterDrag()
+}
+
+function createNumericFilterFromRatios (c, y1Ratio, y2Ratio) {
+	const thresholdA = c.getOutputFromRatio(y1Ratio)
+	const thresholdB = c.getOutputFromRatio(y2Ratio)
+	const filter = new DataFilter(c.title, thresholdA, thresholdB)
+	dataStore.addFilter(filter)
+}
+
+function createCategoricFilterFromRatios (c, y1Ratio, y2Ratio) {
+	const ub = y1Ratio >= y2Ratio ? y1Ratio : y2Ratio
+	const lb = y1Ratio <= y1Ratio ? y1Ratio : y2Ratio
+
+	let lowerBoundRatio = 2
+	let lowerBoundValue = null
+	let upperBoundRatio = -1
+	let upperBoundValue = null
+
+	const includedCategories = []
+	for (let categoricalValue of c.availableCategoricalValues) {
+		const categoryRangeValue = c.scaleLinear(categoricalValue)
+		if (ub >= categoryRangeValue && categoryRangeValue >= lb) {
+			includedCategories.push(categoricalValue)
+
+			if (categoryRangeValue < lowerBoundRatio) {
+				lowerBoundRatio = categoryRangeValue
+				lowerBoundValue = categoricalValue
+			}
+
+			if (categoryRangeValue > upperBoundRatio) {
+				upperBoundRatio = categoryRangeValue
+				upperBoundValue = categoricalValue
+			}
+		}		
+	}
+
+	if (lowerBoundValue === 2 || upperBoundValue === -1) {
+		console.warn(`Failed to get bounds of categorical filter. Bounds: [${lowerBoundValue}, ${upperBoundValue}]`)
+		return
+	}
+	
+	const filter = new DataFilter(c.title, lowerBoundValue, upperBoundValue)
+	dataStore.addFilter(filter)
 }
 
 function onClickAxis (c) {
