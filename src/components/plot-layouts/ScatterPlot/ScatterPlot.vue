@@ -116,7 +116,7 @@ import * as d3 from "d3"
 import { storeToRefs } from "pinia"
 import {useDataStore} from "@/store/DataStore"
 import {useScatterStore} from "@/store/ScatterStore"
-import DataFilter from "@/models/plots/DataFilter"
+import SingleRangeFilter from "@/models/filters/SingleRangeFilter"
 import {getTrueEventCoordinates} from "@/utils/svg-utils"
 
 const dataStore = useDataStore()
@@ -209,8 +209,8 @@ function dragFilterEnd (evt) {
     const yThresholdB = cy.getScale().invert(y2Ratio)
 
     // Create filters
-    const xFilter = new DataFilter(cx.title, xThresholdA, xThresholdB)
-    const yFilter = new DataFilter(cy.title, yThresholdA, yThresholdB)
+    const xFilter = new SingleRangeFilter(cx.title, xThresholdA, xThresholdB)
+    const yFilter = new SingleRangeFilter(cy.title, yThresholdA, yThresholdB)
     dataStore.addFilter(xFilter)
     dataStore.addFilter(yFilter)
 

@@ -1,14 +1,13 @@
-class DataFilter {
+import Filter from '@/models/filters/Filter'
 
-    static counter = 0;
+class SingleRangeFilter extends Filter {
 
-    constructor (categoryID, thresholdA, thresholdB) {
-        this.categoryID = categoryID
+    constructor (columnID, thresholdA, thresholdB) {
+        super()
+        this.type = 'single-range'
+        this.columnID = columnID
         this.thresholdA = thresholdA        
         this.thresholdB = thresholdB      
-        this.id = DataFilter.counter
-
-        DataFilter.counter++
         
         // Threshold A is always lower than threshold B (A < B)
         if (this.thresholdA > this.thresholdB) {
@@ -23,4 +22,4 @@ class DataFilter {
     }
 }
 
-export default DataFilter
+export default SingleRangeFilter

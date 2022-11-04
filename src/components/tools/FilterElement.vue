@@ -52,7 +52,7 @@ onMounted( () => {
     const f = dataStore.getFilterByID(filterID)
     filter.value = f
 
-    targetCategory.value = Category.lookup(filter.value.categoryID)
+    targetCategory.value = Category.lookup(filter.value.columnID)
     componentParameters.stepSize = Math.pow(10, Math.floor(Math.log10(filter.value.thresholdA)))/100
 })
 

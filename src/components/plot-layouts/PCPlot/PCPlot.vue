@@ -55,10 +55,19 @@
 
 						<!-- Axis Filters -->
 						<g v-for="(f, index) in filters[c.title]" :key="index">
-							<rect 
-							class="filter-box"
-							:y="c.scaleLinear(f.thresholdB)*getAxisLength()" 
-							:height="(c.scaleLinear(f.thresholdA)-c.scaleLinear(f.thresholdB))*getAxisLength()" />
+							<g v-if="f.type == 'single-range'">
+								<rect 
+								class="filter-box"
+								:y="c.scaleLinear(f.thresholdB)*getAxisLength()" 
+								:height="(c.scaleLinear(f.thresholdA)-c.scaleLinear(f.thresholdB))*getAxisLength()" />
+							</g>
+							<g v-if="f.type == 'categoric'">
+								<rect
+								class="filter-box"
+								:y="f.lowerBoundRatio*getAxisLength()"
+								:height="(f.upperBoundRatio - f.lowerBoundRatio)*getAxisLength()"
+								/>
+							</g>
 						</g>
 						
 						<!-- Proto axis filters -->
@@ -106,7 +115,8 @@ import { saveSvgAsPng } from "save-svg-as-png"
 
 // Models
 import Category from "@/models/plots/Category"
-import DataFilter from "@/models/plots/DataFilter"
+import SingleRangeFilter from "@/models/filters/SingleRangeFilter"
+import CategoricFilter from "@/models/filters/CategoricFilter"
 
 // Misc
 import dataUtils from "@/utils/data-utils"
@@ -340,13 +350,19 @@ function dragFilterDone () {
 function createNumericFilterFromRatios (c, y1Ratio, y2Ratio) {
 	const thresholdA = c.getOutputFromRatio(y1Ratio)
 	const thresholdB = c.getOutputFromRatio(y2Ratio)
-	const filter = new DataFilter(c.title, thresholdA, thresholdB)
+	const filter = new SingleRangeFilter(c.title, thresholdA, thresholdB)
 	dataStore.addFilter(filter)
 }
 
 function createCategoricFilterFromRatios (c, y1Ratio, y2Ratio) {
-	const ub = y1Ratio >= y2Ratio ? y1Ratio : y2Ratio
-	const lb = y1Ratio <= y1Ratio ? y1Ratio : y2Ratio
+	console.log('build categorical filter')
+
+	// y1 is always higher than y2
+	if (y2Ratio > y1Ratio) {
+		const inter = y2Ratio
+		y2Ratio = y1Ratio
+		y1Ratio = inter
+	}
 
 	let lowerBoundRatio = 2
 	let lowerBoundValue = null
@@ -356,7 +372,7 @@ function createCategoricFilterFromRatios (c, y1Ratio, y2Ratio) {
 	const includedCategories = []
 	for (let categoricalValue of c.availableCategoricalValues) {
 		const categoryRangeValue = c.scaleLinear(categoricalValue)
-		if (ub >= categoryRangeValue && categoryRangeValue >= lb) {
+		if (y1Ratio >= categoryRangeValue && categoryRangeValue >= y2Ratio) {
 			includedCategories.push(categoricalValue)
 
 			if (categoryRangeValue < lowerBoundRatio) {
@@ -376,7 +392,7 @@ function createCategoricFilterFromRatios (c, y1Ratio, y2Ratio) {
 		return
 	}
 	
-	const filter = new DataFilter(c.title, lowerBoundValue, upperBoundValue)
+	const filter = new CategoricFilter(c.title, includedCategories, y1Ratio, y2Ratio)
 	dataStore.addFilter(filter)
 }
 
