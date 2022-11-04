@@ -259,7 +259,12 @@ function setColorScale (category) {
 	}
 
 	settings.colorScaleCategory = category.title
-	settings.colorScale = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateRgbBasis(["red", "green", "blue"]))
+	if (!category.usesCategoricalData) {
+		settings.colorScale = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateRgbBasis(["red", "green", "blue"]))
+	} else {
+		settings.colorScale = d3.scaleOrdinal().domain(category.availableCategoricalValues).range(d3.schemeCategory10)
+	}
+	
 }
 
 function resetFilterDrag () {
