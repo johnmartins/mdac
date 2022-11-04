@@ -149,8 +149,6 @@ function parseCSV (fileReaderRes) {
 		}
 		dataToPlot.push(dataPoint)
 	}
-
-	console.log(categoricalDataMap)
 	
 	// Loop through columns and create Categories used by the plots
 	for (let col of csvData.columns) {

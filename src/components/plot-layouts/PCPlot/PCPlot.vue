@@ -114,10 +114,8 @@ import { saveAs } from "file-saver"
 import { saveSvgAsPng } from "save-svg-as-png"
 
 // Models
-import Category from "@/models/plots/Category"
 import SingleRangeFilter from "@/models/filters/SingleRangeFilter"
 import CategoricFilter from "@/models/filters/CategoricFilter"
-import Filter from "@/models/filters/Filter"
 
 // Misc
 import dataUtils from "@/utils/data-utils"
@@ -339,7 +337,6 @@ function dragFilterDone () {
 	// Check that the range is large enough to be tangible
 	const minRange = 0.001
 	if (Math.abs(y1Ratio - y2Ratio) < minRange) {
-		console.log("too small")
 		resetFilterDrag()
 		return
 	}
