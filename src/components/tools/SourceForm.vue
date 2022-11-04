@@ -30,6 +30,7 @@ import { storeToRefs } from "pinia"
 import * as d3 from "d3"
 
 import {useDataStore} from "@/store/DataStore"
+import dataUtils from "@/utils/data-utils"
 
 import Category from "@/models/plots/Category"
 
@@ -73,57 +74,106 @@ function detectDelimiter (data) {
 }
 
 function readFile () {
-	// Parse form data
-    const file = fileInput.value.files[0] 
-    let delimiter = fileDelimiterSelect.value.value
-	if (delimiter === "\\t") delimiter = "\t";
 	// Reset existing data state (in case another file was previously loaded)
 	dataStore.wipeAllData()
 	// Read the CSV file
+	const file = fileInput.value.files[0] 
 	const reader = new FileReader()
 	reader.readAsText(new Blob([file], {"type": file.type}))	
-	reader.onloadend = (e) => {
-		// If auto delimit detection, parse and return likely delimiter
-		if (delimiter === "auto") delimiter = detectDelimiter(e.target.result)
-		// Parse CSV based on selected delimiter
-		const dataFormat = d3.dsvFormat(delimiter)
-		let csvData = dataFormat.parse(e.target.result)
-		// Allocate variables for CSV data parsing
-		const dataToPlot = []
-		let maxValMap = new Map()
-		let minValMap = new Map()
-		// Loop through rows and columns in CSV and handle the data
-		for (let row of csvData) {
-			let dataPoint = {}
-			for (let col of csvData.columns) {
-				let value = row[col]
-				if (isNaN(parseFloat(value))) {
-					// Not numeric
-					continue
-				} else {
-					// Numeric
-					value = parseFloat(value)
-					// Set initial min/max values (if it has not yet been set)
-					if (isNaN(maxValMap.get(col))) maxValMap.set(col, value)
-					if (isNaN(minValMap.get(col))) minValMap.set(col, value)
-					// Update min/max values if necessary
-					if (maxValMap.get(col) < value) maxValMap.set(col, value)
-					else if (minValMap.get(col) > value) minValMap.set(col, value)
-				}
-				// Update data point with value from currently parsed column
-				dataPoint[col] = value
-			}
-			dataToPlot.push(dataPoint)
-		}
-		// Loop through columns and create Categories used by the plots
-		for (let col of csvData.columns) {
-			dataStore.addCategory(new Category(col, minValMap.get(col), maxValMap.get(col)))
-		}
-		// Commit the extracted data to the data store. This triggers the visualization.
-		dataStore.setData(dataToPlot)
-		eventBus.emit('SourceForm.readData', data.value)
-	}
+	reader.onloadend = parseCSV
 }
+
+function _parseNumericValue (value, col, minValMap, maxValMap) {
+	// Numeric data
+	value = parseFloat(value)
+
+	// Set initial min/max values (if it has not yet been set)
+	if (isNaN(maxValMap.get(col))) maxValMap.set(col, value)
+	if (isNaN(minValMap.get(col))) minValMap.set(col, value)
+
+	// Update min/max values if necessary
+	if (maxValMap.get(col) < value) maxValMap.set(col, value)
+	else if (minValMap.get(col) > value) minValMap.set(col, value)
+}
+
+function _parseStringValue (value, col, categoricalDataMap) {
+	if (!categoricalDataMap.get(col)) {
+		categoricalDataMap.set(col, new Set())
+	}
+	categoricalDataMap.get(col).add(value)
+}
+
+function parseCSV (fileReaderRes) {
+	// Parse form data
+    let delimiter = fileDelimiterSelect.value.value
+	if (delimiter === "\\t") delimiter = "\t";
+
+	// If auto delimit detection, parse and return likely delimiter
+	if (delimiter === "auto") delimiter = detectDelimiter(fileReaderRes.target.result)
+
+	// Parse CSV based on selected delimiter
+	const dataFormat = d3.dsvFormat(delimiter)
+	let csvData = dataFormat.parse(fileReaderRes.target.result)
+
+	// Allocate variables for CSV data parsing
+	const dataToPlot = []
+	const maxValMap = new Map()	// Maps column name to maximum value in that column
+	const minValMap = new Map()	// Maps column name to minimum value in that column
+	const categoricalDataMap = new Map()	// Maps column name to a set of all possible categories in that column (categorical data)
+
+	const numericalColumnsSet = new Set()
+	const categoricalColumnsSet = new Set()
+
+	// Loop through rows and columns in CSV and handle the data
+	for (let row of csvData) {
+		let dataPoint = {}
+		for (let col of csvData.columns) {
+			let value = row[col]
+
+			if (!dataUtils.isNumeric(value) && !numericalColumnsSet.has(col)) {
+				_parseStringValue(value, col, categoricalDataMap)
+				categoricalColumnsSet.add(col)
+
+			} else if (dataUtils.isNumeric(value) && !categoricalColumnsSet.has(col)) {
+				_parseNumericValue(value, col, minValMap, maxValMap)
+				numericalColumnsSet.add(col)
+
+			} else {
+				// If the data makes no sense then skip it to avoid problems downstream.
+				console.warn(`Ignored data in col = "${col}", with value = "${value}". Ambiguous column type (numeric or categoric?).`)
+				continue
+			}
+
+			// Update data point with value from currently parsed column
+			dataPoint[col] = value
+		}
+		dataToPlot.push(dataPoint)
+	}
+	
+	// Loop through columns and create Categories used by the plots
+	for (let col of csvData.columns) {
+		if (numericalColumnsSet.has(col)) {
+			dataStore.addCategory(new Category(col, minValMap.get(col), maxValMap.get(col)))
+		} else if (categoricalColumnsSet.has(col)) {
+			const categoricalDataCol = new Category(col, 0, 1, {
+				ticks: categoricalDataMap.get(col).length, 
+				usesCategoricalData: true,
+				availableCategoricalValues: Array.from(categoricalDataMap.get(col))})
+			
+			dataStore.addCategory(categoricalDataCol)
+		} else {
+			// What's this? Ah.. it is probably not important. Let's launch it into space
+			console.warn(`Ignored column ${col}. Unknown column type (numeric or categoric?).`)
+			continue
+		}
+		
+	}
+
+	// Commit the extracted data to the data store. This triggers the visualization.
+	dataStore.setData(dataToPlot)
+	eventBus.emit('SourceForm.readData', data.value)
+	
+} 
 
 </script>
 

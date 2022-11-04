@@ -55,10 +55,19 @@
 
 						<!-- Axis Filters -->
 						<g v-for="(f, index) in filters[c.title]" :key="index">
-							<rect 
-							class="filter-box"
-							:y="c.scaleLinear(f.thresholdB)*getAxisLength()" 
-							:height="(c.scaleLinear(f.thresholdA)-c.scaleLinear(f.thresholdB))*getAxisLength()" />
+							<g v-if="f.type == 'single-range'">
+								<rect 
+								class="filter-box"
+								:y="c.scaleLinear(f.thresholdB)*getAxisLength()" 
+								:height="(c.scaleLinear(f.thresholdA)-c.scaleLinear(f.thresholdB))*getAxisLength()" />
+							</g>
+							<g v-if="f.type == 'categoric'">
+								<rect
+								class="filter-box"
+								:y="f.lowerBoundRatio*getAxisLength()"
+								:height="(f.upperBoundRatio - f.lowerBoundRatio)*getAxisLength()"
+								/>
+							</g>
 						</g>
 						
 						<!-- Proto axis filters -->
@@ -105,8 +114,8 @@ import { saveAs } from "file-saver"
 import { saveSvgAsPng } from "save-svg-as-png"
 
 // Models
-import Category from "@/models/plots/Category"
-import DataFilter from "@/models/plots/DataFilter"
+import SingleRangeFilter from "@/models/filters/SingleRangeFilter"
+import CategoricFilter from "@/models/filters/CategoricFilter"
 
 // Misc
 import dataUtils from "@/utils/data-utils"
@@ -249,7 +258,12 @@ function setColorScale (category) {
 	}
 
 	settings.colorScaleCategory = category.title
-	settings.colorScale = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateRgbBasis(["red", "green", "blue"]))
+	if (!category.usesCategoricalData) {
+		settings.colorScale = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateRgbBasis(["red", "green", "blue"]))
+	} else {
+		settings.colorScale = d3.scaleOrdinal().domain(category.availableCategoricalValues).range(d3.schemeCategory10)
+	}
+	
 }
 
 function resetFilterDrag () {
@@ -308,10 +322,10 @@ function dragFilterDone () {
 	let y2Ratio = (y2 / getAxisLength())
 
 	// Check if completely out of bounds
-	let outOfBounds = false
 	if ((y1Ratio > 1 || y1Ratio < 0) && (y2Ratio > 1 || y2Ratio < 0) ) {
-		outOfBounds = true
 		console.warn('Filter out of bounds. Ignoring.')
+		resetFilterDrag()
+		return
 	}
 
 	// Limit ratio to be within bounds
@@ -321,19 +335,18 @@ function dragFilterDone () {
 	if (y2Ratio < 0) y2Ratio = -0.01
 	
 	// Check that the range is large enough to be tangible
-	const minRange = 0.0001
-	let insufficientRange = false
+	const minRange = 0.001
 	if (Math.abs(y1Ratio - y2Ratio) < minRange) {
-		insufficientRange = true
+		resetFilterDrag()
+		return
 	}
 
-	const thresholdA = c.getScale().invert(y1Ratio)
-	const thresholdB = c.getScale().invert(y2Ratio)
-
-	// Create and add filter
-	if (!outOfBounds && !insufficientRange) {
-		const filter = new DataFilter(c.title, thresholdA, thresholdB)
-		dataStore.addFilter(filter)
+	if (c.usesCategoricalData) {
+		const f = CategoricFilter.createFromRatios(c, y1Ratio, y2Ratio)
+		dataStore.addFilter(f)
+	} else {
+		const f = SingleRangeFilter.createFromRatios(c, y1Ratio, y2Ratio)
+		dataStore.addFilter(f)
 	}
 
 	resetFilterDrag()
