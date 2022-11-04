@@ -114,6 +114,8 @@ class Category {
         this.position = c.position
         this.ticks = c.ticks
         this.disabled = c.disabled
+        this.usesCategoricalData = c.usesCategoricalData
+        this.availableCategoricalValues = c.availableCategoricalValues
 
         if (migrateReference) { 
             Category.lookupTable.set(this.title, this)
