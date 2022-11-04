@@ -114,10 +114,12 @@
 import { ref, reactive, onMounted, inject, computed } from "vue"
 import * as d3 from "d3"
 import { storeToRefs } from "pinia"
+
 import {useDataStore} from "@/store/DataStore"
 import {useScatterStore} from "@/store/ScatterStore"
-import DataFilter from "@/models/plots/DataFilter"
+import SingleRangeFilter from "@/models/filters/SingleRangeFilter"
 import {getTrueEventCoordinates} from "@/utils/svg-utils"
+import CategoricFilter from "@/models/filters/CategoricFilter"
 
 const dataStore = useDataStore()
 const {data, filters, categories} = storeToRefs(dataStore)
@@ -202,19 +204,17 @@ function dragFilterEnd (evt) {
     let y1Ratio = (y1 / getYAxisLength())
 	let y2Ratio = (y2 / getYAxisLength())
 
-    // Convert to category values
-    const xThresholdA = cx.getScale().invert(x1Ratio)
-    const xThresholdB = cx.getScale().invert(x2Ratio)
-    const yThresholdA = cy.getScale().invert(y1Ratio)
-    const yThresholdB = cy.getScale().invert(y2Ratio)
-
-    // Create filters
-    const xFilter = new DataFilter(cx.title, xThresholdA, xThresholdB)
-    const yFilter = new DataFilter(cy.title, yThresholdA, yThresholdB)
-    dataStore.addFilter(xFilter)
-    dataStore.addFilter(yFilter)
+    createFilter(cx, x1Ratio, x2Ratio)
+    createFilter(cy, y1Ratio, y2Ratio)
 
     dragFilterReset()
+}
+
+function createFilter (category, axisRatio1, axisRatio2) {
+    dataStore.addFilter(category.usesCategoricalData ? 
+        CategoricFilter.createFromRatios(category, axisRatio1, axisRatio2) : 
+        SingleRangeFilter.createFromRatios(category, axisRatio1, axisRatio2)
+    )
 }
 
 function dragFilter (evt) {

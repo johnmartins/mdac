@@ -6,8 +6,14 @@ class Category {
     static lookupTable = new Map()
     static idLookupTable = new Map()
 
-    constructor (title, lb, ub, 
-        {ticks=5, displayTitle=null, overwrite=false, position=Category.lookupTable.size} = {}) { 
+    constructor (title, lb, ub, {
+        ticks=5, 
+        displayTitle=null, 
+        overwrite=false, 
+        position=Category.lookupTable.size, 
+        usesCategoricalData=false,
+        availableCategoricalValues=[]
+    } = {}) { 
 
         // Validate input
         if (Category.lookupTable.get(title) && !overwrite) {
@@ -26,6 +32,10 @@ class Category {
         this.id = Category.count
         this.disabled = false
 
+        // Categorical data variables
+        this.usesCategoricalData = usesCategoricalData
+        this.availableCategoricalValues = availableCategoricalValues
+
         // Manage static variables
         Category.count++
         Category.lookupTable.set(this.title, this)
@@ -33,11 +43,15 @@ class Category {
     }
 
     getTickString (value) {
+        return !this.usesCategoricalData ? this.getTickStringNumeric(value) : value
+    }
+
+    getTickStringNumeric (value) {
         if (isNaN(parseFloat(value))) {
-            return "String"
+            throw new Error(`Encountered non-numeric data in a data series (${this.title}) that was expected to be numeric.`)
         }
 
-        let tickStr = "Whoops"
+        let tickStr
         
         if (this.magnitude < -1) {
             let rounded = Math.round(value * Math.pow(10,(Math.abs(this.magnitude)+3)))/Math.pow(10,3)
@@ -57,10 +71,32 @@ class Category {
     }
 
     getScale () {
-        return d3.scaleLinear().range([0,1]).domain([this.ub, this.lb])
+        if (this.usesCategoricalData) {
+            // Categorical data
+            return d3.scalePoint().range([0,1]).domain(this.availableCategoricalValues)
+        } else {
+            // Numeric data
+            return d3.scaleLinear().range([0,1]).domain([this.ub, this.lb])
+        }
+    }
+
+    getOutputFromRatio (ratio) {
+        if (!this.usesCategoricalData) {
+            return this.getScale().invert(ratio)
+        } else {
+            const scale = this.getScale()
+            const domain = scale.domain(); 
+            const range = scale.range();
+            const rangePoints = d3.range(range[0], range[1], scale.step())
+            return domain[d3.bisect(rangePoints, ratio) -1];
+        }
     }
 
     getTickArray () {
+        if (this.usesCategoricalData) {
+            return this.availableCategoricalValues
+        }
+        
         let ta = [this.lb]
         const tickStep = (this.ub - this.lb)/(this.ticks-1)
         for (let i=0; i<(this.ticks-1); i++) {
@@ -78,6 +114,8 @@ class Category {
         this.position = c.position
         this.ticks = c.ticks
         this.disabled = c.disabled
+        this.usesCategoricalData = c.usesCategoricalData
+        this.availableCategoricalValues = c.availableCategoricalValues
 
         if (migrateReference) { 
             Category.lookupTable.set(this.title, this)

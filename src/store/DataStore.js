@@ -6,7 +6,7 @@ export const useDataStore = defineStore('data', {
             data: [],
             categories: [],
             categoryNameMap: new Map(),
-            filters: {},         // "categoryID" -> [filterA, filterB, ..]
+            filters: {},         // "ColumnID" -> [filterA, filterB, ..]
             filterIDMap: new Map()
         }),
     getters: {},
@@ -25,10 +25,10 @@ export const useDataStore = defineStore('data', {
             this.data = data
         },
         addFilter (f) {
-            if (!this.filters[f.categoryID]) {
-                this.filters[f.categoryID] = []
+            if (!this.filters[f.columnID]) {
+                this.filters[f.columnID] = []
             }
-            this.filters[f.categoryID].push(f)
+            this.filters[f.columnID].push(f)
             this.filterIDMap.set(f.id, f)
         },
         getFilterByID (id) {
@@ -36,8 +36,8 @@ export const useDataStore = defineStore('data', {
         },
         deleteFilter (filterToDelete) {
             let deleteIndex = -1
-            for (let i = 0; i < this.filters[filterToDelete.categoryID].length; i++) {
-                const f = this.filters[filterToDelete.categoryID][i]
+            for (let i = 0; i < this.filters[filterToDelete.columnID].length; i++) {
+                const f = this.filters[filterToDelete.columnID][i]
                 if (f.id === filterToDelete.id) {
                     deleteIndex = i
                     break;
@@ -47,18 +47,18 @@ export const useDataStore = defineStore('data', {
                 throw new Error('Failed to identify filter to delete.')
             }
         
-            this.filters[filterToDelete.categoryID].splice(deleteIndex, 1)
+            this.filters[filterToDelete.columnID].splice(deleteIndex, 1)
 
             // If there are no remaining filters for a category, then delete the key
-            if (this.filters[filterToDelete.categoryID].length === 0) {
-                delete this.filters[filterToDelete.categoryID]
+            if (this.filters[filterToDelete.columnID].length === 0) {
+                delete this.filters[filterToDelete.columnID]
             }
             this.filterIDMap.delete(filterToDelete.id)
         },
         editFilter (oldFilter, newFilter) {
             let changeIndex = -1
-            for (let i = 0; i < this.filters[oldFilter.categoryID].length; i++) {
-                const f = this.filters[oldFilter.categoryID][i]
+            for (let i = 0; i < this.filters[oldFilter.columnID].length; i++) {
+                const f = this.filters[oldFilter.columnID][i]
         
                 if (f.id == oldFilter.id) {
                     changeIndex = i
@@ -67,7 +67,7 @@ export const useDataStore = defineStore('data', {
             }
         
             if (changeIndex >= 0) {
-                const f = this.filters[oldFilter.categoryID][changeIndex]
+                const f = this.filters[oldFilter.columnID][changeIndex]
                 f.thresholdA = newFilter.thresholdA
                 f.thresholdB = newFilter.thresholdB
             }

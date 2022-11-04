@@ -3,9 +3,11 @@
         <div class="control-group p-2">
             <strong>Edit selected category</strong>
             <TextInput v-model="editedCategory.displayTitle">Title</TextInput>
-            <TextInput v-model.number="editedCategory.ub">UB</TextInput>
-            <TextInput v-model.number="editedCategory.lb" >LB</TextInput>
-            <TextInput v-model.number="editedCategory.ticks">Ticks</TextInput>
+            <div v-if="editedCategory.usesCategoricalData == false">
+                <TextInput v-model.number="editedCategory.ub">UB</TextInput>
+                <TextInput v-model.number="editedCategory.lb" >LB</TextInput>
+                <TextInput v-model.number="editedCategory.ticks">Ticks</TextInput>
+            </div>
 
             <div class="btn-group" style="width: 100%">
                 <button class="btn btn-success btn-sm" @click="editCategory">Update</button>

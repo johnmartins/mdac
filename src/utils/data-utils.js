@@ -9,5 +9,10 @@ export default {
         if (!decimalPart) return float
         decimalPart = decimalPart.length > decimals ? decimalPart.substring(0, decimals) : decimalPart
         return parseFloat([integerPart, decimalPart].join("."))
+    },
+
+    isNumeric: function(str) {
+        if (typeof(str) != 'string') return false
+        return !isNaN(str) && !isNaN(parseFloat(str))
     }
 }
