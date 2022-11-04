@@ -20,6 +20,12 @@ class SingleRangeFilter extends Filter {
     filter (value) {
         return value >= this.thresholdA && value <= this.thresholdB
     }
+
+    static createFromRatios (c, y1Ratio, y2Ratio) {
+        const thresholdA = c.getOutputFromRatio(y1Ratio)
+        const thresholdB = c.getOutputFromRatio(y2Ratio)
+        return new SingleRangeFilter(c.title, thresholdA, thresholdB)
+    }
 }
 
 export default SingleRangeFilter

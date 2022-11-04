@@ -6,6 +6,7 @@ class Filter {
         this.id = Filter.counter
         Filter.counter++
     }
+
 }
 
 export default Filter

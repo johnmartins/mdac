@@ -117,6 +117,7 @@ import { saveSvgAsPng } from "save-svg-as-png"
 import Category from "@/models/plots/Category"
 import SingleRangeFilter from "@/models/filters/SingleRangeFilter"
 import CategoricFilter from "@/models/filters/CategoricFilter"
+import Filter from "@/models/filters/Filter"
 
 // Misc
 import dataUtils from "@/utils/data-utils"
@@ -344,61 +345,14 @@ function dragFilterDone () {
 	}
 
 	if (c.usesCategoricalData) {
-		createCategoricFilterFromRatios(c, y1Ratio, y2Ratio)
+		const f = CategoricFilter.createFromRatios(c, y1Ratio, y2Ratio)
+		dataStore.addFilter(f)
 	} else {
-		createNumericFilterFromRatios(c, y1Ratio, y2Ratio)
+		const f = SingleRangeFilter.createFromRatios(c, y1Ratio, y2Ratio)
+		dataStore.addFilter(f)
 	}
 
 	resetFilterDrag()
-}
-
-function createNumericFilterFromRatios (c, y1Ratio, y2Ratio) {
-	const thresholdA = c.getOutputFromRatio(y1Ratio)
-	const thresholdB = c.getOutputFromRatio(y2Ratio)
-	const filter = new SingleRangeFilter(c.title, thresholdA, thresholdB)
-	dataStore.addFilter(filter)
-}
-
-function createCategoricFilterFromRatios (c, y1Ratio, y2Ratio) {
-	console.log('build categorical filter')
-
-	// y1 is always higher than y2
-	if (y2Ratio > y1Ratio) {
-		const inter = y2Ratio
-		y2Ratio = y1Ratio
-		y1Ratio = inter
-	}
-
-	let lowerBoundRatio = 2
-	let lowerBoundValue = null
-	let upperBoundRatio = -1
-	let upperBoundValue = null
-
-	const includedCategories = []
-	for (let categoricalValue of c.availableCategoricalValues) {
-		const categoryRangeValue = c.scaleLinear(categoricalValue)
-		if (y1Ratio >= categoryRangeValue && categoryRangeValue >= y2Ratio) {
-			includedCategories.push(categoricalValue)
-
-			if (categoryRangeValue < lowerBoundRatio) {
-				lowerBoundRatio = categoryRangeValue
-				lowerBoundValue = categoricalValue
-			}
-
-			if (categoryRangeValue > upperBoundRatio) {
-				upperBoundRatio = categoryRangeValue
-				upperBoundValue = categoricalValue
-			}
-		}		
-	}
-
-	if (lowerBoundValue === 2 || upperBoundValue === -1) {
-		console.warn(`Failed to get bounds of categorical filter. Bounds: [${lowerBoundValue}, ${upperBoundValue}]`)
-		return
-	}
-	
-	const filter = new CategoricFilter(c.title, includedCategories, y1Ratio, y2Ratio)
-	dataStore.addFilter(filter)
 }
 
 function onClickAxis (c) {
