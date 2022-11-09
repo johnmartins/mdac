@@ -45,12 +45,12 @@
 					@mousedown.prevent="dragFilterStart($event, c)"
 					v-bind:class="{highlighted: getSelectedCategoryTitle() == c.title}"
 					:key="c.position" 
-					:transform="`translate(${c.position*horizontalOffset} ${getPlotYBounds()[0]})`">	
+					:transform="`translate(${dataUtils.mercilessDecimalDeleter(c.position*horizontalOffset,1)} ${dataUtils.mercilessDecimalDeleter(getPlotYBounds()[0], 1)})`">	
 
 						<!-- Hitbox -->
 						<rect 
 						class="filter-hitbox"
-						:height="getAxisLength()+40"
+						:height="dataUtils.mercilessDecimalDeleter(getAxisLength()+40, 1)"
 						/>
 
 						<!-- Axis Filters -->
@@ -58,14 +58,14 @@
 							<g v-if="f.type == 'single-range'">
 								<rect 
 								class="filter-box"
-								:y="c.scaleLinear(f.thresholdB)*getAxisLength()" 
-								:height="(c.scaleLinear(f.thresholdA)-c.scaleLinear(f.thresholdB))*getAxisLength()" />
+								:y="dataUtils.mercilessDecimalDeleter(c.scaleLinear(f.thresholdB)*getAxisLength(), 1)" 
+								:height="dataUtils.mercilessDecimalDeleter((c.scaleLinear(f.thresholdA)-c.scaleLinear(f.thresholdB))*getAxisLength(), 1)" />
 							</g>
 							<g v-if="f.type == 'categoric'">
 								<rect
 								class="filter-box"
-								:y="f.lowerBoundRatio*getAxisLength()"
-								:height="(f.upperBoundRatio - f.lowerBoundRatio)*getAxisLength()"
+								:y="dataUtils.mercilessDecimalDeleter(f.lowerBoundRatio*getAxisLength(), 1)"
+								:height="dataUtils.mercilessDecimalDeleter((f.upperBoundRatio - f.lowerBoundRatio)*getAxisLength(), 1)"
 								/>
 							</g>
 						</g>
@@ -75,28 +75,28 @@
 							<g v-if="plotVariables.currentFilterCategory.title === c.title">
 								<rect 
 								class="filter-box-proto"
-								:y="Math.min(plotVariables.currentFilterStartValue, plotVariables.currentFilterEndValue) - plotParameters.padding"
-								:height="Math.abs(plotVariables.currentFilterEndValue - plotVariables.currentFilterStartValue)"
+								:y="dataUtils.mercilessDecimalDeleter(Math.min(plotVariables.currentFilterStartValue, plotVariables.currentFilterEndValue) - plotParameters.padding, 1)"
+								:height="dataUtils.mercilessDecimalDeleter(Math.abs(plotVariables.currentFilterEndValue - plotVariables.currentFilterStartValue), 1)"
 								/>
 							</g>
 						</g>
 						
 						<!-- Axis label -->
 						<text 
-							:y="getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10)" 
+							:y="dataUtils.mercilessDecimalDeleter(getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10),1)" 
 							class="title" 
 							:style="{fontSize: `${optionsStore.titleSize}em`}"
-							:transform="`rotate(${plotParameters.axisTitleRotation} 0 ${getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10)})`">
+							:transform="`rotate(${plotParameters.axisTitleRotation} 0 ${dataUtils.mercilessDecimalDeleter(getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10),1)})`">
 							{{c.displayTitle}}
 						</text>
 						
 						<!-- Axis vertical line -->
-						<line x1="0" y1="0" x2="0" :y2="getPlotYBounds()[1]-(plotParameters.axisTitlePadding)"/>
+						<line x1="0" y1="0" x2="0" :y2="dataUtils.mercilessDecimalDeleter(getPlotYBounds()[1]-(plotParameters.axisTitlePadding),1)"/>
 						
 						<!-- Axis tick group -->
 						<g class="tick" v-for="(tick, index) in c.getTickArray()" :key="index"> <!-- Tick group -->
-							<text x="-10" :y="c.scaleLinear(tick)*getAxisLength()" class="tick-string" :style="{fontSize: `${optionsStore.tickSize}em`}">{{c.getTickString(tick)}}</text>
-							<line x1="0" :y1="c.scaleLinear(tick)*getAxisLength()" x2="-5" :y2="c.scaleLinear(tick)*getAxisLength()"/>	<!-- Top tick -->
+							<text x="-10" :y="dataUtils.mercilessDecimalDeleter(c.scaleLinear(tick)*getAxisLength(),1)" class="tick-string" :style="{fontSize: `${optionsStore.tickSize}em`}">{{c.getTickString(tick)}}</text>
+							<line x1="0" :y1="dataUtils.mercilessDecimalDeleter(c.scaleLinear(tick)*getAxisLength(),1)" x2="-5" :y2="dataUtils.mercilessDecimalDeleter(c.scaleLinear(tick)*getAxisLength(),1)"/>	<!-- Top tick -->
 						</g>
 					</g>
 				</g>
@@ -235,7 +235,9 @@ function getAxisLength () {
 }
 
 function getPlotYBounds () {
-	const array = [plotParameters.padding, plotCanvas.value.getBoundingClientRect().height - plotParameters.padding]
+	const upperBoundary = plotParameters.padding
+	const lowerBoundary = plotCanvas.value.getBoundingClientRect().height - plotParameters.padding
+	const array = [upperBoundary, lowerBoundary]
 	return array
 }
 
