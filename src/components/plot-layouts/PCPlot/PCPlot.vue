@@ -1,9 +1,6 @@
 <template>
-{{debugLog("template?")}}
 	<div class="component-container">
-		{{debugLog("component container")}}
 		<div style="height: 100%;" class="svg-container">
-			{{debugLog("Outside SVG")}}
 			<svg 
 			class="pcp-plot svg-content-responsive" 
 			height="100%" 
@@ -15,35 +12,12 @@
 			@mouseup.prevent="dragFilterDone"
 			@keydown.delete="dataStore.deleteCategory(selectedCategory)"
 			>
-				{{debugLog("Aha A!")}}
-				
 				<!-- Full graphics group -->
 				<g v-if="data.length > 0"
 				:transform="`translate(${plotParameters.padding} 0)`"> 
-
-					{{debugLog("Aha B!")}}
-				
 					<!-- Data line generator -->
 					<g stroke-width="1" fill="transparent" :transform="`translate(0 ${getPlotYBounds()[0]})`">
-
-						{{debugLog("Aha C!")}}
-						
-						<!-- Excluded data (through user applied filters) -->
-						<g v-if="!optionsStore.hideExcluded" >
-							<g stroke="#bfbfbf" v-for="(d, index) in dataExcluded" :key="index">
-								<PCPlotPath :data="d"/>
-							</g>
-						</g>
-						
-						<!-- Included data -->
-						<g v-for="(d, index) in dataIncluded" :key="index">
-							<PCPlotPath :data="d"/>
-						</g>
-						<!--<path 
-						v-for="(d, index) in dataIncluded" :key="index"
-						:stroke="getLineColor(d)"
-						:stroke-opacity="optionsStore.dataOpacity"
-						:d="lineGenerator(d)" />-->
+						<PCPlotPath v-for="(d, index) in data" :key="index" :data="d"/>
 					</g>
 
 					<!-- Axis group -->
@@ -138,15 +112,18 @@ import {useDataStore} from "../../../store/DataStore"
 import {useLayoutStore} from "../../../store/LayoutStore"
 import {useOptionsStore} from "../../../store/OptionsStore"
 import {useStateStore} from "../../../store/StateStore"
+import {usePCPStore} from "../../../store/PCPStore"
 
 // Store references
 const dataStore = useDataStore()
 const layoutStore = useLayoutStore()
 const optionsStore = useOptionsStore()
 const stateStore = useStateStore()
+const PCPStore = usePCPStore()
 
 const {data, filterIDMap, filters, categories} = storeToRefs(dataStore)
 const {activeView, selectedCategory} = storeToRefs(stateStore)
+const {horizontalOffset, axisLength, colorScaleCategory, colorScaleFunction} = storeToRefs(PCPStore)
 
 // Plotted data
 const dataIncluded = ref([])
@@ -174,22 +151,11 @@ const plotVariables = reactive({
     yBounds: [0, 500]     // 2D vector with y limits
 })
 
-const horizontalOffset = computed( () => {
-	if (categories.value.length < 2) return 50;
-	return plotVariables.xBounds[1]/Math.max(1,(categories.value.length-1))
-})
-
 function updateContainerSize () {
 	if (activeView.value !== 'pcp') return
 	plotVariables.xBounds = getPlotXBounds()
 	plotVariables.yBounds = getPlotYBounds()
 }
-
-// Data structures
-const settings = reactive({
-	colorScaleCategory: null,
-	colorScale: () => {return "black"}
-})
 
 // Event buss listeners and triggers
 const eventBus = inject('eventBus')
@@ -217,15 +183,22 @@ watch(() => filterIDMap.value.size, () => {
 	dataExcluded.value = data.value.filter(de => !dataStore.dataPointFilterCheck(de))
 })
 
-function debugLog(str) {
-	console.log(str)
-}
+watch([categories, () => plotVariables.xBounds], () => {
+	if (categories.value.length < 2) return 50;
+	horizontalOffset.value = plotVariables.xBounds[1]/Math.max(1,(categories.value.length-1))
+})
+
+watch([getPlotYBounds, () => plotParameters.axisTitlePadding], () => {
+	axisLength.value = getPlotYBounds()[1]-(plotParameters.axisTitlePadding)
+})
 
 function getAxisLength () {
 	return getPlotYBounds()[1]-(plotParameters.axisTitlePadding)
 }
 
 function getPlotYBounds () {
+	if (!plotCanvas.value) return [0, 0]
+
 	const upperBoundary = plotParameters.padding
 	const lowerBoundary = plotCanvas.value.getBoundingClientRect().height - plotParameters.padding
 	const array = [upperBoundary, lowerBoundary]
@@ -237,24 +210,18 @@ function getPlotXBounds () {
 	return array
 }
 
-function getLineColor (dataPoint) {
-	if (!settings.colorScaleCategory) return "black"
-	if (dataPoint[settings.colorScaleCategory] === null || dataPoint[settings.colorScaleCategory] === undefined) return "black"
-	return settings.colorScale(dataPoint[settings.colorScaleCategory])
-}
-
 function setColorScale (category) {
 	if (!category) {
-		settings.colorScaleCategory = null
-		settings.colorScale = () => {return "black"}
+		colorScaleCategory.value = null
+		colorScaleFunction.value = () => 'black'
 		return
 	}
 
-	settings.colorScaleCategory = category.title
+	colorScaleCategory.value = category.title
 	if (!category.usesCategoricalData) {
-		settings.colorScale = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateRgbBasis(["red", "green", "blue"]))
+		colorScaleFunction.value = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateRgbBasis(["red", "green", "blue"]))
 	} else {
-		settings.colorScale = d3.scaleOrdinal().domain(category.availableCategoricalValues).range(d3.schemeCategory10)
+		colorScaleFunction.value = d3.scaleOrdinal().domain(category.availableCategoricalValues).range(d3.schemeCategory10)
 	}
 	
 }
@@ -275,7 +242,6 @@ function dragFilterBox (evt) {
 }
 
 function dragFilterStart (evt, c) {
-	console.log("drag filter start")
 	plotVariables.mousedown = true
 	const loc = getTrueEventCoordinates(evt, plotCanvas.value)
 	plotVariables.currentFilterCategory = c 
@@ -347,7 +313,6 @@ function dragFilterDone () {
 }
 
 function onClickAxis (c) {
-	console.log("on click")
 	if (plotVariables.clickOnCooldown) return;
 	if (plotVariables.mousedown === true) return;
 	if (selectedCategory.value && selectedCategory.value.title === c.title) {

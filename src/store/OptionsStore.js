@@ -9,7 +9,7 @@ export const useOptionsStore = defineStore('options', {
         tickSize: 0.6,
 
         // PCP lines
-        dataOpacity: 0.8,
+        includedDataOpacity: 0.8,
         excludedDataOpacity: 0,
         hideExcluded: true,
         curveType: 'line'

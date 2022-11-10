@@ -1,8 +1,21 @@
 <template>
-    <path 
+
+
+    <path
+    v-if="!optionsStore.hideExcluded && !dataStore.dataPointFilterCheck(props.data)"
+    stroke="#bfbfbf"
     :stroke-opacity="optionsStore.excludedDataOpacity"
     :d="lineGenerator(props.data)"
     />
+        
+    <path 
+    v-else-if="dataStore.dataPointFilterCheck(props.data)"
+    :stroke='getLineColor(props.data)'
+    :stroke-opacity="optionsStore.includedDataOpacity"
+    :d="lineGenerator(props.data)"
+    />
+
+
 </template>
 
 <script setup>
@@ -25,16 +38,14 @@ const optionsStore = useOptionsStore()
 const stateStore = useStateStore()
 
 // Store refs
-const {data, filterIDMap, filters, categories} = storeToRefs(dataStore)
-const {activeView, selectedCategory} = storeToRefs(stateStore)
-const {horizontalOffset, axisLength} = storeToRefs(PCPStore)
+const {horizontalOffset, axisLength, colorScaleCategory, colorScaleFunction} = storeToRefs(PCPStore)
 
 const props = defineProps({
     data: Object   
 })
 
 function lineGenerator(d) {
-	console.log("line generation")
+    console.log("generator")
 	let dataCats = Object.keys(d)
 	let dataArray = Array(dataCats.length).fill(null)
 
@@ -69,8 +80,16 @@ function lineGenerator(d) {
 		(dataArray)
 }
 
+function getLineColor (dataPoint) {
+	if (!colorScaleCategory.value) return "black"
+	if (dataPoint[colorScaleCategory.value] === null || dataPoint[colorScaleCategory.value] === undefined) return "black"
+	return colorScaleFunction.value(dataPoint[colorScaleCategory.value])
+}
+
 </script>
 
 <style lang="scss" scoped>
-
+    path {
+        stroke: "#bfbfbf"
+    }
 </style>
