@@ -39,7 +39,7 @@ import {useOptionsStore} from "@/store/OptionsStore"
 const optionsStore = useOptionsStore()
 
 function setDataOpacity (value) {
-    optionsStore.dataOpacity = parseFloat(value)
+    optionsStore.includedDataOpacity = parseFloat(value)
 }
 
 function setFilteredDataOpacity (value) {
