@@ -1,6 +1,6 @@
 <template>
 
-    <g stroke-width="1" fill="transparent" :transform="`translate(0 50)`"> <!-- <g stroke-width="1" fill="transparent" :transform="`translate(0 ${getPlotYBounds()[0]})`"> -->
+    <g stroke-width="1" fill="transparent" :transform="`translate(0 ${plotYBounds[0]})`">
         <g v-if="!optionsStore.hideExcluded">
             <path v-for="(d, index) in data.filter(dp => !dataStore.dataPointFilterCheck(dp))" 
                 :key="index" 
@@ -39,7 +39,7 @@ const PCPStore = usePCPStore()
 const optionsStore = useOptionsStore()
 
 // Store refs
-const {horizontalOffset, axisLength, colorScaleCategory, colorScaleFunction} = storeToRefs(PCPStore)
+const {horizontalOffset, axisLength, colorScaleCategory, colorScaleFunction, plotYBounds} = storeToRefs(PCPStore)
 const {data} = storeToRefs(dataStore)
 
 function lineGenerator(d) {

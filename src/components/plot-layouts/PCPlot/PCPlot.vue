@@ -120,7 +120,7 @@ const PCPStore = usePCPStore()
 
 const {data, filterIDMap, filters, categories} = storeToRefs(dataStore)
 const {activeView, selectedCategory} = storeToRefs(stateStore)
-const {horizontalOffset, axisLength, colorScaleCategory, colorScaleFunction} = storeToRefs(PCPStore)
+const {horizontalOffset, axisLength, colorScaleCategory, colorScaleFunction, plotXBounds, plotYBounds} = storeToRefs(PCPStore)
 
 // Plotted data
 const dataIncluded = ref([])
@@ -144,14 +144,12 @@ const plotVariables = reactive({
 	currentFilterEndValue: 0,
 	clickOnCooldown: false,
 	hasRendered: false,
-	xBounds: [0, 500],    // 2D vector with x limits
-    yBounds: [0, 500]     // 2D vector with y limits
 })
 
 function updateContainerSize () {
 	if (activeView.value !== 'pcp') return
-	plotVariables.xBounds = getPlotXBounds()
-	plotVariables.yBounds = getPlotYBounds()
+	plotXBounds.value = getPlotXBounds()
+	plotYBounds.value = getPlotYBounds()
 }
 
 // Event buss listeners and triggers
@@ -180,17 +178,17 @@ watch(() => filterIDMap.value.size, () => {
 	dataExcluded.value = data.value.filter(de => !dataStore.dataPointFilterCheck(de))
 })
 
-watch([categories, () => plotVariables.xBounds], () => {
+watch([categories, plotXBounds], () => {
 	if (categories.value.length < 2) return 50;
-	horizontalOffset.value = plotVariables.xBounds[1]/Math.max(1,(categories.value.length-1))
+	horizontalOffset.value = plotXBounds.value[1]/Math.max(1,(categories.value.length-1))
 })
 
-watch([getPlotYBounds, () => plotParameters.axisTitlePadding], () => {
+watch([plotYBounds, () => plotParameters.axisTitlePadding], () => {
 	axisLength.value = getPlotYBounds()[1]-(plotParameters.axisTitlePadding)
 })
 
 function getAxisLength () {
-	return getPlotYBounds()[1]-(plotParameters.axisTitlePadding)
+	return plotYBounds.value[1]-(plotParameters.axisTitlePadding)
 }
 
 function getPlotYBounds () {

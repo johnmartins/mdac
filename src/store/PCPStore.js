@@ -5,7 +5,11 @@ export const usePCPStore = defineStore('pcp', {
             horizontalOffset: 100,
             axisLength: 100,
             colorScaleCategory: null,
-            colorScaleFunction: () => 'black' 
+            colorScaleFunction: () => 'black',
+
+            // Bounds
+            plotXBounds: [0, 500],
+            plotYBounds: [0, 500]
         }),
     getters: {},
     actions: {},
