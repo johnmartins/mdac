@@ -2,19 +2,18 @@
 
 
     <path
-    v-if="!optionsStore.hideExcluded && !dataStore.dataPointFilterCheck(props.data)"
+    v-if="props.excluded"
     stroke="#bfbfbf"
     :stroke-opacity="optionsStore.excludedDataOpacity"
     :d="lineGenerator(props.data)"
     />
         
     <path 
-    v-else-if="dataStore.dataPointFilterCheck(props.data)"
+    v-else
     :stroke='getLineColor(props.data)'
     :stroke-opacity="optionsStore.includedDataOpacity"
     :d="lineGenerator(props.data)"
     />
-
 
 </template>
 
@@ -41,10 +40,12 @@ const stateStore = useStateStore()
 const {horizontalOffset, axisLength, colorScaleCategory, colorScaleFunction} = storeToRefs(PCPStore)
 
 const props = defineProps({
-    data: Object   
+    data: Object ,
+	excluded: Boolean  
 })
 
 function lineGenerator(d) {
+	console.log("blah")
 	let dataCats = Object.keys(d)
 	let dataArray = Array(dataCats.length).fill(null)
 

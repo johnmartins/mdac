@@ -16,8 +16,12 @@
 				<g v-if="data.length > 0"
 				:transform="`translate(${plotParameters.padding} 0)`"> 
 					<!-- Data line generator -->
+
 					<g stroke-width="1" fill="transparent" :transform="`translate(0 ${getPlotYBounds()[0]})`">
-						<PCPlotPath v-for="(d, index) in data" :key="index" :data="d"/>
+						<PCPlotPath v-for="(d, index) in data.filter(dp => dataStore.dataPointFilterCheck(dp))" :key="index" :data="d" :excluded="false"/>
+							<g v-if="!optionsStore.hideExcluded">
+								<PCPlotPath v-for="(d, index) in data.filter(dp => !dataStore.dataPointFilterCheck(dp))" :key="index" :data="d" :excluded="true"/>
+							</g>
 					</g>
 
 					<!-- Axis group -->
@@ -116,7 +120,6 @@ import {usePCPStore} from "../../../store/PCPStore"
 
 // Store references
 const dataStore = useDataStore()
-const layoutStore = useLayoutStore()
 const optionsStore = useOptionsStore()
 const stateStore = useStateStore()
 const PCPStore = usePCPStore()
@@ -261,7 +264,7 @@ function triggerClickCooldown () {
 function dragFilterDone () {
 	let ignoreRequest = false
 	if (!plotVariables.mousedown) ignoreRequest = true
-	if (plotVariables.currentFilterDeltaTime < 250) ignoreRequest = true	
+	if (plotVariables.currentFilterDeltaTime < 100) ignoreRequest = true	
 
 	if (ignoreRequest) {
 		// This filter was likely unintentional.
