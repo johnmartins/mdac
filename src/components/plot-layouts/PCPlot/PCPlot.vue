@@ -1,6 +1,9 @@
 <template>
+{{debugLog("template?")}}
 	<div class="component-container">
+		{{debugLog("component container")}}
 		<div style="height: 100%;" class="svg-container">
+			{{debugLog("Outside SVG")}}
 			<svg 
 			class="pcp-plot svg-content-responsive" 
 			height="100%" 
@@ -12,29 +15,35 @@
 			@mouseup.prevent="dragFilterDone"
 			@keydown.delete="dataStore.deleteCategory(selectedCategory)"
 			>
+				{{debugLog("Aha A!")}}
 				
 				<!-- Full graphics group -->
 				<g v-if="data.length > 0"
 				:transform="`translate(${plotParameters.padding} 0)`"> 
+
+					{{debugLog("Aha B!")}}
 				
 					<!-- Data line generator -->
 					<g stroke-width="1" fill="transparent" :transform="`translate(0 ${getPlotYBounds()[0]})`">
+
+						{{debugLog("Aha C!")}}
 						
 						<!-- Excluded data (through user applied filters) -->
-						<g v-if="!optionsStore.hideExcluded" stroke="#bfbfbf">
-							<path 
-							v-for="(d, index) in data.filter(de => !dataStore.dataPointFilterCheck(de))" :key="index"
-							:stroke-opacity="optionsStore.excludedDataOpacity"
-							:d="lineGenerator(d)"
-							/>
+						<g v-if="!optionsStore.hideExcluded" >
+							<g stroke="#bfbfbf" v-for="(d, index) in dataExcluded" :key="index">
+								<PCPlotPath :data="d"/>
+							</g>
 						</g>
 						
 						<!-- Included data -->
-						<path 
-						v-for="(d, index) in data.filter(de => dataStore.dataPointFilterCheck(de))" :key="index"
+						<g v-for="(d, index) in dataIncluded" :key="index">
+							<PCPlotPath :data="d"/>
+						</g>
+						<!--<path 
+						v-for="(d, index) in dataIncluded" :key="index"
 						:stroke="getLineColor(d)"
 						:stroke-opacity="optionsStore.dataOpacity"
-						:d="lineGenerator(d)" />
+						:d="lineGenerator(d)" />-->
 					</g>
 
 					<!-- Axis group -->
@@ -106,12 +115,15 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, onUpdated, inject, computed, watch } from "vue"
+import { reactive, ref, onMounted, onUpdated, inject, computed, watch} from "vue"
 import { storeToRefs } from "pinia"
 import * as d3 from "d3"
 
 import { saveAs } from "file-saver"
 import { saveSvgAsPng } from "save-svg-as-png"
+
+// Components
+import PCPlotPath from "./PCPlotPath.vue"
 
 // Models
 import SingleRangeFilter from "@/models/filters/SingleRangeFilter"
@@ -133,8 +145,12 @@ const layoutStore = useLayoutStore()
 const optionsStore = useOptionsStore()
 const stateStore = useStateStore()
 
-const {data, filters, categories} = storeToRefs(dataStore)
+const {data, filterIDMap, filters, categories} = storeToRefs(dataStore)
 const {activeView, selectedCategory} = storeToRefs(stateStore)
+
+// Plotted data
+const dataIncluded = ref([])
+const dataExcluded = ref([])
 
 // Layout references
 const plotCanvas = ref(null)
@@ -195,39 +211,14 @@ watch((selectedCategory), () => {
 	setColorScale(selectedCategory.value)
 })
 
-function lineGenerator(d) {
-	let dataCats = Object.keys(d)
-	let dataArray = Array(dataCats.length).fill(null)
+watch(() => filterIDMap.value.size, () => {
+	// This is a bit wasteful. Use reduce instead to get both in one loop?
+	dataIncluded.value = data.value.filter(de => dataStore.dataPointFilterCheck(de))
+	dataExcluded.value = data.value.filter(de => !dataStore.dataPointFilterCheck(de))
+})
 
-	for (let i = 0; i < dataCats.length; i++) {
-		let c = dataStore.getCategoryWithName(dataCats[i])
-
-		if (!c)  {
-			continue
-		}
-		const x = dataUtils.mercilessDecimalDeleter(c.position*horizontalOffset.value, 1)
-		const y = dataUtils.mercilessDecimalDeleter(c.scaleLinear(d[c.title])*getAxisLength(), 1)
-
-		dataArray[c.position] = {
-			x: x, 
-			y: y
-		}
-	}
-
-	dataArray = dataArray.filter((obj) => { return obj != null })
-
-	let d3CurveType = d3.curveMonotoneX
-	if (optionsStore.curveType === 'curve') {
-		d3CurveType = d3.curveMonotoneX
-	} else if (optionsStore.curveType === 'line') {
-		d3CurveType = d3.curveLinear
-	}
-	
-	return d3.line([])
-		.x((de) => {return de.x})
-		.y((de) => {return de.y})
-		.curve(d3CurveType)
-		(dataArray)
+function debugLog(str) {
+	console.log(str)
 }
 
 function getAxisLength () {
@@ -284,6 +275,7 @@ function dragFilterBox (evt) {
 }
 
 function dragFilterStart (evt, c) {
+	console.log("drag filter start")
 	plotVariables.mousedown = true
 	const loc = getTrueEventCoordinates(evt, plotCanvas.value)
 	plotVariables.currentFilterCategory = c 
@@ -355,6 +347,7 @@ function dragFilterDone () {
 }
 
 function onClickAxis (c) {
+	console.log("on click")
 	if (plotVariables.clickOnCooldown) return;
 	if (plotVariables.mousedown === true) return;
 	if (selectedCategory.value && selectedCategory.value.title === c.title) {
