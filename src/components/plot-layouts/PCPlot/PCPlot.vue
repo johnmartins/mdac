@@ -15,14 +15,9 @@
 				<!-- Full graphics group -->
 				<g v-if="data.length > 0"
 				:transform="`translate(${plotParameters.padding} 0)`"> 
+					
 					<!-- Data line generator -->
-
-					<g stroke-width="1" fill="transparent" :transform="`translate(0 ${getPlotYBounds()[0]})`">
-						<PCPlotPath v-for="(d, index) in data.filter(dp => dataStore.dataPointFilterCheck(dp))" :key="index" :data="d" :excluded="false"/>
-							<g v-if="!optionsStore.hideExcluded">
-								<PCPlotPath v-for="(d, index) in data.filter(dp => !dataStore.dataPointFilterCheck(dp))" :key="index" :data="d" :excluded="true"/>
-							</g>
-					</g>
+					<PCPlotPathLayer />
 
 					<!-- Axis group -->
 					<g 
@@ -101,7 +96,7 @@ import { saveAs } from "file-saver"
 import { saveSvgAsPng } from "save-svg-as-png"
 
 // Components
-import PCPlotPath from "./PCPlotPath.vue"
+import PCPlotPathLayer from "./PCPlotPathLayer"
 
 // Models
 import SingleRangeFilter from "@/models/filters/SingleRangeFilter"
@@ -113,7 +108,6 @@ import {getTrueEventCoordinates} from "@/utils/svg-utils"
 
 // Stores
 import {useDataStore} from "../../../store/DataStore"
-import {useLayoutStore} from "../../../store/LayoutStore"
 import {useOptionsStore} from "../../../store/OptionsStore"
 import {useStateStore} from "../../../store/StateStore"
 import {usePCPStore} from "../../../store/PCPStore"

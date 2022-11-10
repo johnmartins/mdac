@@ -1,24 +1,27 @@
 <template>
 
-
-    <path
-    v-if="props.excluded"
-    stroke="#bfbfbf"
-    :stroke-opacity="optionsStore.excludedDataOpacity"
-    :d="lineGenerator(props.data)"
-    />
+    <g stroke-width="1" fill="transparent" :transform="`translate(0 50)`"> <!-- <g stroke-width="1" fill="transparent" :transform="`translate(0 ${getPlotYBounds()[0]})`"> -->
+        <g v-if="!optionsStore.hideExcluded">
+            <path v-for="(d, index) in data.filter(dp => !dataStore.dataPointFilterCheck(dp))" 
+                :key="index" 
+                stroke="#bfbfbf"
+                :stroke-opacity="optionsStore.excludedDataOpacity"
+                :d="lineGenerator(d)"
+            />
+        </g>
         
-    <path 
-    v-else
-    :stroke='getLineColor(props.data)'
-    :stroke-opacity="optionsStore.includedDataOpacity"
-    :d="lineGenerator(props.data)"
-    />
+        <path v-for="(d, index) in data.filter(dp => dataStore.dataPointFilterCheck(dp))" 
+            :key="index" 
+            :excluded="true"
+            :stroke='getLineColor(d)'
+            :stroke-opacity="optionsStore.includedDataOpacity"
+            :d="lineGenerator(d)"
+        />
+    </g>
 
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, onUpdated, inject, computed, watch} from "vue"
 import { storeToRefs } from "pinia"
 import * as d3 from "d3"
 
@@ -34,15 +37,10 @@ import {useStateStore} from "../../../store/StateStore"
 const dataStore = useDataStore()
 const PCPStore = usePCPStore()
 const optionsStore = useOptionsStore()
-const stateStore = useStateStore()
 
 // Store refs
 const {horizontalOffset, axisLength, colorScaleCategory, colorScaleFunction} = storeToRefs(PCPStore)
-
-const props = defineProps({
-    data: Object ,
-	excluded: Boolean  
-})
+const {data} = storeToRefs(dataStore)
 
 function lineGenerator(d) {
 	let dataCats = Object.keys(d)
