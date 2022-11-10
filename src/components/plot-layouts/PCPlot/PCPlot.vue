@@ -12,30 +12,12 @@
 			@mouseup.prevent="dragFilterDone"
 			@keydown.delete="dataStore.deleteCategory(selectedCategory)"
 			>
-				
 				<!-- Full graphics group -->
 				<g v-if="data.length > 0"
 				:transform="`translate(${plotParameters.padding} 0)`"> 
-				
+					
 					<!-- Data line generator -->
-					<g stroke-width="1" fill="transparent" :transform="`translate(0 ${getPlotYBounds()[0]})`">
-						
-						<!-- Excluded data (through user applied filters) -->
-						<g v-if="!optionsStore.hideExcluded" stroke="#bfbfbf">
-							<path 
-							v-for="(d, index) in data.filter(de => !dataStore.dataPointFilterCheck(de))" :key="index"
-							:stroke-opacity="optionsStore.excludedDataOpacity"
-							:d="lineGenerator(d)"
-							/>
-						</g>
-						
-						<!-- Included data -->
-						<path 
-						v-for="(d, index) in data.filter(de => dataStore.dataPointFilterCheck(de))" :key="index"
-						:stroke="getLineColor(d)"
-						:stroke-opacity="optionsStore.dataOpacity"
-						:d="lineGenerator(d)" />
-					</g>
+					<PCPlotPathLayer />
 
 					<!-- Axis group -->
 					<g 
@@ -45,12 +27,12 @@
 					@mousedown.prevent="dragFilterStart($event, c)"
 					v-bind:class="{highlighted: getSelectedCategoryTitle() == c.title}"
 					:key="c.position" 
-					:transform="`translate(${c.position*horizontalOffset} ${getPlotYBounds()[0]})`">	
+					:transform="`translate(${dataUtils.mercilessDecimalDeleter(c.position*horizontalOffset,1)} ${dataUtils.mercilessDecimalDeleter(getPlotYBounds()[0], 1)})`">	
 
 						<!-- Hitbox -->
 						<rect 
 						class="filter-hitbox"
-						:height="getAxisLength()+40"
+						:height="dataUtils.mercilessDecimalDeleter(getAxisLength()+40, 1)"
 						/>
 
 						<!-- Axis Filters -->
@@ -58,14 +40,14 @@
 							<g v-if="f.type == 'single-range'">
 								<rect 
 								class="filter-box"
-								:y="c.scaleLinear(f.thresholdB)*getAxisLength()" 
-								:height="(c.scaleLinear(f.thresholdA)-c.scaleLinear(f.thresholdB))*getAxisLength()" />
+								:y="dataUtils.mercilessDecimalDeleter(c.scaleLinear(f.thresholdB)*getAxisLength(), 1)" 
+								:height="dataUtils.mercilessDecimalDeleter((c.scaleLinear(f.thresholdA)-c.scaleLinear(f.thresholdB))*getAxisLength(), 1)" />
 							</g>
 							<g v-if="f.type == 'categoric'">
 								<rect
 								class="filter-box"
-								:y="f.lowerBoundRatio*getAxisLength()"
-								:height="(f.upperBoundRatio - f.lowerBoundRatio)*getAxisLength()"
+								:y="dataUtils.mercilessDecimalDeleter(f.lowerBoundRatio*getAxisLength(), 1)"
+								:height="dataUtils.mercilessDecimalDeleter((f.upperBoundRatio - f.lowerBoundRatio)*getAxisLength(), 1)"
 								/>
 							</g>
 						</g>
@@ -75,28 +57,28 @@
 							<g v-if="plotVariables.currentFilterCategory.title === c.title">
 								<rect 
 								class="filter-box-proto"
-								:y="Math.min(plotVariables.currentFilterStartValue, plotVariables.currentFilterEndValue) - plotParameters.padding"
-								:height="Math.abs(plotVariables.currentFilterEndValue - plotVariables.currentFilterStartValue)"
+								:y="dataUtils.mercilessDecimalDeleter(Math.min(plotVariables.currentFilterStartValue, plotVariables.currentFilterEndValue) - plotParameters.padding, 1)"
+								:height="dataUtils.mercilessDecimalDeleter(Math.abs(plotVariables.currentFilterEndValue - plotVariables.currentFilterStartValue), 1)"
 								/>
 							</g>
 						</g>
 						
 						<!-- Axis label -->
 						<text 
-							:y="getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10)" 
+							:y="dataUtils.mercilessDecimalDeleter(getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10),1)" 
 							class="title" 
 							:style="{fontSize: `${optionsStore.titleSize}em`}"
-							:transform="`rotate(${plotParameters.axisTitleRotation} 0 ${getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10)})`">
+							:transform="`rotate(${plotParameters.axisTitleRotation} 0 ${dataUtils.mercilessDecimalDeleter(getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10),1)})`">
 							{{c.displayTitle}}
 						</text>
 						
 						<!-- Axis vertical line -->
-						<line x1="0" y1="0" x2="0" :y2="getPlotYBounds()[1]-(plotParameters.axisTitlePadding)"/>
+						<line x1="0" y1="0" x2="0" :y2="dataUtils.mercilessDecimalDeleter(getPlotYBounds()[1]-(plotParameters.axisTitlePadding),1)"/>
 						
 						<!-- Axis tick group -->
 						<g class="tick" v-for="(tick, index) in c.getTickArray()" :key="index"> <!-- Tick group -->
-							<text x="-10" :y="c.scaleLinear(tick)*getAxisLength()" class="tick-string" :style="{fontSize: `${optionsStore.tickSize}em`}">{{c.getTickString(tick)}}</text>
-							<line x1="0" :y1="c.scaleLinear(tick)*getAxisLength()" x2="-5" :y2="c.scaleLinear(tick)*getAxisLength()"/>	<!-- Top tick -->
+							<text x="-10" :y="dataUtils.mercilessDecimalDeleter(c.scaleLinear(tick)*getAxisLength(),1)" class="tick-string" :style="{fontSize: `${optionsStore.tickSize}em`}">{{c.getTickString(tick)}}</text>
+							<line x1="0" :y1="dataUtils.mercilessDecimalDeleter(c.scaleLinear(tick)*getAxisLength(),1)" x2="-5" :y2="dataUtils.mercilessDecimalDeleter(c.scaleLinear(tick)*getAxisLength(),1)"/>	<!-- Top tick -->
 						</g>
 					</g>
 				</g>
@@ -106,12 +88,15 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, onUpdated, inject, computed, watch } from "vue"
+import { reactive, ref, onMounted, onUpdated, inject, computed, watch} from "vue"
 import { storeToRefs } from "pinia"
 import * as d3 from "d3"
 
 import { saveAs } from "file-saver"
 import { saveSvgAsPng } from "save-svg-as-png"
+
+// Components
+import PCPlotPathLayer from "./PCPlotPathLayer"
 
 // Models
 import SingleRangeFilter from "@/models/filters/SingleRangeFilter"
@@ -123,18 +108,23 @@ import {getTrueEventCoordinates} from "@/utils/svg-utils"
 
 // Stores
 import {useDataStore} from "../../../store/DataStore"
-import {useLayoutStore} from "../../../store/LayoutStore"
 import {useOptionsStore} from "../../../store/OptionsStore"
 import {useStateStore} from "../../../store/StateStore"
+import {usePCPStore} from "../../../store/PCPStore"
 
 // Store references
 const dataStore = useDataStore()
-const layoutStore = useLayoutStore()
 const optionsStore = useOptionsStore()
 const stateStore = useStateStore()
+const PCPStore = usePCPStore()
 
-const {data, filters, categories} = storeToRefs(dataStore)
+const {data, filterIDMap, filters, categories} = storeToRefs(dataStore)
 const {activeView, selectedCategory} = storeToRefs(stateStore)
+const {horizontalOffset, axisLength, colorScaleCategory, colorScaleFunction, plotXBounds, plotYBounds} = storeToRefs(PCPStore)
+
+// Plotted data
+const dataIncluded = ref([])
+const dataExcluded = ref([])
 
 // Layout references
 const plotCanvas = ref(null)
@@ -154,26 +144,13 @@ const plotVariables = reactive({
 	currentFilterEndValue: 0,
 	clickOnCooldown: false,
 	hasRendered: false,
-	xBounds: [0, 500],    // 2D vector with x limits
-    yBounds: [0, 500]     // 2D vector with y limits
-})
-
-const horizontalOffset = computed( () => {
-	if (categories.value.length < 2) return 50;
-	return plotVariables.xBounds[1]/Math.max(1,(categories.value.length-1))
 })
 
 function updateContainerSize () {
 	if (activeView.value !== 'pcp') return
-	plotVariables.xBounds = getPlotXBounds()
-	plotVariables.yBounds = getPlotYBounds()
+	plotXBounds.value = getPlotXBounds()
+	plotYBounds.value = getPlotYBounds()
 }
-
-// Data structures
-const settings = reactive({
-	colorScaleCategory: null,
-	colorScale: () => {return "black"}
-})
 
 // Event buss listeners and triggers
 const eventBus = inject('eventBus')
@@ -195,47 +172,31 @@ watch((selectedCategory), () => {
 	setColorScale(selectedCategory.value)
 })
 
-function lineGenerator(d) {
-	let dataCats = Object.keys(d)
-	let dataArray = Array(dataCats.length).fill(null)
+watch(() => filterIDMap.value.size, () => {
+	// This is a bit wasteful. Use reduce instead to get both in one loop?
+	dataIncluded.value = data.value.filter(de => dataStore.dataPointFilterCheck(de))
+	dataExcluded.value = data.value.filter(de => !dataStore.dataPointFilterCheck(de))
+})
 
-	for (let i = 0; i < dataCats.length; i++) {
-		let c = dataStore.getCategoryWithName(dataCats[i])
+watch([categories, plotXBounds], () => {
+	if (categories.value.length < 2) return 50;
+	horizontalOffset.value = plotXBounds.value[1]/Math.max(1,(categories.value.length-1))
+})
 
-		if (!c)  {
-			continue
-		}
-		const x = dataUtils.mercilessDecimalDeleter(c.position*horizontalOffset.value, 1)
-		const y = dataUtils.mercilessDecimalDeleter(c.scaleLinear(d[c.title])*getAxisLength(), 1)
-
-		dataArray[c.position] = {
-			x: x, 
-			y: y
-		}
-	}
-
-	dataArray = dataArray.filter((obj) => { return obj != null })
-
-	let d3CurveType = d3.curveMonotoneX
-	if (optionsStore.curveType === 'curve') {
-		d3CurveType = d3.curveMonotoneX
-	} else if (optionsStore.curveType === 'line') {
-		d3CurveType = d3.curveLinear
-	}
-	
-	return d3.line([])
-		.x((de) => {return de.x})
-		.y((de) => {return de.y})
-		.curve(d3CurveType)
-		(dataArray)
-}
+watch([plotYBounds, () => plotParameters.axisTitlePadding], () => {
+	axisLength.value = getPlotYBounds()[1]-(plotParameters.axisTitlePadding)
+})
 
 function getAxisLength () {
-	return getPlotYBounds()[1]-(plotParameters.axisTitlePadding)
+	return plotYBounds.value[1]-(plotParameters.axisTitlePadding)
 }
 
 function getPlotYBounds () {
-	const array = [plotParameters.padding, plotCanvas.value.getBoundingClientRect().height - plotParameters.padding]
+	if (!plotCanvas.value) return [0, 0]
+
+	const upperBoundary = plotParameters.padding
+	const lowerBoundary = plotCanvas.value.getBoundingClientRect().height - plotParameters.padding
+	const array = [upperBoundary, lowerBoundary]
 	return array
 }
 
@@ -244,24 +205,18 @@ function getPlotXBounds () {
 	return array
 }
 
-function getLineColor (dataPoint) {
-	if (!settings.colorScaleCategory) return "black"
-	if (dataPoint[settings.colorScaleCategory] === null || dataPoint[settings.colorScaleCategory] === undefined) return "black"
-	return settings.colorScale(dataPoint[settings.colorScaleCategory])
-}
-
 function setColorScale (category) {
 	if (!category) {
-		settings.colorScaleCategory = null
-		settings.colorScale = () => {return "black"}
+		colorScaleCategory.value = null
+		colorScaleFunction.value = () => 'black'
 		return
 	}
 
-	settings.colorScaleCategory = category.title
+	colorScaleCategory.value = category.title
 	if (!category.usesCategoricalData) {
-		settings.colorScale = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateRgbBasis(["red", "green", "blue"]))
+		colorScaleFunction.value = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateRgbBasis(["red", "green", "blue"]))
 	} else {
-		settings.colorScale = d3.scaleOrdinal().domain(category.availableCategoricalValues).range(d3.schemeCategory10)
+		colorScaleFunction.value = d3.scaleOrdinal().domain(category.availableCategoricalValues).range(d3.schemeCategory10)
 	}
 	
 }
@@ -301,7 +256,7 @@ function triggerClickCooldown () {
 function dragFilterDone () {
 	let ignoreRequest = false
 	if (!plotVariables.mousedown) ignoreRequest = true
-	if (plotVariables.currentFilterDeltaTime < 250) ignoreRequest = true	
+	if (plotVariables.currentFilterDeltaTime < 100) ignoreRequest = true	
 
 	if (ignoreRequest) {
 		// This filter was likely unintentional.
