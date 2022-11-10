@@ -45,7 +45,6 @@ const props = defineProps({
 })
 
 function lineGenerator(d) {
-    console.log("generator")
 	let dataCats = Object.keys(d)
 	let dataArray = Array(dataCats.length).fill(null)
 
@@ -89,7 +88,5 @@ function getLineColor (dataPoint) {
 </script>
 
 <style lang="scss" scoped>
-    path {
-        stroke: "#bfbfbf"
-    }
+
 </style>
