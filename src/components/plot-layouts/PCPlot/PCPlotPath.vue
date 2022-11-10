@@ -45,7 +45,6 @@ const props = defineProps({
 })
 
 function lineGenerator(d) {
-	console.log("blah")
 	let dataCats = Object.keys(d)
 	let dataArray = Array(dataCats.length).fill(null)
 
