@@ -115,7 +115,7 @@ onMounted( () => {
 	.mdac-header {
 		height: $header-height;
 		display: grid;
-		grid-template-columns: 100px auto 120px;
+		grid-template-columns: 100px auto 200px;
 		text-align: left;
 		vertical-align: top;
 		border-bottom: 1px solid whitesmoke;
@@ -144,6 +144,7 @@ onMounted( () => {
 			color: darkgrey;
 			font-family: monospace;
 			font-size: 0.8em;
+			white-space: nowrap;
 		}
 	}
 
