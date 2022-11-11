@@ -6,7 +6,22 @@ export const useScatterStore = defineStore('scatter', {
             plots: [],              // Plot configs
             selectedPlotID: null,
             selectedPlot: null,
-            plotIDMap: new Map()    // ID -> PlotConfig
+            plotIDMap: new Map(),    // ID -> PlotConfig
+
+            // Boundaries
+            plotXBounds: [],
+            plotYBounds: [],
+
+            // Layout parameters
+            padding: 120
+        }
+    },
+    getters: {
+        getXAxisLength: (state) => {
+            return state.plotXBounds[1] - state.padding
+        },
+        getYAxisLength: (state) => {
+            return state.plotYBounds[1] - state.padding
         }
     },
     actions: {
