@@ -35,14 +35,14 @@ function getScaledCoordinate (data, categoryName, axis) {
         if (axis !== 'x' && axis !== 'y') {
             throw new Error('Unknown axis setting')
         }
-        return axis === 'x' ? 0 : scatterStore.getYAxisLength
+        return axis === 'x' ? 0 : scatterStore.yAxisLength
     }
 
     const valueScaled = c.scaleLinear(value)
 
     let coordinate = 0
     if (axis === 'x') {
-        coordinate = scatterStore.getXAxisLength - valueScaled * (scatterStore.plotXBounds[1] - scatterStore.plotXBounds[0])
+        coordinate = scatterStore.xAxisLength - valueScaled * (scatterStore.plotXBounds[1] - scatterStore.plotXBounds[0])
     } else if (axis === 'y') {
         coordinate = valueScaled * (scatterStore.plotYBounds[1] - scatterStore.plotYBounds[0])
     } else {

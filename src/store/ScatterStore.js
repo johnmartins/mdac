@@ -17,10 +17,10 @@ export const useScatterStore = defineStore('scatter', {
         }
     },
     getters: {
-        getXAxisLength: (state) => {
+        xAxisLength: (state) => {
             return state.plotXBounds[1] - state.padding
         },
-        getYAxisLength: (state) => {
+        yAxisLength: (state) => {
             return state.plotYBounds[1] - state.padding
         }
     },

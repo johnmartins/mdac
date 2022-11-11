@@ -40,22 +40,22 @@
                     <g
                     :transform="`translate(${scatterStore.padding} ${scatterStore.padding})`"> 
                         <line 
-                        x1="0" :x2="scatterStore.getXAxisLength" 
-                        :y1="scatterStore.getYAxisLength" :y2="scatterStore.getYAxisLength" />
+                        x1="0" :x2="scatterStore.xAxisLength" 
+                        :y1="scatterStore.yAxisLength" :y2="scatterStore.yAxisLength" />
                         <g v-if="checkAxisIsDefined('x')">
 
                             <!-- title -->
                             <text class="scatter-axis-title-x" 
-                            :x="scatterStore.getXAxisLength/2" 
-                            :y="scatterStore.getYAxisLength + plotParameters.xAxisTitlePadding"
+                            :x="scatterStore.xAxisLength/2" 
+                            :y="scatterStore.yAxisLength + plotParameters.xAxisTitlePadding"
                             >
                                 {{cx.displayTitle}}
                             </text>
 
                             <!-- ticks -->
                             <g class="tick" v-for="(tick, index) in cx.getTickArray()" :key="index"> <!-- Tick group -->
-                                <text :x="scatterStore.getXAxisLength - cx.scaleLinear(tick)*scatterStore.getXAxisLength" :y="scatterStore.getYAxisLength+ 20" class="tick-string">{{cx.getTickString(tick)}}</text>
-                                <line :x1="cx.scaleLinear(tick)*scatterStore.getXAxisLength" :y1="scatterStore.getYAxisLength" :x2="cx.scaleLinear(tick)*scatterStore.getXAxisLength" :y2="scatterStore.getYAxisLength+5"/>	<!-- Top tick -->
+                                <text :x="scatterStore.xAxisLength - cx.scaleLinear(tick)*scatterStore.xAxisLength" :y="scatterStore.yAxisLength+ 20" class="tick-string">{{cx.getTickString(tick)}}</text>
+                                <line :x1="cx.scaleLinear(tick)*scatterStore.xAxisLength" :y1="scatterStore.yAxisLength" :x2="cx.scaleLinear(tick)*scatterStore.xAxisLength" :y2="scatterStore.yAxisLength+5"/>	<!-- Top tick -->
                             </g>
                         </g>
                     </g>
@@ -65,22 +65,22 @@
                     :transform="`translate(${plotParameters.padding} ${plotParameters.padding})`"> 
                         <line 
                         x1="0" :x2="0" 
-                        :y1="0" :y2="scatterStore.getYAxisLength" 
+                        :y1="0" :y2="scatterStore.yAxisLength" 
                         />
                         <g v-if="checkAxisIsDefined('y')">
                             <!-- title -->
                             <text class="scatter-axis-title-y" 
                             :x="- plotParameters.yAxisTitlePadding" 
-                            :y="scatterStore.getYAxisLength/2"
-                            :transform="`rotate(-90 ${- plotParameters.yAxisTitlePadding} ${scatterStore.getYAxisLength/2})`"
+                            :y="scatterStore.yAxisLength/2"
+                            :transform="`rotate(-90 ${- plotParameters.yAxisTitlePadding} ${scatterStore.yAxisLength/2})`"
                             >
                                 {{cy.displayTitle}}
                             </text>
 
                             <!-- ticks -->
                             <g class="tick" v-for="(tick, index) in cy.getTickArray()" :key="index"> <!-- Tick group -->
-                                <text :x="- 7" :y="+ cy.scaleLinear(tick)*scatterStore.getYAxisLength" class="tick-string" style="text-anchor: end;">{{cy.getTickString(tick)}}</text>
-                                <line x1="0" :y1="cy.scaleLinear(tick)*scatterStore.getYAxisLength" x2="-5" :y2="cy.scaleLinear(tick)*scatterStore.getYAxisLength"/>	<!-- Top tick -->
+                                <text :x="- 7" :y="+ cy.scaleLinear(tick)*scatterStore.yAxisLength" class="tick-string" style="text-anchor: end;">{{cy.getTickString(tick)}}</text>
+                                <line x1="0" :y1="cy.scaleLinear(tick)*scatterStore.yAxisLength" x2="-5" :y2="cy.scaleLinear(tick)*scatterStore.yAxisLength"/>	<!-- Top tick -->
                             </g>
                         </g>
                     </g>
@@ -186,12 +186,12 @@ function dragFilterEnd (evt) {
     // Proto filter coordinates
 	const x1 = filterVariables.startValue.x - scatterStore.padding
 	const x2 = filterVariables.endValue.x - scatterStore.padding
-    let x1Ratio = 1-(x1 / scatterStore.getXAxisLength)
-	let x2Ratio = 1-(x2 / scatterStore.getXAxisLength)
+    let x1Ratio = 1-(x1 / scatterStore.xAxisLength)
+	let x2Ratio = 1-(x2 / scatterStore.xAxisLength)
     const y1 = filterVariables.startValue.y - scatterStore.padding
 	const y2 = filterVariables.endValue.y - scatterStore.padding
-    let y1Ratio = (y1 / scatterStore.getYAxisLength)
-	let y2Ratio = (y2 / scatterStore.getYAxisLength)
+    let y1Ratio = (y1 / scatterStore.yAxisLength)
+	let y2Ratio = (y2 / scatterStore.yAxisLength)
 
     createFilter(cx, x1Ratio, x2Ratio)
     createFilter(cy, y1Ratio, y2Ratio)
