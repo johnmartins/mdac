@@ -1,14 +1,16 @@
 <template>
     <!-- Excluded data (through user applied filters) -->
-    <g v-for="(d, index) in data.filter(de => !dataStore.dataPointFilterCheck(de))" :key="index" style="fill: black; opacity: 0.4;">
+    <g style="fill: black; opacity: 0.4;">
         <circle 
+        v-for="(d, index) in data.filter(de => !dataStore.dataPointFilterCheck(de))" :key="index" 
         :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
         :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
         r="3" />
     </g>
     <!-- Included data -->
-    <g v-for="(d, index) in data.filter(dataStore.dataPointFilterCheck)" :key="index" style="fill: blue;">
+    <g style="fill: blue;">
         <circle 
+        v-for="(d, index) in data.filter(dataStore.dataPointFilterCheck)" :key="index"
         :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
         :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
         r="3" />
@@ -17,6 +19,8 @@
 
 <script setup>
 import { storeToRefs } from "pinia"
+
+import {truncateDecimals} from "@/utils/data-utils"
 
 import {useDataStore} from "@/store/DataStore"
 import {useScatterStore} from "@/store/ScatterStore"
@@ -51,7 +55,7 @@ function getScaledCoordinate (data, categoryName, axis) {
 
     if (isNaN(coordinate)) return 0
 
-    return coordinate
+    return truncateDecimals(coordinate,2)
 }
 
 

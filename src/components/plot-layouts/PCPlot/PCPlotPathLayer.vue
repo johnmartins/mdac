@@ -25,7 +25,7 @@
 import { storeToRefs } from "pinia"
 import * as d3 from "d3"
 
-import dataUtils from "@/utils/data-utils"
+import {truncateDecimals} from "@/utils/data-utils"
 
 // Stores
 import {useDataStore} from "../../../store/DataStore"
@@ -51,8 +51,8 @@ function lineGenerator(d) {
 		if (!c)  {
 			continue
 		}
-		const x = dataUtils.mercilessDecimalDeleter(c.position*horizontalOffset.value, 1)
-		const y = dataUtils.mercilessDecimalDeleter(c.scaleLinear(d[c.title])*axisLength.value, 1)
+		const x = truncateDecimals(c.position*horizontalOffset.value, 1)
+		const y = truncateDecimals(c.scaleLinear(d[c.title])*axisLength.value, 1)
 
 		dataArray[c.position] = {
 			x: x, 
