@@ -28,10 +28,6 @@ const {data, filters, categories} = storeToRefs(dataStore)
 const {selectedPlot} = storeToRefs(scatterStore)
 
 function getScaledCoordinate (data, categoryName, axis) {
-    if (axis === 'x') {
-        console.log('get coordinate')
-    }
-
     const c = dataStore.getCategoryWithName(categoryName)
     const value = data[categoryName]
 
