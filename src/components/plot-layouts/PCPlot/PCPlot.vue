@@ -27,7 +27,7 @@
 					@mousedown.prevent="dragFilterStart($event, c)"
 					v-bind:class="{highlighted: getSelectedCategoryTitle() == c.title}"
 					:key="c.position" 
-					:transform="`translate(${truncateDecimals(c.position*horizontalOffset,1)} ${truncateDecimals(getPlotYBounds()[0], 1)})`">	
+					:transform="`translate(${truncateDecimals(c.position*horizontalOffset,2)} ${truncateDecimals(getPlotYBounds()[0], 2)})`">	
 
 						<!-- Hitbox -->
 						<rect 
@@ -73,12 +73,13 @@
 						</text>
 						
 						<!-- Axis vertical line -->
-						<line x1="0" y1="0" x2="0" :y2="truncateDecimals(getPlotYBounds()[1]-(plotParameters.axisTitlePadding),1)"/>
+						<line x1="0" y1="0" x2="0" :y2="truncateDecimals(getPlotYBounds()[1]-(plotParameters.axisTitlePadding),2)"/>
 						
 						<!-- Axis tick group -->
-						<g class="tick" v-for="(tick, index) in c.getTickArray()" :key="index"> <!-- Tick group -->
-							<text x="-10" :y="truncateDecimals(c.scaleLinear(tick)*getAxisLength(),1)" class="tick-string" :style="{fontSize: `${optionsStore.tickSize}em`}">{{c.getTickString(tick)}}</text>
-							<line x1="0" :y1="truncateDecimals(c.scaleLinear(tick)*getAxisLength(),1)" x2="-5" :y2="truncateDecimals(c.scaleLinear(tick)*getAxisLength(),1)"/>	<!-- Top tick -->
+						<g class="tick" v-for="(tick, index) in c.getTickArray()" :key="index"> 
+							<text x="-10" :y="c.scaleLinear(tick)*getAxisLength()" class="tick-string" :style="{fontSize: `${optionsStore.tickSize}em`}">{{c.getTickString(tick)}}</text>
+							<line x1="0" :y1="c.scaleLinear(tick)*getAxisLength()" x2="-5" :y2="c.scaleLinear(tick)*getAxisLength()"/>	
+							<!-- Top tick -->
 						</g>
 					</g>
 				</g>

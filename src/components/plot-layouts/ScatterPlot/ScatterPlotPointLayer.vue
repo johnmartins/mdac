@@ -28,12 +28,12 @@ import {useScatterStore} from "@/store/ScatterStore"
 const dataStore = useDataStore()
 const scatterStore = useScatterStore()
 
-const {data, filters, categories} = storeToRefs(dataStore)
+const {data} = storeToRefs(dataStore)
 const {selectedPlot} = storeToRefs(scatterStore)
 
-function getScaledCoordinate (data, categoryName, axis) {
+function getScaledCoordinate (dataPoint, categoryName, axis) {
     const c = dataStore.getCategoryWithName(categoryName)
-    const value = data[categoryName]
+    const value = dataPoint[categoryName]
 
     if (!value) {
         if (axis !== 'x' && axis !== 'y') {

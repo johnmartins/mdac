@@ -98,8 +98,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, inject, computed } from "vue"
-import * as d3 from "d3"
+import { ref, reactive, inject, computed } from "vue"
 import { storeToRefs } from "pinia"
 
 import {useDataStore} from "@/store/DataStore"
@@ -112,7 +111,6 @@ import CategoricFilter from "@/models/filters/CategoricFilter"
 import ScatterPlotPointLayer from "./ScatterPlotPointLayer.vue"
 
 const dataStore = useDataStore()
-const {data, filters, categories} = storeToRefs(dataStore)
 const scatterStore = useScatterStore()
 const {selectedPlot} = storeToRefs(scatterStore)
 
