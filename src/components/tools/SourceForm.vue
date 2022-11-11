@@ -30,7 +30,7 @@ import { storeToRefs } from "pinia"
 import * as d3 from "d3"
 
 import {useDataStore} from "@/store/DataStore"
-import dataUtils from "@/utils/data-utils"
+import {isNumeric} from "@/utils/data-utils"
 
 import Category from "@/models/plots/Category"
 
@@ -130,11 +130,11 @@ function parseCSV (fileReaderRes) {
 		for (let col of csvData.columns) {
 			let value = row[col]
 
-			if (!dataUtils.isNumeric(value) && !numericalColumnsSet.has(col)) {
+			if (!isNumeric(value) && !numericalColumnsSet.has(col)) {
 				_parseStringValue(value, col, categoricalDataMap)
 				categoricalColumnsSet.add(col)
 
-			} else if (dataUtils.isNumeric(value) && !categoricalColumnsSet.has(col)) {
+			} else if (isNumeric(value) && !categoricalColumnsSet.has(col)) {
 				_parseNumericValue(value, col, minValMap, maxValMap)
 				numericalColumnsSet.add(col)
 
