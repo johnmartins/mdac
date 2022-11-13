@@ -131,7 +131,6 @@ const plotVariables = reactive({
 const filterVariables = reactive({
     mousedown: false,
     startTime: 0,
-    deltaTime: 0,
     startValue: {x:0, y:0},
     endValue: {x:0, y:0}
 })
@@ -169,12 +168,19 @@ function dragFilterStart (evt) {
     filterVariables.mousedown = true
     filterVariables.startValue.x = loc.x 
     filterVariables.startValue.y = loc.y
+    filterVariables.startTime = Date.now()
 }
 
 function dragFilterEnd (evt) {
-    if (!filterVariables.mousedown) return;
+    const filterTolerance = 200 // ms
 
-    // First of, delete all existing filters
+    // Ensure that filters are created intentionally
+    if (!filterVariables.mousedown || (Date.now() - filterVariables.startTime) < filterTolerance) {
+        dragFilterReset();
+        return
+    } 
+    
+    // Then, delete all existing filters
     dataStore.clearFilters()
 
     // Categories

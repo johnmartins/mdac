@@ -1,19 +1,25 @@
 <template>
     <!-- Excluded data (through user applied filters) -->
-    <g style="fill: black; opacity: 0.4;">
-        <circle 
-        v-for="(d, index) in data.filter(de => !dataStore.dataPointFilterCheck(de))" :key="index" 
-        :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
-        :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
-        r="3" />
-    </g>
-    <!-- Included data -->
-    <g style="fill: blue;">
-        <circle 
-        v-for="(d, index) in data.filter(dataStore.dataPointFilterCheck)" :key="index"
-        :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
-        :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
-        r="3" />
+    <g>
+        <g style="fill: black; opacity: 0.4;" class="scatter-point">
+            <circle 
+            v-for="(d, index) in data.filter(de => !dataStore.dataPointFilterCheck(de))" :key="index" 
+            :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
+            :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
+            r="3" 
+            @click="onClick($event, d)"
+            />
+        </g>
+        <!-- Included data -->
+        <g style="fill: blue;" class="scatter-point">
+            <circle 
+            v-for="(d, index) in data.filter(dataStore.dataPointFilterCheck)" :key="index"
+            :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
+            :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
+            r="3" 
+            @click="onClick($event, d)"
+            />
+        </g>
     </g>
 </template>
 
@@ -30,6 +36,11 @@ const scatterStore = useScatterStore()
 
 const {data} = storeToRefs(dataStore)
 const {selectedPlot} = storeToRefs(scatterStore)
+
+function onClick (evt, d) {
+    console.log(evt)
+    console.log(d)
+}
 
 function getScaledCoordinate (dataPoint, categoryName, axis) {
     const c = dataStore.getCategoryWithName(categoryName)
@@ -62,5 +73,9 @@ function getScaledCoordinate (dataPoint, categoryName, axis) {
 </script>
 
 <style lang="scss" scoped>
+
+    .scatter-point {
+        cursor: pointer;
+    }
 
 </style>
