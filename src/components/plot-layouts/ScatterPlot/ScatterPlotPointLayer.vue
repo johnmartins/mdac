@@ -42,6 +42,7 @@ const {data} = storeToRefs(dataStore)
 const {selectedPlot} = storeToRefs(scatterStore)
 
 function onClick (evt, d) {
+    console.log(evt)
 
     const ID = d[dataStore.idCol]
     console.log(`$ID$ = ${ID}`)

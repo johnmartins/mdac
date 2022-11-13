@@ -93,6 +93,7 @@
                 </g>
             </svg>
         </div>
+        <DataPointInfo />
     </div>
 
 </template>
@@ -109,6 +110,7 @@ import CategoricFilter from "@/models/filters/CategoricFilter"
 
 // Components
 import ScatterPlotPointLayer from "./ScatterPlotPointLayer.vue"
+import DataPointInfo from "../../tools/overlays/DataPointInfo.vue"
 
 const dataStore = useDataStore()
 const scatterStore = useScatterStore()
