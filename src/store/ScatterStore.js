@@ -3,10 +3,14 @@ import { defineStore } from 'pinia'
 export const useScatterStore = defineStore('scatter', {
     state: () => {
         return { 
+            // Plots
             plots: [],              // Plot configs
             selectedPlotID: null,
             selectedPlot: null,
             plotIDMap: new Map(),    // ID -> PlotConfig
+
+            // Data
+            selectedDataIndex: -1,
 
             // Boundaries
             plotXBounds: [],

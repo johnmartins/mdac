@@ -7,7 +7,7 @@
             tabindex="0"
             ref="plotCanvas"
             class="scatter-plot svg-content-responsive"
-            @mousedown.prevent="dragFilterStart"
+            @mousedown.prevent.self="onMouseDown"
             @mouseup.prevent="dragFilterEnd"
             @mousemove="dragFilter"
             >
@@ -161,6 +161,12 @@ eventBus.on('Router.TabChange', (viewName) => {
 })
 eventBus.on('Layout.contentResize', updateContainerSize)
 
+function onMouseDown (evt) {
+    console.log("omd")
+    scatterStore.selectedDataIndex = -1
+    dragFilterStart(evt)
+}
+
 function dragFilterStart (evt) {
     if (!selectedPlot.value) return;
     if (!cx.value || !cy.value) return;
@@ -257,8 +263,6 @@ function checkAxisIsDefined (axis) {
 
     return true
 }
-
-
 
 </script>
 

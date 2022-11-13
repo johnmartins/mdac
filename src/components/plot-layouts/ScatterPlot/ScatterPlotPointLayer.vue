@@ -7,7 +7,7 @@
             :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
             :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
             r="3" 
-            @click="onClick($event, d)"
+            @click.self="onClick($event, d, index)"
             />
         </g>
         <!-- Included data -->
@@ -17,7 +17,7 @@
             :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
             :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
             r="3" 
-            @click="onClick($event, d)"
+            @click.self="onClick($event, d, index)"
             />
         </g>
     </g>
@@ -37,7 +37,11 @@ const scatterStore = useScatterStore()
 const {data} = storeToRefs(dataStore)
 const {selectedPlot} = storeToRefs(scatterStore)
 
-function onClick (evt, d) {
+function onClick (evt, d, index) {
+
+    scatterStore.selectedDataIndex = index
+
+    console.log(index)
     console.log(evt)
     console.log(d)
 }
