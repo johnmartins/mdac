@@ -6,8 +6,10 @@
             v-for="(d, index) in data.filter(de => !dataStore.dataPointFilterCheck(de))" :key="index" 
             :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
             :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
+            :fill="getFill(d)"
+            :stroke="getStroke(d)"
             r="3" 
-            @click.self="onClick($event, d, index)"
+            @click.self="onClick($event, d)"
             />
         </g>
         <!-- Included data -->
@@ -17,7 +19,9 @@
             :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
             :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
             r="3" 
-            @click.self="onClick($event, d, index)"
+            :fill="getFill(d)"
+            :stroke="getStroke(d)"
+            @click.self="onClick($event, d)"
             />
         </g>
     </g>
@@ -37,13 +41,12 @@ const scatterStore = useScatterStore()
 const {data} = storeToRefs(dataStore)
 const {selectedPlot} = storeToRefs(scatterStore)
 
-function onClick (evt, d, index) {
+function onClick (evt, d) {
 
-    scatterStore.selectedDataIndex = index
+    const ID = d[dataStore.idCol]
+    console.log(`$ID$ = ${ID}`)
 
-    console.log(index)
-    console.log(evt)
-    console.log(d)
+    scatterStore.selectedDataID = ID
 }
 
 function getScaledCoordinate (dataPoint, categoryName, axis) {
@@ -71,6 +74,20 @@ function getScaledCoordinate (dataPoint, categoryName, axis) {
     if (isNaN(coordinate)) return 0
 
     return truncateDecimals(coordinate,2)
+}
+
+function getFill (d) {
+    const ID = d[dataStore.idCol]
+    if (ID !== scatterStore.selectedDataID) return;
+
+    return 'lightgreen'
+}
+
+function getStroke (d) {
+    const ID = d[dataStore.idCol]
+    if (ID !== scatterStore.selectedDataID) return;
+
+    return "black"
 }
 
 

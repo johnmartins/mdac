@@ -39,7 +39,7 @@ const fileDelimiterSelect = ref(null)
 const fileInput = ref(null)
 
 const dataStore = useDataStore()
-const {data, filters, categories} = storeToRefs(dataStore)
+const {data} = storeToRefs(dataStore)
 
 // Listeners
 const eventBus = inject('eventBus')
@@ -125,7 +125,8 @@ function parseCSV (fileReaderRes) {
 	const categoricalColumnsSet = new Set()
 
 	// Loop through rows and columns in CSV and handle the data
-	for (let row of csvData) {
+	for (let i = 0; i < csvData.length; i++) {
+		let row = csvData[i]
 		let dataPoint = {}
 		for (let col of csvData.columns) {
 			let value = row[col]
@@ -147,6 +148,8 @@ function parseCSV (fileReaderRes) {
 			// Update data point with value from currently parsed column
 			dataPoint[col] = value
 		}
+
+		dataPoint[dataStore.idCol] = i
 		dataToPlot.push(dataPoint)
 	}
 	

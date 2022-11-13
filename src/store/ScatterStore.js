@@ -10,7 +10,7 @@ export const useScatterStore = defineStore('scatter', {
             plotIDMap: new Map(),    // ID -> PlotConfig
 
             // Data
-            selectedDataIndex: -1,
+            selectedDataID: -1,
 
             // Boundaries
             plotXBounds: [],

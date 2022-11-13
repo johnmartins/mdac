@@ -162,8 +162,7 @@ eventBus.on('Router.TabChange', (viewName) => {
 eventBus.on('Layout.contentResize', updateContainerSize)
 
 function onMouseDown (evt) {
-    console.log("omd")
-    scatterStore.selectedDataIndex = -1
+    scatterStore.selectedDataID = -1
     dragFilterStart(evt)
 }
 
