@@ -32,7 +32,7 @@ const props = defineProps({
 
     .content {
         max-height: 200px;
-        min-width: 150px;
+        min-width: 300px;
         overflow-y: auto;
         text-align: left;
     }

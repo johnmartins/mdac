@@ -11,6 +11,7 @@ export const useScatterStore = defineStore('scatter', {
 
             // Data
             selectedDataID: -1,
+            selectedDataPoint: null,
 
             // Boundaries
             plotXBounds: [],

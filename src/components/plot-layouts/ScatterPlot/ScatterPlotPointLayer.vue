@@ -1,24 +1,24 @@
 <template>
     <!-- Excluded data (through user applied filters) -->
     <g>
-        <g style="fill: black; opacity: 0.4;" class="scatter-point">
+        <g style="fill: black; opacity: 0.3;" class="scatter-point">
             <circle 
             v-for="(d, index) in data.filter(de => !dataStore.dataPointFilterCheck(de))" :key="index" 
             :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
             :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
             :fill="getFill(d)"
             :stroke="getStroke(d)"
-            r="3" 
+            :r="getRadius(d)" 
             @click.self="onClick($event, d)"
             />
         </g>
         <!-- Included data -->
-        <g style="fill: blue;" class="scatter-point">
+        <g style="fill: black;" class="scatter-point">
             <circle 
             v-for="(d, index) in data.filter(dataStore.dataPointFilterCheck)" :key="index"
             :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
             :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
-            r="3" 
+            :r="getRadius(d)" 
             :fill="getFill(d)"
             :stroke="getStroke(d)"
             @click.self="onClick($event, d)"
@@ -48,6 +48,8 @@ function onClick (evt, d) {
     console.log(`$ID$ = ${ID}`)
 
     scatterStore.selectedDataID = ID
+    scatterStore.selectedDataPoint = d
+
 }
 
 function getScaledCoordinate (dataPoint, categoryName, axis) {
@@ -81,14 +83,20 @@ function getFill (d) {
     const ID = d[dataStore.idCol]
     if (ID !== scatterStore.selectedDataID) return;
 
-    return 'lightgreen'
+    return 'whitesmoke'
 }
 
 function getStroke (d) {
     const ID = d[dataStore.idCol]
-    if (ID !== scatterStore.selectedDataID) return;
+    if (ID !== scatterStore.selectedDataID) return null;
 
-    return "black"
+    return 'black'
+}
+
+function getRadius (d) {
+    const ID = d[dataStore.idCol]
+    if (ID !== scatterStore.selectedDataID) return 4
+    return 6
 }
 
 

@@ -165,6 +165,7 @@ eventBus.on('Layout.contentResize', updateContainerSize)
 
 function onMouseDown (evt) {
     scatterStore.selectedDataID = -1
+    scatterStore.selectedDataPoint = null
     dragFilterStart(evt)
 }
 
