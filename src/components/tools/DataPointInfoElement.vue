@@ -1,7 +1,7 @@
 <template>
-    <div>{{props.variable}}</div>
+    <div class="text-truncate">{{props.variable}}</div>
     <div>=</div>
-    <div>{{props.value}}</div>
+    <div class="text-truncate">{{props.value}}</div>
 </template>
 
 <script setup>

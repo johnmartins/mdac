@@ -31,10 +31,11 @@
 				</BoxLayout>
 			</div>
 			<div ref="scatterContainer" class="fill-content" style="display: none;">
-				<SidebarLayout>
-					<template #sidebar><ScatterSideMenu /></template>
+				<DoubleSidebarLayout>
+					<template #sidebarA><ScatterSideMenu /></template>
 					<ScatterPlot/>
-				</SidebarLayout>
+					<template #sidebarB><ScatterSideMenuRight /></template>
+				</DoubleSidebarLayout>
 			</div>
 		</div>
 
@@ -49,6 +50,7 @@ import { reactive, ref, onMounted, onUpdated, inject } from "vue"
 
 // Layouts
 import SidebarLayout from '@/components/layouts/SidebarLayout'
+import DoubleSidebarLayout from '@/components/layouts/DoubleSidebarLayout'
 import BoxLayout from '@/components/layouts/BoxLayout'
 import PopupBox from '@/components/layouts/PopupBox'
 
@@ -57,6 +59,7 @@ import PCPSideMenu from '@/components/plot-layouts/PCPlot/PCPSideMenu'
 import DataList from '@/components/DataList'
 import ScatterPlot from '@/components/plot-layouts/ScatterPlot/ScatterPlot'
 import ScatterSideMenu from '@/components/plot-layouts/ScatterPlot/ScatterSideMenu'
+import ScatterSideMenuRight from '@/components/plot-layouts/ScatterPlot/ScatterSideMenuRight'
 
 import { storeToRefs } from "pinia"
 import {useLayoutStore} from "@/store/LayoutStore"
