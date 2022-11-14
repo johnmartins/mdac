@@ -1,7 +1,7 @@
 <template>
     <!-- Excluded data (through user applied filters) -->
     <g>
-        <g style="fill: black; opacity: 0.3;" class="scatter-point">
+        <g style="opacity: 0.3;" class="scatter-point">
             <circle 
             v-for="(d, index) in data.filter(de => !dataStore.dataPointFilterCheck(de))" :key="index" 
             :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
@@ -13,7 +13,7 @@
             />
         </g>
         <!-- Included data -->
-        <g style="fill: black;" class="scatter-point">
+        <g class="scatter-point">
             <circle 
             v-for="(d, index) in data.filter(dataStore.dataPointFilterCheck)" :key="index"
             :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
@@ -81,22 +81,26 @@ function getScaledCoordinate (dataPoint, categoryName, axis) {
 
 function getFill (d) {
     const ID = d[dataStore.idCol]
-    if (ID !== scatterStore.selectedDataID) return;
+    if (ID === scatterStore.selectedDataID) return 'whitesmoke'
 
-    return 'whitesmoke'
+    return scatterStore.getSampleColor(d)
 }
 
 function getStroke (d) {
     const ID = d[dataStore.idCol]
-    if (ID !== scatterStore.selectedDataID) return null;
+    if (ID === scatterStore.selectedDataID) return 'black';
 
-    return 'black'
+    return null
 }
 
 function getRadius (d) {
     const ID = d[dataStore.idCol]
     if (ID !== scatterStore.selectedDataID) return 4
     return 6
+}
+
+function getColor (d) {
+	return scatterStore.getSampleColor(d)
 }
 
 

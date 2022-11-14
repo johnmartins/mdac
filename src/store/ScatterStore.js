@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import * as d3 from "d3"
 
 export const useScatterStore = defineStore('scatter', {
     state: () => {
@@ -12,6 +13,10 @@ export const useScatterStore = defineStore('scatter', {
             // Data
             selectedDataID: -1,
             selectedDataPoint: null,
+
+            // Color coding
+            selectedColorCodeCategory: null,
+            useSimilarityColorCoding: true,
 
             // Boundaries
             plotXBounds: [],
@@ -49,6 +54,19 @@ export const useScatterStore = defineStore('scatter', {
         },
         getSelectedPlot () {
             return this.selectedPlot
+        },
+        getSampleColor (d) {
+            if (!this.selectedColorCodeCategory) return () => 'black'
+
+            if (!this.selectedColorCodeCategory.usesCategoricalData) {
+                return d3.scaleSequential()
+                    .domain([this.selectedColorCodeCategory.lb, this.selectedColorCodeCategory.ub])
+                    .interpolator(d3.interpolateRgbBasis(["red", "green", "blue"]))(d[this.selectedColorCodeCategory.title])
+            } else {
+                return d3.scaleOrdinal()
+                    .domain(this.selectedColorCodeCategory.availableCategoricalValues)
+                    .range(d3.schemeCategory10)(d[this.selectedColorCodeCategory.title])
+            }
         }
     },
 })

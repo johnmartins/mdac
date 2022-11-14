@@ -8,7 +8,7 @@ export const useDataStore = defineStore('data', {
             categoryNameMap: new Map(),
             filters: {},         // "ColumnID" -> [filterA, filterB, ..]
             filterIDMap: new Map(),
-            idCol: '$ID$'
+            idCol: '$ID$',
         }),
     getters: {},
     actions: {

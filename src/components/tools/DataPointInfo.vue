@@ -3,8 +3,9 @@
         <div class="control-group p-2">
             <strong>Selected sample info</strong>
             <div class="element-container" v-if="selectedDataPoint">
-                <DataPointInfoElement v-for="c in categories" :key="c.id" :variable="c.displayTitle" :value="selectedDataPoint[c.title]" />
+                <DataPointInfoElement v-for="c in categories" :key="c.id" :category="c" :value="selectedDataPoint[c.title]" />
             </div>
+            <div v-else>No sample selected</div>
         </div>
     </div>
 </template>

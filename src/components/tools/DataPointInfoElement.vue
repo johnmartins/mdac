@@ -1,7 +1,7 @@
 <template>
-    <div class="text-truncate">{{props.variable}}</div>
+    <div class="text-truncate">{{props.category.displayTitle}}</div>
     <div>=</div>
-    <div class="text-truncate">{{props.value}}</div>
+    <div class="text-truncate text-end">{{props.value}}</div>
 </template>
 
 <script setup>
@@ -9,7 +9,7 @@
 import {ref} from 'vue'
 
 const props = defineProps({
-    variable: String,
+    category: Object,
     value: [Number, String]
 })
 
@@ -19,7 +19,7 @@ const props = defineProps({
 
 .variable-element {
     display: grid;
-    grid-template-columns: auto 20px auto;
+    grid-template-columns: auto 10px auto;
 }
 
 </style>
