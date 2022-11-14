@@ -1,7 +1,7 @@
 <template>
     <div class="sidebar-grid" ref="sidebarLayoutContainer">
         <slot name="sidebar"></slot>
-        <div id="menu-resize-border" class="resize-border-v" @mousedown="resizeMenu"></div>
+        <div class="resize-border-v" @mousedown="resizeMenu"></div>
         <slot></slot>
     </div>
 </template>
