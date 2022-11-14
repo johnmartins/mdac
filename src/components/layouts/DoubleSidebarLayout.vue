@@ -33,10 +33,11 @@ function resizeMenu (evt, side) {
         let mouseX = evt.clientX
 
         if (side === 'left') {
-            if (mouseX < minWidth) mouseX = minWidth
             leftWidth = mouseX
+			if (leftWidth < minWidth) leftWidth = minWidth
         } else if (side === 'right') {
             rightWidth = doubleSidebarLayoutContainer.value.clientWidth - mouseX
+			if (rightWidth < minWidth) rightWidth = minWidth
         } else {
             throw new Error('Unclear layout resize instructions.')
         }

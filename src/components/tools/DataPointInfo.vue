@@ -1,8 +1,8 @@
 <template>
     <div class="card mt-3">
-        <div class="control-group p-2 text-truncate">
+        <div class="control-group p-2">
             <strong>Selected sample info</strong>
-            <div class="variable-element" v-if="selectedDataPoint">
+            <div class="element-container" v-if="selectedDataPoint">
                 <DataPointInfoElement v-for="c in categories" :key="c.id" :variable="c.displayTitle" :value="selectedDataPoint[c.title]" />
             </div>
         </div>
@@ -28,10 +28,11 @@ const {selectedDataPoint} = storeToRefs(scatterStore)
 
 <style lang="scss" scoped>
 
-.variable-element {
+.element-container {
     display: grid;
     grid-template-columns: auto 20px auto;
     text-align: left;
+    font-size: 0.8em;
 }
 
 </style>
