@@ -61,7 +61,7 @@ export const useScatterStore = defineStore('scatter', {
             if (!this.selectedColorCodeCategory.usesCategoricalData) {
                 return d3.scaleSequential()
                     .domain([this.selectedColorCodeCategory.lb, this.selectedColorCodeCategory.ub])
-                    .interpolator(d3.interpolateRgbBasis(["red", "green", "blue"]))(d[this.selectedColorCodeCategory.title])
+                    .interpolator(d3.interpolateRgbBasis(["blue", "green", "yellow", "red"]))(d[this.selectedColorCodeCategory.title])
             } else {
                 return d3.scaleOrdinal()
                     .domain(this.selectedColorCodeCategory.availableCategoricalValues)
