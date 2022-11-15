@@ -28,6 +28,7 @@
 </template>
 
 <script setup>
+import * as d3 from "d3"
 import { storeToRefs } from "pinia"
 
 import {truncateDecimals, getArrayFromDataPoint} from "@/utils/data-utils"
@@ -40,7 +41,7 @@ const dataStore = useDataStore()
 const scatterStore = useScatterStore()
 
 const {data} = storeToRefs(dataStore)
-const {selectedPlot, selectedDataPoint} = storeToRefs(scatterStore)
+const {selectedPlot, selectedDataPoint, overrideColorCodeColumn, overrideColorCodeFunction} = storeToRefs(scatterStore)
 
 function setupSimilarityColorScale () {
 
@@ -61,8 +62,11 @@ function setupSimilarityColorScale () {
         maxDistance = ed > maxDistance ? ed : maxDistance
     }
 
-    console.log('Max d: ' + maxDistance)
-    console.log('Min d: ' + minDistance)
+    overrideColorCodeColumn.value = '$SIMILARITY$'
+    overrideColorCodeFunction.value = d3.scaleSequential()
+        .domain([minDistance, maxDistance])
+        .interpolator(d3.interpolateRgbBasis(["blue", "green", "yellow", "red"]))
+
 }
 
 function onClick (evt, d) {

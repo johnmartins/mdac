@@ -17,6 +17,8 @@ export const useScatterStore = defineStore('scatter', {
             // Color coding
             selectedColorCodeCategory: null,
             useSimilarityColorCoding: true,
+            overrideColorCodeColumn: null,
+            overrideColorCodeFunction: null,
 
             // Boundaries
             plotXBounds: [],
@@ -56,6 +58,7 @@ export const useScatterStore = defineStore('scatter', {
             return this.selectedPlot
         },
         getSampleColor (d) {
+            if (this.overrideColorCodeFunction) return this.overrideColorCodeFunction(d[this.overrideColorCodeColumn])
             if (!this.selectedColorCodeCategory) return () => 'black'
 
             if (!this.selectedColorCodeCategory.usesCategoricalData) {
