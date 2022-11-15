@@ -215,7 +215,7 @@ function setColorScale (category) {
 
 	colorScaleCategory.value = category.title
 	if (!category.usesCategoricalData) {
-		colorScaleFunction.value = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateRgbBasis(["red", "green", "blue"]))
+		colorScaleFunction.value = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateRgbBasis(["blue", "green", "yellow", "red"]))
 	} else {
 		colorScaleFunction.value = d3.scaleOrdinal().domain(category.availableCategoricalValues).range(d3.schemeCategory10)
 	}

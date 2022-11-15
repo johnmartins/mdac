@@ -16,6 +16,8 @@ function isNumeric (str) {
     return !isNaN(str) && !isNaN(parseFloat(str))
 }
 
+function getArrayFromDataPoint (d, cols) {
+    return cols.map((col) => d[col])
+}
 
-
-export {truncateDecimals, isNumeric}
+export {truncateDecimals, isNumeric, getArrayFromDataPoint}

@@ -1,7 +1,7 @@
 <template>
     <!-- Excluded data (through user applied filters) -->
     <g>
-        <g style="opacity: 0.3;" class="scatter-point">
+        <g style="opacity: 0.1;" class="scatter-point">
             <circle 
             v-for="(d, index) in data.filter(de => !dataStore.dataPointFilterCheck(de))" :key="index" 
             :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
@@ -30,7 +30,8 @@
 <script setup>
 import { storeToRefs } from "pinia"
 
-import {truncateDecimals} from "@/utils/data-utils"
+import {truncateDecimals, getArrayFromDataPoint} from "@/utils/data-utils"
+import {euclideanDistance} from "@/sadse/similarity"
 
 import {useDataStore} from "@/store/DataStore"
 import {useScatterStore} from "@/store/ScatterStore"
@@ -39,7 +40,30 @@ const dataStore = useDataStore()
 const scatterStore = useScatterStore()
 
 const {data} = storeToRefs(dataStore)
-const {selectedPlot} = storeToRefs(scatterStore)
+const {selectedPlot, selectedDataPoint} = storeToRefs(scatterStore)
+
+function setupSimilarityColorScale () {
+
+    const inputCols = ['VANE_TOTAL_COUNT', 'VANE_LEAN', 'T_VANE_REG', 'T_VANE_MNT', 'T_HUB_REG', 'T_HUB_MNT', 'T_OUTER_REG', 'T_OUTER_MNT']
+    const filteredData = data.value.filter((d) => d['FIDELITY'] == 'SIMULATED')
+
+    const v = getArrayFromDataPoint(selectedDataPoint.value, inputCols)
+
+    let minDistance = 1
+    let maxDistance = 0
+
+    for (let d of filteredData) {
+        const w = getArrayFromDataPoint(d, inputCols)
+        const ed = euclideanDistance(v, w, true)
+        d['$SIMILARITY$'] = ed
+
+        minDistance = ed < minDistance ? ed : minDistance
+        maxDistance = ed > maxDistance ? ed : maxDistance
+    }
+
+    console.log('Max d: ' + maxDistance)
+    console.log('Min d: ' + minDistance)
+}
 
 function onClick (evt, d) {
     console.log(evt)
@@ -49,6 +73,12 @@ function onClick (evt, d) {
 
     scatterStore.selectedDataID = ID
     scatterStore.selectedDataPoint = d
+
+    // Filter based on arbitrary criteria (hard coded to be FIDELITY = SIMULATED)
+    // Calculate euclidean distance to those points
+    // Find MIN and MAX, and create a d3 color scale
+    // Recolor all design points
+    setupSimilarityColorScale()
 
 }
 

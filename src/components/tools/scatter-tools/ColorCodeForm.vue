@@ -34,18 +34,6 @@ const {plots, selectedPlotID, selectedColorCodeCategory, useSimilarityColorCodin
 const {categories} = storeToRefs(dataStore)
 
 
-function changeColorCode () {
-    scatterStore.setSelectedColorCode(plotSelector.value.value)
-}
-
-function newPlot () {
-    const newPlot = new ScatterPlotConfig()
-    scatterStore.addPlot(newPlot)
-
-    // Update selected plot to new plot
-    scatterStore.setSelectedPlot(newPlot.id)
-}
-
 </script>
 
 <style lang="scss" scoped>
