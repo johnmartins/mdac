@@ -9,6 +9,8 @@ export const useDataStore = defineStore('data', {
             filters: {},         // "ColumnID" -> [filterA, filterB, ..]
             filterIDMap: new Map(),
             idCol: '$ID$',
+            inputColumns: ['VANE_TOTAL_COUNT', 'VANE_LEAN', 'T_VANE_REG', 'T_VANE_MNT', 'T_HUB_REG', 'T_HUB_MNT', 'T_OUTER_REG', 'T_OUTER_MNT'],
+            outputColumns: []
         }),
     getters: {},
     actions: {

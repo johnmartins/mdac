@@ -49,7 +49,7 @@ const {selectedPlot, selectedDataPoint, useSimilarityColorCoding, overrideColorC
 function setupSimilarityColorScale () {
     if (!useSimilarityColorCoding.value) return
 
-    const inputCols = ['VANE_TOTAL_COUNT', 'VANE_LEAN', 'T_VANE_REG', 'T_VANE_MNT', 'T_HUB_REG', 'T_HUB_MNT', 'T_OUTER_REG', 'T_OUTER_MNT']
+    const inputCols = dataStore.inputColumns
     // const filteredData = data.value.filter((d) => d['FIDELITY'] == 'SIMULATED')
 
     const v = getArrayFromDataPoint(selectedDataPoint.value, inputCols)
