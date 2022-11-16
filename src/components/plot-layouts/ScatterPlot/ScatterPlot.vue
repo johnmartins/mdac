@@ -162,9 +162,13 @@ eventBus.on('Router.TabChange', (viewName) => {
 eventBus.on('Layout.contentResize', updateContainerSize)
 
 function onMouseDown (evt) {
+    clearSelections()
+    dragFilterStart(evt)
+}
+
+function clearSelections() {
     scatterStore.selectedDataID = -1
     scatterStore.selectedDataPoint = null
-    dragFilterStart(evt)
 }
 
 function dragFilterStart (evt) {

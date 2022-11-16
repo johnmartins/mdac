@@ -16,7 +16,6 @@ export const useScatterStore = defineStore('scatter', {
 
             // Color coding
             selectedColorCodeCategory: null,
-            useSimilarityColorCoding: true,
             overrideColorCodeColumn: null,
             overrideColorCodeFunction: null,
 
@@ -25,7 +24,10 @@ export const useScatterStore = defineStore('scatter', {
             plotYBounds: [],
 
             // Layout parameters
-            padding: 120
+            padding: 120,
+
+            // Similarity
+            useSimilarityColorCoding: true,
         }
     },
     getters: {

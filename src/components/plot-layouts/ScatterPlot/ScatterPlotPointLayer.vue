@@ -1,7 +1,7 @@
 <template>
     <!-- Excluded data (through user applied filters) -->
     <g>
-        <g style="opacity: 0.1;" class="scatter-point">
+        <g class="scatter-point">
             <circle 
             v-for="(d, index) in data.filter(de => !dataStore.dataPointFilterCheck(de))" :key="index" 
             :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
@@ -9,7 +9,9 @@
             :fill="getFill(d)"
             :stroke="getStroke(d)"
             :r="getRadius(d)" 
+            :opacity="getOpacity(d)"
             @click.self="onClick($event, d)"
+            @click.shift.self="onShiftClick($event, d)"
             />
         </g>
         <!-- Included data -->
@@ -22,6 +24,7 @@
             :fill="getFill(d)"
             :stroke="getStroke(d)"
             @click.self="onClick($event, d)"
+            @click.shift.self="onShiftClick($event, d)"
             />
         </g>
     </g>
@@ -41,9 +44,10 @@ const dataStore = useDataStore()
 const scatterStore = useScatterStore()
 
 const {data} = storeToRefs(dataStore)
-const {selectedPlot, selectedDataPoint, overrideColorCodeColumn, overrideColorCodeFunction} = storeToRefs(scatterStore)
+const {selectedPlot, selectedDataPoint, useSimilarityColorCoding, overrideColorCodeColumn, overrideColorCodeFunction} = storeToRefs(scatterStore)
 
 function setupSimilarityColorScale () {
+    if (!useSimilarityColorCoding.value) return
 
     const inputCols = ['VANE_TOTAL_COUNT', 'VANE_LEAN', 'T_VANE_REG', 'T_VANE_MNT', 'T_HUB_REG', 'T_HUB_MNT', 'T_OUTER_REG', 'T_OUTER_MNT']
     const filteredData = data.value.filter((d) => d['FIDELITY'] == 'SIMULATED')
@@ -70,7 +74,7 @@ function setupSimilarityColorScale () {
 }
 
 function onClick (evt, d) {
-    console.log(evt)
+    if (evt.ctrlKey) return onCtrlClick(evt, d)
 
     const ID = d[dataStore.idCol]
     console.log(`$ID$ = ${ID}`)
@@ -78,12 +82,11 @@ function onClick (evt, d) {
     scatterStore.selectedDataID = ID
     scatterStore.selectedDataPoint = d
 
-    // Filter based on arbitrary criteria (hard coded to be FIDELITY = SIMULATED)
-    // Calculate euclidean distance to those points
-    // Find MIN and MAX, and create a d3 color scale
-    // Recolor all design points
     setupSimilarityColorScale()
+}
 
+function onCtrlClick (evt, d) {
+    console.log("CTRL click")
 }
 
 function getScaledCoordinate (dataPoint, categoryName, axis) {
@@ -115,7 +118,7 @@ function getScaledCoordinate (dataPoint, categoryName, axis) {
 
 function getFill (d) {
     const ID = d[dataStore.idCol]
-    if (ID === scatterStore.selectedDataID) return 'whitesmoke'
+    if (ID === scatterStore.selectedDataID) return 'white'
 
     return scatterStore.getSampleColor(d)
 }
@@ -129,12 +132,18 @@ function getStroke (d) {
 
 function getRadius (d) {
     const ID = d[dataStore.idCol]
-    if (ID !== scatterStore.selectedDataID) return 4
-    return 6
+    if (ID !== scatterStore.selectedDataID) return 5
+    return 7
 }
 
 function getColor (d) {
 	return scatterStore.getSampleColor(d)
+}
+
+function getOpacity (d) {
+    const ID = d[dataStore.idCol]
+    if (ID !== scatterStore.selectedDataID) return 0.1
+    return 1
 }
 
 
@@ -144,6 +153,8 @@ function getColor (d) {
 
     .scatter-point {
         cursor: pointer;
+        fill: white;
+        stroke: black;
     }
 
 </style>
