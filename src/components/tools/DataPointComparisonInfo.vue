@@ -1,11 +1,11 @@
 <template>
-    <div class="card mt-3">
+    <div class="card mt-3" v-if="selectedDataPoint">
         <div class="control-group p-2">
-            <strong>Selected sample info</strong>
-            <div class="element-container" v-if="selectedDataPoint">
-                <DataPointInfoElement v-for="c in categories" :key="c.id" :category="c" :value="selectedDataPoint[c.title]" />
+            <strong>Data comparison</strong>
+            <div class="element-container" v-if="selectedSecondaryDataPoint">
+                <DataPointInfoElement v-for="c in categories" :key="c.id" :category="c" :value="selectedSecondaryDataPoint[c.title]" />
             </div>
-            <div v-else>No sample selected. Click on a data point to select it.</div>
+            <div v-else>No sample selected. Click on a data point <strong>while holding the CTRL-key</strong> to select it.</div>
         </div>
     </div>
 </template>
@@ -23,7 +23,7 @@ const dataStore = useDataStore()
 const scatterStore = useScatterStore()
 
 const {categories} = storeToRefs(dataStore)
-const {selectedDataPoint} = storeToRefs(scatterStore)
+const {selectedDataPoint, selectedSecondaryDataPoint} = storeToRefs(scatterStore)
 
 </script>
 

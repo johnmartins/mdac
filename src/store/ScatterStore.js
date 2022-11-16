@@ -13,6 +13,8 @@ export const useScatterStore = defineStore('scatter', {
             // Data
             selectedDataID: -1,
             selectedDataPoint: null,
+            selectedSecondaryDataID: -1,
+            selectedSecondaryDataPoint: null,
 
             // Color coding
             selectedColorCodeCategory: null,
@@ -72,6 +74,16 @@ export const useScatterStore = defineStore('scatter', {
                     .domain(this.selectedColorCodeCategory.availableCategoricalValues)
                     .range(d3.schemeCategory10)(d[this.selectedColorCodeCategory.title])
             }
+        },
+        resetColorCodeOverride () {
+            this.overrideColorCodeColumn = null
+            this.overrideColorCodeFunction = null
+        },
+        resetDataSelection () {
+            this.selectedDataID = -1
+            this.selectedDataPoint = null
+            this.selectedSecondaryDataID = -1
+            this.selectedSecondaryDataPoint = null
         }
     },
 })

@@ -167,8 +167,7 @@ function onMouseDown (evt) {
 }
 
 function clearSelections() {
-    scatterStore.selectedDataID = -1
-    scatterStore.selectedDataPoint = null
+    scatterStore.resetDataSelection()
 }
 
 function dragFilterStart (evt) {

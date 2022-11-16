@@ -4,13 +4,17 @@
             <strong>Color coding</strong>
             <div class="labeled-form">                
                 <span>Property:</span>
-                <select v-model="selectedColorCodeCategory" @change="onColorCategoryChange">
+                <select 
+                v-model="selectedColorCodeCategory" 
+                @change="onColorCategoryChange">
                     <option :value="null">None</option>
                     <option v-for="c in categories" :value="c" :key="c.id"> {{c.displayTitle}}</option>
                 </select>
             </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" v-model="useSimilarityColorCoding">
+            <div class="form-check" title="If enabled, data points will be color coded based on input similarity (euclidean proximity).">
+                <input class="form-check-input" type="checkbox" 
+                v-model="useSimilarityColorCoding" 
+                @change="onUseSimilarityColorCodingChange">
                 <label class="form-check-label" for="flexCheckDefault">
                     Use similarity color coding
                 </label>
@@ -34,8 +38,11 @@ const {plots, selectedPlotID, selectedColorCodeCategory, useSimilarityColorCodin
 const {categories} = storeToRefs(dataStore)
 
 function onColorCategoryChange (evt) {
-    overrideColorCodeColumn.value = null
-    overrideColorCodeFunction.value = null
+    scatterStore.resetColorCodeOverride()
+}
+
+function onUseSimilarityColorCodingChange (evt) {
+    scatterStore.resetColorCodeOverride()
 }
 
 

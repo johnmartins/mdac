@@ -50,14 +50,14 @@ function setupSimilarityColorScale () {
     if (!useSimilarityColorCoding.value) return
 
     const inputCols = ['VANE_TOTAL_COUNT', 'VANE_LEAN', 'T_VANE_REG', 'T_VANE_MNT', 'T_HUB_REG', 'T_HUB_MNT', 'T_OUTER_REG', 'T_OUTER_MNT']
-    const filteredData = data.value.filter((d) => d['FIDELITY'] == 'SIMULATED')
+    // const filteredData = data.value.filter((d) => d['FIDELITY'] == 'SIMULATED')
 
     const v = getArrayFromDataPoint(selectedDataPoint.value, inputCols)
 
     let minDistance = 1
     let maxDistance = 0
 
-    for (let d of filteredData) {
+    for (let d of data.value) {
         const w = getArrayFromDataPoint(d, inputCols)
         const ed = euclideanDistance(v, w, true)
         d['$SIMILARITY$'] = ed
@@ -73,11 +73,16 @@ function setupSimilarityColorScale () {
 
 }
 
-function onClick (evt, d) {
-    if (evt.ctrlKey) return onCtrlClick(evt, d)
+/**
+ * Triggered when the user clicks on a data point in the scatter plot.
+ * @param evt click event
+ * @param d data point
+ * @ignoreCtrl ignore if the user pressed CTRL-key during click
+ */
+function onClick (evt, d, ignoreCtrl=false) {
+    if (evt.ctrlKey && ignoreCtrl === false) return onCtrlClick(evt, d)
 
     const ID = d[dataStore.idCol]
-    console.log(`$ID$ = ${ID}`)
 
     scatterStore.selectedDataID = ID
     scatterStore.selectedDataPoint = d
@@ -85,8 +90,22 @@ function onClick (evt, d) {
     setupSimilarityColorScale()
 }
 
+/**
+ * This method enables the user to make a secondary selection, 
+ * used for comparing two data points.
+ * @param evt click event
+ * @param d data point
+ */
 function onCtrlClick (evt, d) {
-    console.log("CTRL click")
+    // If there is no primary selection, then make this a "regular click"
+    if (!scatterStore.selectedDataPoint) {
+        return onClick(evt, d, true)
+    }
+    
+    const ID = d[dataStore.idCol]
+
+    scatterStore.selectedSecondaryDataID = ID
+    scatterStore.selectedSecondaryDataPoint = d
 }
 
 function getScaledCoordinate (dataPoint, categoryName, axis) {
