@@ -48,10 +48,12 @@ const {selectedPlot, selectedDataPoint, useSimilarityColorCoding, overrideColorC
 
 function setupSimilarityColorScale () {
     if (!useSimilarityColorCoding.value) return
+    if (dataStore.inputColumns.length === 0) {
+        console.warn('Input cols definition is empty')
+        return
+    }
 
     const inputCols = dataStore.inputColumns
-    // const filteredData = data.value.filter((d) => d['FIDELITY'] == 'SIMULATED')
-
     const v = getArrayFromDataPoint(selectedDataPoint.value, inputCols)
 
     let minDistance = 1

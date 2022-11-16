@@ -34,6 +34,8 @@ const {selectedDataPoint} = storeToRefs(scatterStore)
     grid-template-columns: auto 20px auto;
     text-align: left;
     font-size: 0.9em;
+    font-family: monospace;
+    user-select: text;
 }
 
 </style>

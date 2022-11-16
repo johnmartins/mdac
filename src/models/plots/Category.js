@@ -47,23 +47,27 @@ class Category {
     }
 
     getTickStringNumeric (value) {
+        return this.getFormattedNumericValue (value)
+    }
+
+    getFormattedNumericValue (value) {
         if (isNaN(parseFloat(value))) {
             throw new Error(`Encountered non-numeric data in a data series (${this.title}) that was expected to be numeric.`)
         }
 
-        let tickStr
+        let formattedValue
         
         if (this.magnitude < -1) {
             let rounded = Math.round(value * Math.pow(10,(Math.abs(this.magnitude)+3)))/Math.pow(10,3)
-            tickStr = `${rounded}e${this.magnitude}`
+            formattedValue = `${rounded}e${this.magnitude}`
         } else if (this.magnitude > 3) {
             let rounded = Math.round(value / Math.pow(10,(this.magnitude-3)))*Math.pow(10,(this.magnitude-3))
-            tickStr = `${rounded/Math.pow(10, this.magnitude)}e${this.magnitude}`
+            formattedValue = `${rounded/Math.pow(10, this.magnitude)}e${this.magnitude}`
         } else {
-            tickStr = `${Math.round(value * 1000) / 1000}`
+            formattedValue = `${Math.round(value * 1000) / 1000}`
         }
 
-        return tickStr
+        return formattedValue
     }
 
     scaleLinear (value) {
