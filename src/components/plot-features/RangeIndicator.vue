@@ -5,7 +5,7 @@
             <text 
             class="tick-ub"
             :x="barWidth + tickMargin">
-                {{colorCodeUpperBound}}
+                {{parseFloat(colorCodeUpperBound).toFixed(4)}}
             </text>
 
             <rect v-for="(color, index) in spectrumArray" 
@@ -19,7 +19,7 @@
             class="text-lb"
             :x="barWidth + tickMargin" 
             :y="4*resolution">
-                {{colorCodeLowerBound}}
+                {{parseFloat(colorCodeLowerBound).toFixed(4)}}
             </text>
         </g>
     </g>

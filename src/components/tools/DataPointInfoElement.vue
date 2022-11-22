@@ -20,9 +20,5 @@ const props = defineProps({
 
 <style lang="scss" scoped>
 
-.variable-element {
-    display: grid;
-    grid-template-columns: auto 10px auto;
-}
 
 </style>
