@@ -11,7 +11,6 @@
             :r="getRadius(d)" 
             :opacity="getOpacity(d)"
             @click.self="onClick($event, d)"
-            @click.shift.self="onShiftClick($event, d)"
             />
         </g>
         <!-- Included data -->
@@ -24,7 +23,6 @@
             :fill="getFill(d)"
             :stroke="getStroke(d)"
             @click.self="onClick($event, d)"
-            @click.shift.self="onShiftClick($event, d)"
             />
         </g>
     </g>
@@ -34,7 +32,7 @@
 import * as d3 from "d3"
 import { storeToRefs } from "pinia"
 
-import {truncateDecimals, getArrayFromDataPoint} from "@/utils/data-utils"
+import {truncateDecimals} from "@/utils/data-utils"
 import {euclideanDistance} from "@/sadse/similarity"
 
 import {useDataStore} from "@/store/DataStore"
@@ -54,13 +52,13 @@ function setupSimilarityColorScale () {
     }
 
     const inputCols = dataStore.inputColumns
-    const v = getArrayFromDataPoint(selectedDataPoint.value, inputCols)
+    const v = dataStore.getArrayFromDataPoint(selectedDataPoint.value, inputCols, {normalize: true})
 
     let minDistance = 1
     let maxDistance = 0
 
     for (let d of data.value) {
-        const w = getArrayFromDataPoint(d, inputCols)
+        const w = dataStore.getArrayFromDataPoint(d, inputCols, {normalize: true})
         const ed = euclideanDistance(v, w, true)
         d['$SIMILARITY$'] = ed
 

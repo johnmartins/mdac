@@ -2,6 +2,11 @@
     <div class="card mt-3" v-if="selectedDataPoint">
         <div class="control-group p-2">
             <strong>Data comparison</strong>
+
+            <div v-if="selectionSimilarity >= 0" style="font-size: 0.9em">
+                <span>Similarity to selection: {{selectionSimilarity}}</span>
+            </div>
+            
             <div class="element-container" v-if="selectedSecondaryDataPoint">
                 <DataPointInfoElement v-for="c in categories" :key="c.id" :category="c" :value="selectedSecondaryDataPoint[c.title]" />
             </div>
@@ -11,10 +16,12 @@
 </template>
 
 <script setup>
+import {computed} from "vue"
 
 import {useDataStore} from "../../store/DataStore"
 import {useScatterStore} from "../../store/ScatterStore"
 import {storeToRefs} from 'pinia'
+import {euclideanDistance} from "../../sadse/similarity"
 
 // Components
 import DataPointInfoElement from './DataPointInfoElement'
@@ -24,6 +31,14 @@ const scatterStore = useScatterStore()
 
 const {categories} = storeToRefs(dataStore)
 const {selectedDataPoint, selectedSecondaryDataPoint} = storeToRefs(scatterStore)
+const selectionSimilarity = computed(() => {
+    if (!selectedDataPoint.value || !selectedSecondaryDataPoint.value) return -1
+
+    let v = dataStore.getArrayFromDataPoint(selectedDataPoint.value, dataStore.inputColumns, {normalize: true})
+    let w = dataStore.getArrayFromDataPoint(selectedSecondaryDataPoint.value, dataStore.inputColumns, {normalize: true})
+
+    return euclideanDistance(v, w, true)
+})
 
 </script>
 

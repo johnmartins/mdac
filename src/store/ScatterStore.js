@@ -104,6 +104,8 @@ export const useScatterStore = defineStore('scatter', {
             this.selectedDataPoint = null
             this.selectedSecondaryDataID = -1
             this.selectedSecondaryDataPoint = null
+
+            this.resetColorCodeOverride()
         },
         getActiveColorCodeColumn () {
             if (this.overrideColorCodeColumn) return this.overrideColorCodeColumn

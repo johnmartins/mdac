@@ -16,10 +16,6 @@ function isNumeric (str) {
     return !isNaN(str) && !isNaN(parseFloat(str))
 }
 
-function getArrayFromDataPoint (d, cols) {
-    return cols.map((col) => d[col])
-}
-
 function linspace (start, stop, n) {
     let range = stop - start
     let step = range / (n - 1)
@@ -30,4 +26,4 @@ function linspace (start, stop, n) {
     return linspaceArray
 }
 
-export {truncateDecimals, isNumeric, getArrayFromDataPoint, linspace}
+export {truncateDecimals, isNumeric, linspace}

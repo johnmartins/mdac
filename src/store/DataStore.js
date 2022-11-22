@@ -127,6 +127,19 @@ export const useDataStore = defineStore('data', {
                 if (!passed) return false
             }
             return true
+        },
+        getArrayFromDataPoint (d, cols, {normalize = false} = {}) {
+            if (!normalize) {
+                return cols.map((col) => d[col])
+            }
+
+            let normalizedArray = []
+            for (let col of cols) {
+                const c = this.getCategoryWithName(col)
+                const scaledValue = c.scaleLinear(d[col])
+                normalizedArray.push(scaledValue)
+            }
+            return normalizedArray
         }
     },
 })
