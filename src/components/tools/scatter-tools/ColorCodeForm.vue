@@ -5,7 +5,7 @@
             <div class="labeled-form">                
                 <span>Property:</span>
                 <select 
-                v-model="selectedColorCodeColumn" 
+                v-model="selectedColorCodeCategory" 
                 @change="onColorCategoryChange">
                     <option :value="null">None</option>
                     <option v-for="c in categories" :value="c" :key="c.id"> {{c.displayTitle}}</option>
@@ -34,7 +34,7 @@ import ScatterPlotConfig from "@/models/plots/ScatterPlotConfig"
 const scatterStore = useScatterStore()
 const dataStore = useDataStore()
 
-const {plots, selectedPlotID, selectedColorCodeColumn, useSimilarityColorCoding, overrideColorCodeColumn, overrideColorCodeFunction} = storeToRefs(scatterStore)
+const {plots, selectedPlotID, selectedColorCodeCategory, useSimilarityColorCoding, overrideColorCodeColumn, overrideColorCodeFunction, colorCodeUpperBound, colorCodeLowerBound} = storeToRefs(scatterStore)
 const {categories} = storeToRefs(dataStore)
 
 function onColorCategoryChange (evt) {

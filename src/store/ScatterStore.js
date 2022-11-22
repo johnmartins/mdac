@@ -17,16 +17,23 @@ export const useScatterStore = defineStore('scatter', {
             selectedSecondaryDataPoint: null,
 
             // Color coding
-            selectedColorCodeColumn: null,
+            selectedColorCodeCategory: null,
             overrideColorCodeColumn: null,
             overrideColorCodeFunction: null,
+            colorCodeUpperBound: null,
+            colorCodeLowerBound: null,
 
             // Boundaries
             plotXBounds: [],
             plotYBounds: [],
 
             // Layout parameters
-            padding: 120,
+            paddingTop: 120,
+            paddingBottom: 120,
+            paddingLeft: 120,
+            paddingRight: 200,
+            xAxisTitleMargin: 40,
+            yAxisTitleMargin: 80,
 
             // Similarity
             useSimilarityColorCoding: true,
@@ -34,10 +41,10 @@ export const useScatterStore = defineStore('scatter', {
     },
     getters: {
         xAxisLength: (state) => {
-            return state.plotXBounds[1] - state.padding
+            return state.plotXBounds[1] - state.paddingLeft
         },
         yAxisLength: (state) => {
-            return state.plotYBounds[1] - state.padding
+            return state.plotYBounds[1] - state.paddingTop
         }
     },
     actions: {
@@ -65,26 +72,32 @@ export const useScatterStore = defineStore('scatter', {
             if (this.overrideColorCodeColumn) {
                 return this.getSampleColorWithValue(d[this.overrideColorCodeColumn])
             } 
-            if (!this.selectedColorCodeColumn) return 'black'
-            return this.getSampleColorWithValue(d[this.selectedColorCodeColumn.title])
+            if (!this.selectedColorCodeCategory) return 'black'
+            return this.getSampleColorWithValue(d[this.selectedColorCodeCategory.title])
         },
         getSampleColorWithValue (value) {
             if (this.overrideColorCodeFunction) return this.overrideColorCodeFunction(value)
-            if (!this.selectedColorCodeColumn) return () => 'black'
+            if (!this.selectedColorCodeCategory) return () => 'black'
 
-            if (!this.selectedColorCodeColumn.usesCategoricalData) {
+            if (!this.selectedColorCodeCategory.usesCategoricalData) {
                 return d3.scaleSequential()
-                    .domain([this.selectedColorCodeColumn.lb, this.selectedColorCodeColumn.ub])
+                    .domain([this.selectedColorCodeCategory.lb, this.selectedColorCodeCategory.ub])
                     .interpolator(d3.interpolateRgbBasis(["blue", "green", "yellow", "red"]))(value)
             } else {
                 return d3.scaleOrdinal()
-                    .domain(this.selectedColorCodeColumn.availableCategoricalValues)
+                    .domain(this.selectedColorCodeCategory.availableCategoricalValues)
                     .range(d3.schemeCategory10)(value)
             }
         },
         resetColorCodeOverride () {
             this.overrideColorCodeColumn = null
             this.overrideColorCodeFunction = null
+
+            if (!this.selectedColorCodeCategory) return
+
+            this.colorCodeLowerBound = this.selectedColorCodeCategory.lb
+            this.colorCodeUpperBound = this.selectedColorCodeCategory.ub
+
         },
         resetDataSelection () {
             this.selectedDataID = -1
@@ -94,7 +107,8 @@ export const useScatterStore = defineStore('scatter', {
         },
         getActiveColorCodeColumn () {
             if (this.overrideColorCodeColumn) return this.overrideColorCodeColumn
-            return this.selectedColorCodeColumn
+            if (this.selectedColorCodeCategory) return this.selectedColorCodeCategory.title
+            return null
         }
     },
 })

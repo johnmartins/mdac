@@ -44,7 +44,7 @@ const dataStore = useDataStore()
 const scatterStore = useScatterStore()
 
 const {data} = storeToRefs(dataStore)
-const {selectedPlot, selectedDataPoint, useSimilarityColorCoding, overrideColorCodeColumn, overrideColorCodeFunction} = storeToRefs(scatterStore)
+const {selectedPlot, selectedDataPoint, useSimilarityColorCoding, overrideColorCodeColumn, overrideColorCodeFunction, colorCodeUpperBound, colorCodeLowerBound} = storeToRefs(scatterStore)
 
 function setupSimilarityColorScale () {
     if (!useSimilarityColorCoding.value) return
@@ -68,6 +68,8 @@ function setupSimilarityColorScale () {
         maxDistance = ed > maxDistance ? ed : maxDistance
     }
 
+    colorCodeUpperBound.value = maxDistance
+    colorCodeLowerBound.value = minDistance
     overrideColorCodeColumn.value = '$SIMILARITY$'
     overrideColorCodeFunction.value = d3.scaleSequential()
         .domain([minDistance, maxDistance])

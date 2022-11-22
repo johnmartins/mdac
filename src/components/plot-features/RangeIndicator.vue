@@ -1,11 +1,11 @@
 <template>
-    <g v-if="category && !category.usesCategoricalData" :transform="`translate(200 200)`">
-        <text class="title">{{category.displayTitle}}</text>
-        <g v-if="category" :transform="`translate(0 ${tickMargin})`">
+    <g v-if="column">
+        <text class="title">{{column}}</text>
+        <g :transform="`translate(0 ${tickMargin})`">
             <text 
             class="tick-ub"
             :x="barWidth + tickMargin">
-                {{category.getTickString(category.ub)}}
+                {{colorCodeUpperBound}}
             </text>
 
             <rect v-for="(color, index) in spectrumArray" 
@@ -19,7 +19,7 @@
             class="text-lb"
             :x="barWidth + tickMargin" 
             :y="4*resolution">
-                {{category.getTickString(category.lb)}}
+                {{colorCodeLowerBound}}
             </text>
         </g>
     </g>
@@ -34,7 +34,7 @@ import {useScatterStore} from "../../store/ScatterStore"
 import {useDataStore} from "../../store/DataStore"
 
 const scatterStore = useScatterStore()
-// const {} = storeToRefs(scatterStore)
+const {colorCodeUpperBound, colorCodeLowerBound} = storeToRefs(scatterStore)
 const dataStore = useDataStore()
 const {data} = storeToRefs(dataStore)
 
@@ -43,14 +43,14 @@ const barWidth = 20
 const barHeight = 4
 const tickMargin = 8
 
-const category = computed(() => {
+const column = computed(() => {
     return scatterStore.getActiveColorCodeColumn()
 })
 
 const spectrumArray = computed(() => {
-    console.log(category.value)
-    if (!category) return []
-    let linearScale = linspace(category.value.lb, category.value.ub, resolution)
+    if (!column.value) return []
+    
+    let linearScale = linspace(colorCodeLowerBound.value, colorCodeUpperBound.value, resolution)
     let colorScale = []
     for (let value of linearScale) {
         colorScale.push(scatterStore.getSampleColorWithValue(value))
