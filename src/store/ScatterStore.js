@@ -17,7 +17,7 @@ export const useScatterStore = defineStore('scatter', {
             selectedSecondaryDataPoint: null,
 
             // Color coding
-            selectedColorCodeCategory: null,
+            selectedColorCodeColumn: null,
             overrideColorCodeColumn: null,
             overrideColorCodeFunction: null,
 
@@ -62,17 +62,24 @@ export const useScatterStore = defineStore('scatter', {
             return this.selectedPlot
         },
         getSampleColor (d) {
-            if (this.overrideColorCodeFunction) return this.overrideColorCodeFunction(d[this.overrideColorCodeColumn])
-            if (!this.selectedColorCodeCategory) return () => 'black'
+            if (this.overrideColorCodeColumn) {
+                return this.getSampleColorWithValue(d[this.overrideColorCodeColumn])
+            } 
+            if (!this.selectedColorCodeColumn) return 'black'
+            return this.getSampleColorWithValue(d[this.selectedColorCodeColumn.title])
+        },
+        getSampleColorWithValue (value) {
+            if (this.overrideColorCodeFunction) return this.overrideColorCodeFunction(value)
+            if (!this.selectedColorCodeColumn) return () => 'black'
 
-            if (!this.selectedColorCodeCategory.usesCategoricalData) {
+            if (!this.selectedColorCodeColumn.usesCategoricalData) {
                 return d3.scaleSequential()
-                    .domain([this.selectedColorCodeCategory.lb, this.selectedColorCodeCategory.ub])
-                    .interpolator(d3.interpolateRgbBasis(["blue", "green", "yellow", "red"]))(d[this.selectedColorCodeCategory.title])
+                    .domain([this.selectedColorCodeColumn.lb, this.selectedColorCodeColumn.ub])
+                    .interpolator(d3.interpolateRgbBasis(["blue", "green", "yellow", "red"]))(value)
             } else {
                 return d3.scaleOrdinal()
-                    .domain(this.selectedColorCodeCategory.availableCategoricalValues)
-                    .range(d3.schemeCategory10)(d[this.selectedColorCodeCategory.title])
+                    .domain(this.selectedColorCodeColumn.availableCategoricalValues)
+                    .range(d3.schemeCategory10)(value)
             }
         },
         resetColorCodeOverride () {
@@ -84,6 +91,10 @@ export const useScatterStore = defineStore('scatter', {
             this.selectedDataPoint = null
             this.selectedSecondaryDataID = -1
             this.selectedSecondaryDataPoint = null
+        },
+        getActiveColorCodeColumn () {
+            if (this.overrideColorCodeColumn) return this.overrideColorCodeColumn
+            return this.selectedColorCodeColumn
         }
     },
 })

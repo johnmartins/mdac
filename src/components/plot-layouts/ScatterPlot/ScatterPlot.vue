@@ -91,6 +91,8 @@
                         <ScatterPlotPointLayer />
                     </g>
                 </g>
+
+                <RangeIndicator />
             </svg>
         </div>
     </div>
@@ -109,6 +111,8 @@ import CategoricFilter from "@/models/filters/CategoricFilter"
 
 // Components
 import ScatterPlotPointLayer from "./ScatterPlotPointLayer.vue"
+import RangeIndicator from "@/components/plot-features/RangeIndicator"
+
 
 const dataStore = useDataStore()
 const scatterStore = useScatterStore()
