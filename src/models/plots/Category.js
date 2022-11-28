@@ -28,7 +28,7 @@ class Category {
         this.ub = ub
         this.position = position
         this.ticks = ticks
-        this.magnitude = this.lb > 0 ? Math.floor(Math.log10(this.lb)) : 0
+        this.magnitude = Math.abs(this.ub) > 0  ? Math.floor(Math.log10(this.ub)) : 0
         this.id = Category.count
         this.disabled = false
 
@@ -52,7 +52,8 @@ class Category {
 
     getFormattedNumericValue (value) {
         if (isNaN(parseFloat(value))) {
-            throw new Error(`Encountered non-numeric data in a data series (${this.title}) that was expected to be numeric.`)
+            console.warn(`Encountered non-numeric data in a data series (${this.title}) that was expected to be numeric.`)
+            return null
         }
 
         let formattedValue

@@ -17,7 +17,7 @@
                 
                     <g v-if="selectedPlot">
                         <text 
-                        :x="(scatterStore.plotXBounds[1])/2 "
+                        :x="(scatterStore.xAxisLength)/2 "
                         :y="-scatterStore.xAxisTitleMargin"
                         >
                         {{selectedPlot.title}}</text>
