@@ -4,6 +4,7 @@ export const useStateStore = defineStore('state', {
     state: () => ({
             // Layout
             activeView: 'pcp',
+            showCategorySettingsWindow: false,
 
             // Data
             selectedCategory: null,

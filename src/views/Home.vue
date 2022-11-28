@@ -7,9 +7,28 @@
 			</div>
 
 			<div class="nav-container">
-				<span class="link" @click="setView('pcp')" :class="{active: activeView === 'pcp'}">PCP</span>
-				<span class="link" @click="setView('scatter')" :class="{active: activeView === 'scatter'}">Scatter</span>
-				<span class="link" @click="setView('data')" :class="{active: activeView === 'data'}">Data</span>
+				<span class="link" 
+				@click="setView('pcp')" 
+				:class="{active: activeView === 'pcp'}">
+					PCP
+				</span>
+
+				<span class="link" 
+				@click="setView('scatter')" 
+				:class="{active: activeView === 'scatter'}">
+					Scatter
+				</span>
+				<span class="link" 
+				@click="setView('data')" 
+				:class="{active: activeView === 'data'}">
+					Data
+				</span>
+				<span class="link" 
+				v-if="categories.length > 0"
+				@click="showCategorySettingsWindow=true" 
+				:class="{active: showCategorySettingsWindow === true}">
+					Data settings
+				</span>
 
 			</div>
 
@@ -42,6 +61,8 @@
 		<div v-for="popup in popups" :key="popup.id">
 			<PopupBox :popupID="popup.id" />
 		</div>
+
+		<CategorySettings />
 	</div>
 </template>
 
@@ -60,17 +81,21 @@ import DataList from '@/components/DataList'
 import ScatterPlot from '@/components/plot-layouts/ScatterPlot/ScatterPlot'
 import ScatterSideMenu from '@/components/plot-layouts/ScatterPlot/ScatterSideMenu'
 import ScatterSideMenuRight from '@/components/plot-layouts/ScatterPlot/ScatterSideMenuRight'
+import CategorySettings from '@/components/CategorySettings'
 
 import { storeToRefs } from "pinia"
 import {useLayoutStore} from "@/store/LayoutStore"
 import {useStateStore} from "@/store/StateStore"
+import {useDataStore} from "@/store/DataStore"
 import Popup from "@/models/layout/Popup"
 
 const stateStore = useStateStore()
 const layoutStore = useLayoutStore()
+const dataStore = useDataStore()
 
-const {activeView} = storeToRefs(stateStore)
+const {activeView, showCategorySettingsWindow} = storeToRefs(stateStore)
 const {popups} = storeToRefs(layoutStore)
+const {categories} = storeToRefs(dataStore)
 
 const pcpContainer = ref(null)
 const scatterContainer = ref(null)

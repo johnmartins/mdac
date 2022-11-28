@@ -12,7 +12,8 @@ class Category {
         overwrite=false, 
         position=Category.lookupTable.size, 
         usesCategoricalData=false,
-        availableCategoricalValues=[]
+        availableCategoricalValues=[],
+        
     } = {}) { 
 
         // Validate input
@@ -30,7 +31,8 @@ class Category {
         this.ticks = ticks
         this.magnitude = Math.abs(this.ub) > 0  ? Math.floor(Math.log10(this.ub)) : 0
         this.id = Category.count
-        this.disabled = false
+        this.enabled = true
+        this.io = null              // Input or output column. Can be 'input', 'output', or null.
 
         // Categorical data variables
         this.usesCategoricalData = usesCategoricalData
@@ -118,7 +120,7 @@ class Category {
         this.ub = c.ub
         this.position = c.position
         this.ticks = c.ticks
-        this.disabled = c.disabled
+        this.enabled = c.enabled
         this.usesCategoricalData = c.usesCategoricalData
         this.availableCategoricalValues = c.availableCategoricalValues
 
