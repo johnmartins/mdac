@@ -48,7 +48,7 @@ function lineGenerator(d) {
 	for (let i = 0; i < dataCats.length; i++) {
 		let c = dataStore.getCategoryWithName(dataCats[i])
 
-		if (!c)  {
+		if (!c || !c.enabled)  {
 			continue
 		}
 		const x = truncateDecimals(c.position*horizontalOffset.value, 1)

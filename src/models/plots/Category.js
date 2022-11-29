@@ -32,7 +32,7 @@ class Category {
         this.magnitude = Math.abs(this.ub) > 0  ? Math.floor(Math.log10(this.ub)) : 0
         this.id = Category.count
         this.enabled = true
-        this.io = null              // Input or output column. Can be 'input', 'output', or null.
+        this.io = usesCategoricalData ? null : 'input' // Input or output column. Can be 'input', 'output', or null.
 
         // Categorical data variables
         this.usesCategoricalData = usesCategoricalData
@@ -121,6 +121,7 @@ class Category {
         this.position = c.position
         this.ticks = c.ticks
         this.enabled = c.enabled
+        this.io = c.io
         this.usesCategoricalData = c.usesCategoricalData
         this.availableCategoricalValues = c.availableCategoricalValues
 

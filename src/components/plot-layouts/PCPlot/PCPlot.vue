@@ -22,7 +22,7 @@
 					<!-- Axis group -->
 					<g 
 					class="axis" 
-					v-for="c in categories" 
+					v-for="c in categories.filter((c) => c.enabled)" 
 					@click="onClickAxis(c)"
 					@mousedown.prevent="dragFilterStart($event, c)"
 					v-bind:class="{highlighted: getSelectedCategoryTitle() == c.title}"

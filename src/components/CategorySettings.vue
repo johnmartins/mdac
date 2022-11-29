@@ -1,6 +1,6 @@
 <template>
     <div class="modal-mask" v-if="categories.length > 0 && showCategorySettingsWindow">
-        <div class="window">
+        <div class="window box-shadow">
             <div class="window-header">
                 <strong>Category settings</strong>
             </div>
@@ -19,7 +19,7 @@
                         {{c.usesCategoricalData ? "Categorical" : "Numeric"}}
                     </div>
                     <div>
-                        <select ref="formatSelector" v-model="c.io">
+                        <select ref="formatSelector" v-model="c.io" :disabled="c.usesCategoricalData">
                             <option :value="null">Undefined</option>
                             <option value="input">Input</option>
                             <option value="output">Output</option>
@@ -76,6 +76,7 @@ $width: 300px;
     overflow-x: hidden;
     cursor: auto;
     font-size: 0.8em;    
+    font-family: monospace;
 }
 
 .window-header {
@@ -95,6 +96,7 @@ $width: 300px;
     display: grid;
     grid-template-columns: auto 100px 100px 50px;
     grid-gap: 4px;
+    border-bottom: 1px solid whitesmoke;
 
     div {
         text-align: left;
