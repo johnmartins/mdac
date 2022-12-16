@@ -7,7 +7,7 @@
 			width="100%" 
 			ref="plotCanvas"
 			tabindex="0"
-			style="font-size: 1em;"
+			style="font-size: 1em; font-family: monospace;"
 			@mousemove.prevent="dragFilterBox"
 			@mouseup.prevent="dragFilterDone"
 			@keydown.delete="dataStore.deleteCategory(selectedCategory)"
@@ -342,11 +342,12 @@ function exportCSV () {
 	var head = '<svg title="graph" version="1.1" xmlns="http://www.w3.org/2000/svg">'
 	
 	let style = `<style>`
+	style += 'svg {font-family: monospace;}'
 	style += '.title {font-size: 0.8rem; text-anchor: start; x: 0px;}'
 	style += '.tick-string {font-size: 0.8rem; text-anchor: end; dominant-baseline: middle;}'
 	style += 'line {stroke: black; fill-opacity: 0;}'
 	style += 'path {fill-opacity: 0;}'
-	style += '.filter-box {stroke: white;stroke-opacity: 0.9;fill: purple;fill-opacity: 0.4;x: -8px;width: 16px;}'
+	style += '.filter-box {stroke: white;stroke-opacity: 0.9;fill: purple; fill-opacity: 0.4;x: -8px;width: 16px;}'
 	style += '</style>'
 	var full_svg = head +  style + svgData + "</svg>"
 	var blob = new Blob([full_svg], {type: "image/svg+xml"});  
