@@ -30,10 +30,10 @@ export const useScatterStore = defineStore('scatter', {
             // Layout parameters
             paddingTop: 120,
             paddingBottom: 120,
-            paddingLeft: 120,
+            paddingLeft: 140,
             paddingRight: 200,
             xAxisTitleMargin: 40,
-            yAxisTitleMargin: 80,
+            yAxisTitleMargin: 100,
 
             // Similarity
             useSimilarityColorCoding: true,

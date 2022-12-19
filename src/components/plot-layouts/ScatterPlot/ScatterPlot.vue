@@ -7,6 +7,7 @@
             tabindex="0"
             ref="plotCanvas"
             class="scatter-plot svg-content-responsive"
+            style="font-family: monospace;"
             @mousedown.prevent.self="onMouseDown"
             @mouseup.prevent="dragFilterEnd"
             @mousemove="dragFilter"
