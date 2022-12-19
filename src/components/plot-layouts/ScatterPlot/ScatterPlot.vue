@@ -12,6 +12,7 @@
             @mouseup.prevent="dragFilterEnd"
             @mousemove="dragFilter"
             >
+            TEST
                 <!-- Full plot group -->
                 <g v-if="plotVariables.hasRendered"
                 :transform="`translate(${scatterStore.paddingLeft} ${scatterStore.paddingTop})`">
