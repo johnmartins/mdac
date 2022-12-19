@@ -344,7 +344,8 @@ function exportCSV () {
 	let style = `<style>`
 	style += '.title {font-size: 0.8rem; text-anchor: start; x: 0px;}'
 	style += '.tick-string {font-size: 0.8rem; text-anchor: end; dominant-baseline: middle;}'
-	style += 'line {stroke: black; fill: transparent;}'
+	style += 'line {stroke: black; fill-opacity: 0;}'
+	style += 'path {fill-opacity: 0;}'
 	style += '.filter-box {stroke: white;stroke-opacity: 0.9;fill: purple;fill-opacity: 0.4;x: -8px;width: 16px;}'
 	style += '</style>'
 	var full_svg = head +  style + svgData + "</svg>"
@@ -372,12 +373,12 @@ function exportPNG () {
 
 		text {
 			fill: black;
-			stroke: transparent;
+			stroke-opacity: 0;
 		}
 
 		line {
 			stroke: black;
-			fill: transparent;
+			fill-opacity: 0;
 		}
 
 		.filter-box {
@@ -392,7 +393,7 @@ function exportPNG () {
 
 		.filter-hitbox {
 			stroke: transparent;
-			fill: transparent;
+			fill-opacity: 0;
 			x: -10px;
 			y: -20px;
 			width: 20px;
