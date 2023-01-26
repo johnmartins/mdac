@@ -19,15 +19,15 @@
 					<!-- Data line generator -->
 					<PCPlotPathLayer />
 
-					<!-- Axis group -->
+					<!-- Axis group. Filter for enabled, sort by position, position using index. -->
 					<g 
 					class="axis" 
-					v-for="c in categories.filter((c) => c.enabled)" 
+					v-for="(c, cIndex) in dataStore.enabledCategoriesSorted" 
 					@click="onClickAxis(c)"
 					@mousedown.prevent="dragFilterStart($event, c)"
 					v-bind:class="{highlighted: getSelectedCategoryTitle() == c.title}"
 					:key="c.position" 
-					:transform="`translate(${truncateDecimals(c.position*horizontalOffset,2)} ${truncateDecimals(getPlotYBounds()[0], 2)})`">	
+					:transform="`translate(${truncateDecimals(cIndex*horizontalOffset,2)} ${truncateDecimals(getPlotYBounds()[0], 2)})`">	
 
 						<!-- Hitbox -->
 						<rect 
@@ -180,8 +180,8 @@ watch(() => filterIDMap.value.size, () => {
 })
 
 watch([categories, plotXBounds], () => {
-	if (categories.value.length < 2) return 50;
-	horizontalOffset.value = plotXBounds.value[1]/Math.max(1,(categories.value.length-1))
+	if (dataStore.enabledCategoriesCount < 2) return 50;
+	horizontalOffset.value = plotXBounds.value[1]/Math.max(1,(dataStore.enabledCategoriesCount-1))
 })
 
 watch([plotYBounds, () => plotParameters.axisTitlePadding], () => {

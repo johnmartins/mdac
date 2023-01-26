@@ -28,6 +28,27 @@ export const useDataStore = defineStore('data', {
                 }
             }
             return ocols
+        },
+        enabledCategoriesCount: (state) => {
+            if (state.categories.length === 0) return 0
+            let enabledCats = state.categories.filter((c) => {
+                return c.enabled
+            })
+            console.log('Enabled cats: ' + enabledCats.length)
+            return enabledCats.length
+        },
+        /**
+         * Returns all enabled categories, sorted by position
+         * @param {*} state 
+         */
+        enabledCategoriesSorted: (state) => {
+            return state.categories.filter((c) => {
+                return c.enabled
+            }).sort((a, b) => {
+                if (a.position > b.position) return 1
+                if (a.position < b.position) return -1
+                return 0
+            })
         }
     },
     actions: {
@@ -108,6 +129,14 @@ export const useDataStore = defineStore('data', {
         },
         getCategoryWithName (categoryName) {
             return this.categoryNameMap.get(categoryName)
+        },
+        getTrueCategoryPosition (categoryName) {
+            const sortedCats = this.enabledCategoriesSorted
+            const targetCat = this.getCategoryWithName(categoryName)
+            for (let i = 0; i < sortedCats.length; i++) {
+                if (sortedCats[i].id === targetCat.id) return i
+            }
+            throw new Error('Could not resolve true category position')
         },
         deleteCategory (c) {
             if (!c) return

@@ -45,15 +45,19 @@ function lineGenerator(d) {
 	let dataCats = Object.keys(d)
 	let dataArray = Array(dataCats.length).fill(null)
 
-	for (let i = 0; i < dataCats.length; i++) {
+	for (let i = 0; i < dataCats.length; i++) {		
 		let c = dataStore.getCategoryWithName(dataCats[i])
 
+		// Ignore disabled categories
 		if (!c || !c.enabled)  {
 			continue
 		}
-		const x = truncateDecimals(c.position*horizontalOffset.value, 1)
+
+		// Set data point coordinates
+		const x = truncateDecimals(dataStore.getTrueCategoryPosition(c.title)*horizontalOffset.value, 1)			// This needs to be moved
 		const y = truncateDecimals(c.scaleLinear(d[c.title])*axisLength.value, 1)
 
+		// Build data array
 		dataArray[c.position] = {
 			x: x, 
 			y: y
