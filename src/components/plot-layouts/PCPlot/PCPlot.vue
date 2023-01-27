@@ -179,7 +179,7 @@ watch(() => filterIDMap.value.size, () => {
 	dataExcluded.value = data.value.filter(de => !dataStore.dataPointFilterCheck(de))
 })
 
-watch([categories, plotXBounds], () => {
+watch([categories, plotXBounds, () => dataStore.enabledCategoriesCount], () => {
 	if (dataStore.enabledCategoriesCount < 2) return 50;
 	horizontalOffset.value = plotXBounds.value[1]/Math.max(1,(dataStore.enabledCategoriesCount-1))
 })

@@ -34,7 +34,6 @@ export const useDataStore = defineStore('data', {
             let enabledCats = state.categories.filter((c) => {
                 return c.enabled
             })
-            console.log('Enabled cats: ' + enabledCats.length)
             return enabledCats.length
         },
         /**
