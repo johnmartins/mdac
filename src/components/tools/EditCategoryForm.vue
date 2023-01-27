@@ -11,7 +11,8 @@
 
             <div class="btn-group" style="width: 100%">
                 <button class="btn btn-success btn-sm" @click="editCategory">Update</button>
-                <button class="btn btn-danger btn-sm" @click="deleteCategory">Delete</button>
+                <button v-if="selectedCategory.enabled" class="btn btn-danger btn-sm" @click="disableCategory">Disable</button>
+                <button v-if="!selectedCategory.enabled" class="btn btn-primary btn-sm" @click="enableCategory">Enable</button>
             </div>
         </div>
     </div>
@@ -51,8 +52,12 @@
         editedCategory.value = newCat
     })
 
-    function deleteCategory () {
-        dataStore.deleteCategory(selectedCategory.value)
+    function disableCategory () {
+        selectedCategory.value.enabled = false
+    }
+
+    function enableCategory () {
+        selectedCategory.value.enabled = true
     }
 
     function editCategory () {

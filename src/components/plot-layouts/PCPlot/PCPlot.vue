@@ -19,15 +19,15 @@
 					<!-- Data line generator -->
 					<PCPlotPathLayer />
 
-					<!-- Axis group -->
+					<!-- Axis group. Filter for enabled, sort by position, position using index. -->
 					<g 
 					class="axis" 
-					v-for="c in categories" 
+					v-for="(c, cIndex) in dataStore.enabledCategoriesSorted" 
 					@click="onClickAxis(c)"
 					@mousedown.prevent="dragFilterStart($event, c)"
 					v-bind:class="{highlighted: getSelectedCategoryTitle() == c.title}"
 					:key="c.position" 
-					:transform="`translate(${truncateDecimals(c.position*horizontalOffset,2)} ${truncateDecimals(getPlotYBounds()[0], 2)})`">	
+					:transform="`translate(${truncateDecimals(cIndex*horizontalOffset,2)} ${truncateDecimals(getPlotYBounds()[0], 2)})`">	
 
 						<!-- Hitbox -->
 						<rect 
@@ -179,9 +179,9 @@ watch(() => filterIDMap.value.size, () => {
 	dataExcluded.value = data.value.filter(de => !dataStore.dataPointFilterCheck(de))
 })
 
-watch([categories, plotXBounds], () => {
-	if (categories.value.length < 2) return 50;
-	horizontalOffset.value = plotXBounds.value[1]/Math.max(1,(categories.value.length-1))
+watch([categories, plotXBounds, () => dataStore.enabledCategoriesCount], () => {
+	if (dataStore.enabledCategoriesCount < 2) return 50;
+	horizontalOffset.value = plotXBounds.value[1]/Math.max(1,(dataStore.enabledCategoriesCount-1))
 })
 
 watch([plotYBounds, () => plotParameters.axisTitlePadding], () => {
@@ -215,7 +215,7 @@ function setColorScale (category) {
 
 	colorScaleCategory.value = category.title
 	if (!category.usesCategoricalData) {
-		colorScaleFunction.value = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateRgbBasis(["red", "green", "blue"]))
+		colorScaleFunction.value = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateRgbBasis(["blue", "green", "yellow", "red"]))
 	} else {
 		colorScaleFunction.value = d3.scaleOrdinal().domain(category.availableCategoricalValues).range(d3.schemeCategory10)
 	}

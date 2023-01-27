@@ -7,9 +7,49 @@ export const useDataStore = defineStore('data', {
             categories: [],
             categoryNameMap: new Map(),
             filters: {},         // "ColumnID" -> [filterA, filterB, ..]
-            filterIDMap: new Map()
+            filterIDMap: new Map(),
+            idCol: '$ID$',
         }),
-    getters: {},
+    getters: {
+        inputColumns: (state) => {
+            let icols = []
+            for (let c of state.categories) {
+                if (c.io == 'input') {
+                    icols.push(c.title)
+                }
+            }
+            return icols
+        },
+        outputColumns: (state) => {
+            let ocols = []
+            for (let c of state.categories) {
+                if (c.io == 'output') {
+                    ocols.push(c.title)
+                }
+            }
+            return ocols
+        },
+        enabledCategoriesCount: (state) => {
+            if (state.categories.length === 0) return 0
+            let enabledCats = state.categories.filter((c) => {
+                return c.enabled
+            })
+            return enabledCats.length
+        },
+        /**
+         * Returns all enabled categories, sorted by position
+         * @param {*} state 
+         */
+        enabledCategoriesSorted: (state) => {
+            return state.categories.filter((c) => {
+                return c.enabled
+            }).sort((a, b) => {
+                if (a.position > b.position) return 1
+                if (a.position < b.position) return -1
+                return 0
+            })
+        }
+    },
     actions: {
         wipeAllData () {
             this.data = []
@@ -89,6 +129,14 @@ export const useDataStore = defineStore('data', {
         getCategoryWithName (categoryName) {
             return this.categoryNameMap.get(categoryName)
         },
+        getTrueCategoryPosition (categoryName) {
+            const sortedCats = this.enabledCategoriesSorted
+            const targetCat = this.getCategoryWithName(categoryName)
+            for (let i = 0; i < sortedCats.length; i++) {
+                if (sortedCats[i].id === targetCat.id) return i
+            }
+            throw new Error('Could not resolve true category position')
+        },
         deleteCategory (c) {
             if (!c) return
             // Delete category from category list
@@ -124,6 +172,19 @@ export const useDataStore = defineStore('data', {
                 if (!passed) return false
             }
             return true
+        },
+        getArrayFromDataPoint (d, cols, {normalize = false} = {}) {
+            if (!normalize) {
+                return cols.map((col) => d[col])
+            }
+
+            let normalizedArray = []
+            for (let col of cols) {
+                const c = this.getCategoryWithName(col)
+                const scaledValue = c.scaleLinear(d[col])
+                normalizedArray.push(scaledValue)
+            }
+            return normalizedArray
         }
     },
 })

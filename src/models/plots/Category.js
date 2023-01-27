@@ -12,7 +12,8 @@ class Category {
         overwrite=false, 
         position=Category.lookupTable.size, 
         usesCategoricalData=false,
-        availableCategoricalValues=[]
+        availableCategoricalValues=[],
+        
     } = {}) { 
 
         // Validate input
@@ -28,9 +29,10 @@ class Category {
         this.ub = ub
         this.position = position
         this.ticks = ticks
-        this.magnitude = this.lb > 0 ? Math.floor(Math.log10(this.lb)) : 0
+        this.magnitude = Math.abs(this.ub) > 0  ? Math.floor(Math.log10(this.ub)) : 0
         this.id = Category.count
-        this.disabled = false
+        this.enabled = true
+        this.io = usesCategoricalData ? null : 'input' // Input or output column. Can be 'input', 'output', or null.
 
         // Categorical data variables
         this.usesCategoricalData = usesCategoricalData
@@ -47,23 +49,28 @@ class Category {
     }
 
     getTickStringNumeric (value) {
+        return this.getFormattedNumericValue (value)
+    }
+
+    getFormattedNumericValue (value) {
         if (isNaN(parseFloat(value))) {
-            throw new Error(`Encountered non-numeric data in a data series (${this.title}) that was expected to be numeric.`)
+            console.warn(`Encountered non-numeric data in a data series (${this.title}) that was expected to be numeric.`)
+            return null
         }
 
-        let tickStr
+        let formattedValue
         
         if (this.magnitude < -1) {
             let rounded = Math.round(value * Math.pow(10,(Math.abs(this.magnitude)+3)))/Math.pow(10,3)
-            tickStr = `${rounded}e${this.magnitude}`
+            formattedValue = `${rounded}e${this.magnitude}`
         } else if (this.magnitude > 3) {
             let rounded = Math.round(value / Math.pow(10,(this.magnitude-3)))*Math.pow(10,(this.magnitude-3))
-            tickStr = `${rounded/Math.pow(10, this.magnitude)}e${this.magnitude}`
+            formattedValue = `${rounded/Math.pow(10, this.magnitude)}e${this.magnitude}`
         } else {
-            tickStr = `${Math.round(value * 1000) / 1000}`
+            formattedValue = `${Math.round(value * 1000) / 1000}`
         }
 
-        return tickStr
+        return formattedValue
     }
 
     scaleLinear (value) {
@@ -113,7 +120,8 @@ class Category {
         this.ub = c.ub
         this.position = c.position
         this.ticks = c.ticks
-        this.disabled = c.disabled
+        this.enabled = c.enabled
+        this.io = c.io
         this.usesCategoricalData = c.usesCategoricalData
         this.availableCategoricalValues = c.availableCategoricalValues
 

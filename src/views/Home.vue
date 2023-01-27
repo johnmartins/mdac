@@ -7,9 +7,28 @@
 			</div>
 
 			<div class="nav-container">
-				<span class="link" @click="setView('pcp')" :class="{active: activeView === 'pcp'}">PCP</span>
-				<span class="link" @click="setView('scatter')" :class="{active: activeView === 'scatter'}">Scatter</span>
-				<span class="link" @click="setView('data')" :class="{active: activeView === 'data'}">Data</span>
+				<span class="link" 
+				@click="setView('pcp')" 
+				:class="{active: activeView === 'pcp'}">
+					PCP
+				</span>
+
+				<span class="link" 
+				@click="setView('scatter')" 
+				:class="{active: activeView === 'scatter'}">
+					Scatter
+				</span>
+				<span class="link" 
+				@click="setView('data')" 
+				:class="{active: activeView === 'data'}">
+					Data
+				</span>
+				<span class="link" 
+				v-if="categories.length > 0"
+				@click="showCategorySettingsWindow=true" 
+				:class="{active: showCategorySettingsWindow === true}">
+					Data settings
+				</span>
 
 			</div>
 
@@ -31,16 +50,19 @@
 				</BoxLayout>
 			</div>
 			<div ref="scatterContainer" class="fill-content" style="display: none;">
-				<SidebarLayout>
-					<template #sidebar><ScatterSideMenu /></template>
+				<DoubleSidebarLayout>
+					<template #sidebarA><ScatterSideMenu /></template>
 					<ScatterPlot/>
-				</SidebarLayout>
+					<template #sidebarB><ScatterSideMenuRight /></template>
+				</DoubleSidebarLayout>
 			</div>
 		</div>
 
 		<div v-for="popup in popups" :key="popup.id">
 			<PopupBox :popupID="popup.id" />
 		</div>
+
+		<CategorySettings />
 	</div>
 </template>
 
@@ -49,6 +71,7 @@ import { reactive, ref, onMounted, onUpdated, inject } from "vue"
 
 // Layouts
 import SidebarLayout from '@/components/layouts/SidebarLayout'
+import DoubleSidebarLayout from '@/components/layouts/DoubleSidebarLayout'
 import BoxLayout from '@/components/layouts/BoxLayout'
 import PopupBox from '@/components/layouts/PopupBox'
 
@@ -57,17 +80,22 @@ import PCPSideMenu from '@/components/plot-layouts/PCPlot/PCPSideMenu'
 import DataList from '@/components/DataList'
 import ScatterPlot from '@/components/plot-layouts/ScatterPlot/ScatterPlot'
 import ScatterSideMenu from '@/components/plot-layouts/ScatterPlot/ScatterSideMenu'
+import ScatterSideMenuRight from '@/components/plot-layouts/ScatterPlot/ScatterSideMenuRight'
+import CategorySettings from '@/components/CategorySettings'
 
 import { storeToRefs } from "pinia"
 import {useLayoutStore} from "@/store/LayoutStore"
 import {useStateStore} from "@/store/StateStore"
+import {useDataStore} from "@/store/DataStore"
 import Popup from "@/models/layout/Popup"
 
 const stateStore = useStateStore()
 const layoutStore = useLayoutStore()
+const dataStore = useDataStore()
 
-const {activeView} = storeToRefs(stateStore)
+const {activeView, showCategorySettingsWindow} = storeToRefs(stateStore)
 const {popups} = storeToRefs(layoutStore)
+const {categories} = storeToRefs(dataStore)
 
 const pcpContainer = ref(null)
 const scatterContainer = ref(null)
@@ -115,7 +143,7 @@ onMounted( () => {
 	.mdac-header {
 		height: $header-height;
 		display: grid;
-		grid-template-columns: 100px auto 120px;
+		grid-template-columns: 100px auto 200px;
 		text-align: left;
 		vertical-align: top;
 		border-bottom: 1px solid whitesmoke;
@@ -144,6 +172,7 @@ onMounted( () => {
 			color: darkgrey;
 			font-family: monospace;
 			font-size: 0.8em;
+			white-space: nowrap;
 		}
 	}
 

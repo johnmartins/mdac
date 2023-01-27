@@ -7,23 +7,26 @@
             tabindex="0"
             ref="plotCanvas"
             class="scatter-plot svg-content-responsive"
-            @mousedown.prevent="dragFilterStart"
+            style="font-family: monospace;"
+            @mousedown.prevent.self="onMouseDown"
             @mouseup.prevent="dragFilterEnd"
             @mousemove="dragFilter"
             >
+            TEST
                 <!-- Full plot group -->
-                <g v-if="plotVariables.hasRendered">
+                <g v-if="plotVariables.hasRendered"
+                :transform="`translate(${scatterStore.paddingLeft} ${scatterStore.paddingTop})`">
+                
                     <g v-if="selectedPlot">
                         <text 
-                        :x="(scatterStore.plotXBounds[1] + scatterStore.padding)/2 "
-                        :y="scatterStore.plotYBounds[0]-plotParameters.xAxisTitlePadding"
+                        :x="(scatterStore.xAxisLength)/2 "
+                        :y="-scatterStore.xAxisTitleMargin"
                         >
                         {{selectedPlot.title}}</text>
                     </g>
+                    
                     <!-- filter group -->
-                    <g
-                    :transform="`translate(${plotParameters.padding} ${plotParameters.padding})`"
-                    > 
+                    <g>
 
                         <rect
                         class="filter-box-proto"
@@ -37,32 +40,28 @@
                     </g>
 
                     <!-- x-axis group -->
-                    <g
-                    :transform="`translate(${scatterStore.padding} ${scatterStore.padding})`"> 
-                        <line 
-                        x1="0" :x2="scatterStore.xAxisLength" 
-                        :y1="scatterStore.yAxisLength" :y2="scatterStore.yAxisLength" />
-                        <g v-if="checkAxisIsDefined('x')">
+                    <line 
+                    x1="0" :x2="scatterStore.xAxisLength" 
+                    :y1="scatterStore.yAxisLength" :y2="scatterStore.yAxisLength" />
+                    <g v-if="checkAxisIsDefined('x')">
 
-                            <!-- title -->
-                            <text class="scatter-axis-title-x" 
-                            :x="scatterStore.xAxisLength/2" 
-                            :y="scatterStore.yAxisLength + plotParameters.xAxisTitlePadding"
-                            >
-                                {{cx.displayTitle}}
-                            </text>
+                        <!-- title -->
+                        <text class="scatter-axis-title-x" 
+                        :x="scatterStore.xAxisLength/2" 
+                        :y="scatterStore.yAxisLength + plotParameters.xAxisTitlePadding"
+                        >
+                            {{cx.displayTitle}}
+                        </text>
 
-                            <!-- ticks -->
-                            <g class="tick" v-for="(tick, index) in cx.getTickArray()" :key="index"> <!-- Tick group -->
-                                <text :x="scatterStore.xAxisLength - cx.scaleLinear(tick)*scatterStore.xAxisLength" :y="scatterStore.yAxisLength+ 20" class="tick-string">{{cx.getTickString(tick)}}</text>
-                                <line :x1="cx.scaleLinear(tick)*scatterStore.xAxisLength" :y1="scatterStore.yAxisLength" :x2="cx.scaleLinear(tick)*scatterStore.xAxisLength" :y2="scatterStore.yAxisLength+5"/>	<!-- Top tick -->
-                            </g>
+                        <!-- ticks -->
+                        <g class="tick" v-for="(tick, index) in cx.getTickArray()" :key="index"> <!-- Tick group -->
+                            <text :x="scatterStore.xAxisLength - cx.scaleLinear(tick)*scatterStore.xAxisLength" :y="scatterStore.yAxisLength+ 20" class="tick-string">{{cx.getTickString(tick)}}</text>
+                            <line :x1="cx.scaleLinear(tick)*scatterStore.xAxisLength" :y1="scatterStore.yAxisLength" :x2="cx.scaleLinear(tick)*scatterStore.xAxisLength" :y2="scatterStore.yAxisLength+5"/>	<!-- Top tick -->
                         </g>
                     </g>
 
                     <!-- y-axis group -->
-                    <g
-                    :transform="`translate(${plotParameters.padding} ${plotParameters.padding})`"> 
+                    <g>
                         <line 
                         x1="0" :x2="0" 
                         :y1="0" :y2="scatterStore.yAxisLength" 
@@ -70,9 +69,9 @@
                         <g v-if="checkAxisIsDefined('y')">
                             <!-- title -->
                             <text class="scatter-axis-title-y" 
-                            :x="- plotParameters.yAxisTitlePadding" 
+                            :x="-scatterStore.yAxisTitleMargin" 
                             :y="scatterStore.yAxisLength/2"
-                            :transform="`rotate(-90 ${- plotParameters.yAxisTitlePadding} ${scatterStore.yAxisLength/2})`"
+                            :transform="`rotate(-90 ${-scatterStore.yAxisTitleMargin} ${scatterStore.yAxisLength/2})`"
                             >
                                 {{cy.displayTitle}}
                             </text>
@@ -86,9 +85,12 @@
                     </g>
 
                     <!-- data group -->
-                    <g v-if="selectedPlot"
-                    :transform="`translate(${scatterStore.padding} ${scatterStore.padding})`">
+                    <g v-if="selectedPlot">
                         <ScatterPlotPointLayer />
+                    </g>
+
+                    <g :transform="`translate(${scatterStore.xAxisLength + 20} 0)`">
+                        <RangeIndicator />
                     </g>
                 </g>
             </svg>
@@ -109,6 +111,8 @@ import CategoricFilter from "@/models/filters/CategoricFilter"
 
 // Components
 import ScatterPlotPointLayer from "./ScatterPlotPointLayer.vue"
+import RangeIndicator from "@/components/plot-features/RangeIndicator"
+
 
 const dataStore = useDataStore()
 const scatterStore = useScatterStore()
@@ -119,9 +123,8 @@ const plotCanvas = ref(null)
 const cx = computed (() => selectedPlot.value ? dataStore.getCategoryWithName(selectedPlot.value.xAxisCategoryName) : null)
 const cy = computed (() => selectedPlot.value ? dataStore.getCategoryWithName(selectedPlot.value.yAxisCategoryName) : null)
 const plotParameters = reactive({
-    padding: 120,
     xAxisTitlePadding: 40,
-    yAxisTitlePadding: 80,
+    yAxisTitlePadding: 40,
 })
 const plotVariables = reactive({
     hasRendered: false,
@@ -131,7 +134,6 @@ const plotVariables = reactive({
 const filterVariables = reactive({
     mousedown: false,
     startTime: 0,
-    deltaTime: 0,
     startValue: {x:0, y:0},
     endValue: {x:0, y:0}
 })
@@ -162,6 +164,15 @@ eventBus.on('Router.TabChange', (viewName) => {
 })
 eventBus.on('Layout.contentResize', updateContainerSize)
 
+function onMouseDown (evt) {
+    clearSelections()
+    dragFilterStart(evt)
+}
+
+function clearSelections() {
+    scatterStore.resetDataSelection()
+}
+
 function dragFilterStart (evt) {
     if (!selectedPlot.value) return;
     if (!cx.value || !cy.value) return;
@@ -169,12 +180,19 @@ function dragFilterStart (evt) {
     filterVariables.mousedown = true
     filterVariables.startValue.x = loc.x 
     filterVariables.startValue.y = loc.y
+    filterVariables.startTime = Date.now()
 }
 
 function dragFilterEnd (evt) {
-    if (!filterVariables.mousedown) return;
+    const filterTolerance = 200 // ms
 
-    // First of, delete all existing filters
+    // Ensure that filters are created intentionally
+    if (!filterVariables.mousedown || (Date.now() - filterVariables.startTime) < filterTolerance) {
+        dragFilterReset();
+        return
+    } 
+    
+    // Then, delete all existing filters
     dataStore.clearFilters()
 
     // Categories
@@ -182,12 +200,12 @@ function dragFilterEnd (evt) {
     const cy = dataStore.getCategoryWithName(selectedPlot.value.yAxisCategoryName)
 
     // Proto filter coordinates
-	const x1 = filterVariables.startValue.x - scatterStore.padding
-	const x2 = filterVariables.endValue.x - scatterStore.padding
+	const x1 = filterVariables.startValue.x - scatterStore.paddingLeft
+	const x2 = filterVariables.endValue.x - scatterStore.paddingLeft
     let x1Ratio = 1-(x1 / scatterStore.xAxisLength)
 	let x2Ratio = 1-(x2 / scatterStore.xAxisLength)
-    const y1 = filterVariables.startValue.y - scatterStore.padding
-	const y2 = filterVariables.endValue.y - scatterStore.padding
+    const y1 = filterVariables.startValue.y - scatterStore.paddingTop
+	const y2 = filterVariables.endValue.y - scatterStore.paddingTop
     let y1Ratio = (y1 / scatterStore.yAxisLength)
 	let y2Ratio = (y2 / scatterStore.yAxisLength)
 
@@ -219,12 +237,12 @@ function dragFilterReset () {
 }
 
 function getPlotYBounds () {
-	const array = [scatterStore.padding, plotCanvas.value.getBoundingClientRect().height - scatterStore.padding]
+	const array = [scatterStore.paddingTop, plotCanvas.value.getBoundingClientRect().height - scatterStore.paddingBottom]
 	return array
 }
 
 function getPlotXBounds () {
-	const array = [scatterStore.padding, plotCanvas.value.getBoundingClientRect().width - scatterStore.padding]
+	const array = [scatterStore.paddingLeft, plotCanvas.value.getBoundingClientRect().width - scatterStore.paddingRight]
     return array
 }
 
@@ -251,8 +269,6 @@ function checkAxisIsDefined (axis) {
 
     return true
 }
-
-
 
 </script>
 
@@ -286,5 +302,6 @@ function checkAxisIsDefined (axis) {
         fill-opacity: 0.8;
     }
 }
+
 
 </style>

@@ -16,6 +16,14 @@ function isNumeric (str) {
     return !isNaN(str) && !isNaN(parseFloat(str))
 }
 
+function linspace (start, stop, n) {
+    let range = stop - start
+    let step = range / (n - 1)
+    let linspaceArray = []
+    for (let i = 0; i < n; i++) {
+        linspaceArray.push(start + step * i)
+    }
+    return linspaceArray
+}
 
-
-export {truncateDecimals, isNumeric}
+export {truncateDecimals, isNumeric, linspace}
