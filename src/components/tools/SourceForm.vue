@@ -30,6 +30,7 @@ import { storeToRefs } from "pinia"
 import * as d3 from "d3"
 
 import {useDataStore} from "@/store/DataStore"
+import {useScatterStore} from "@/store/ScatterStore"
 import {isNumeric} from "@/utils/data-utils"
 
 import Category from "@/models/plots/Category"
@@ -38,6 +39,7 @@ import Category from "@/models/plots/Category"
 const fileDelimiterSelect = ref(null)
 const fileInput = ref(null)
 
+const scatterStore = useScatterStore()
 const dataStore = useDataStore()
 const {data} = storeToRefs(dataStore)
 
@@ -75,6 +77,7 @@ function detectDelimiter (data) {
 
 function readFile () {
 	// Reset existing data state (in case another file was previously loaded)
+	scatterStore.resetDataSelection() // TODO: This should ideally be in the state store.
 	dataStore.wipeAllData()
 	// Read the CSV file
 	const file = fileInput.value.files[0] 
