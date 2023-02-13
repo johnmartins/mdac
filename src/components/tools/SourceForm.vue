@@ -76,11 +76,12 @@ function detectDelimiter (data) {
 }
 
 function readFile () {
+	// Read the CSV file
+	const file = fileInput.value.files[0] 
+	if (!file) return
 	// Reset existing data state (in case another file was previously loaded)
 	scatterStore.resetDataSelection() // TODO: This should ideally be in the state store.
 	dataStore.wipeAllData()
-	// Read the CSV file
-	const file = fileInput.value.files[0] 
 	const reader = new FileReader()
 	reader.readAsText(new Blob([file], {"type": file.type}))	
 	reader.onloadend = parseCSV
