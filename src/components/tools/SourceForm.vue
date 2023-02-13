@@ -29,6 +29,7 @@ import { ref, inject } from "vue"
 import { storeToRefs } from "pinia"
 import * as d3 from "d3"
 
+import {useStateStore} from "@/store/StateStore"
 import {useDataStore} from "@/store/DataStore"
 import {useScatterStore} from "@/store/ScatterStore"
 import {isNumeric} from "@/utils/data-utils"
@@ -41,6 +42,7 @@ const fileInput = ref(null)
 
 const scatterStore = useScatterStore()
 const dataStore = useDataStore()
+const stateStore = useStateStore()
 const {data} = storeToRefs(dataStore)
 
 // Listeners
@@ -79,12 +81,16 @@ function readFile () {
 	// Read the CSV file
 	const file = fileInput.value.files[0] 
 	if (!file) return
+	stateStore.setLoading('Parsing imported file..')
 	// Reset existing data state (in case another file was previously loaded)
 	scatterStore.resetDataSelection() // TODO: This should ideally be in the state store.
 	dataStore.wipeAllData()
 	const reader = new FileReader()
 	reader.readAsText(new Blob([file], {"type": file.type}))	
-	reader.onloadend = parseCSV
+	reader.onloadend = (res) => {
+		parseCSV(res)
+		stateStore.clearLoading()
+	} 
 }
 
 function _parseNumericValue (value, col, minValMap, maxValMap) {

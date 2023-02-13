@@ -63,6 +63,7 @@
 		</div>
 
 		<CategorySettings />
+		<LoadingModal />
 	</div>
 </template>
 
@@ -82,6 +83,7 @@ import ScatterPlot from '@/components/plot-layouts/ScatterPlot/ScatterPlot'
 import ScatterSideMenu from '@/components/plot-layouts/ScatterPlot/ScatterSideMenu'
 import ScatterSideMenuRight from '@/components/plot-layouts/ScatterPlot/ScatterSideMenuRight'
 import CategorySettings from '@/components/CategorySettings'
+import LoadingModal from '@/components/LoadingModal'
 
 import { storeToRefs } from "pinia"
 import {useLayoutStore} from "@/store/LayoutStore"
