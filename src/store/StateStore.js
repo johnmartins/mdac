@@ -8,11 +8,20 @@ export const useStateStore = defineStore('state', {
 
             // Data
             selectedCategory: null,
+
+            // Misc
+            loadingReason: null,        // If not null, then something is loading, preventing the user from interacting with the interface.
         }),
     getters: {},
     actions: {
         setView(view) {
             this.activeView = view
+        },
+        setLoading(reason) {
+            this.loadingReason = reason
+        },
+        clearLoading() {
+            this.loadingReason = null
         }
     },
 })

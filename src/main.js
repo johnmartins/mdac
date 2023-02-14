@@ -3,6 +3,8 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 
+import faIcons from "./fontawesome"
+
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap"
 
@@ -16,7 +18,7 @@ app.provide('eventBus', eventBus)
 app.use(createPinia())
 app.use(router)
 app.mount('#app')
-
+app.component("font-awesome-icon", faIcons)
 
 // Handle errors globally. Send via event bus
 app.config.errorHandler = (err, instance, info) => {
