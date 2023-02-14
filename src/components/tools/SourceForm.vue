@@ -32,9 +32,11 @@ import * as d3 from "d3"
 import {useStateStore} from "@/store/StateStore"
 import {useDataStore} from "@/store/DataStore"
 import {useScatterStore} from "@/store/ScatterStore"
+import {useLayoutStore} from "@/store/LayoutStore"
 import {isNumeric} from "@/utils/data-utils"
 
 import Category from "@/models/plots/Category"
+import Popup from '@/models/layout/Popup'
 
 // DOM references
 const fileDelimiterSelect = ref(null)
@@ -43,6 +45,7 @@ const fileInput = ref(null)
 const scatterStore = useScatterStore()
 const dataStore = useDataStore()
 const stateStore = useStateStore()
+const layoutStore = useLayoutStore()
 const {data} = storeToRefs(dataStore)
 
 // Listeners
@@ -164,6 +167,7 @@ function parseCSV (fileReaderRes) {
 	}
 	
 	// Loop through columns and create Categories used by the plots
+	const maxUniqueCategoryValues = 50 // if this value is exceeded, then the category is disabled by default to prevent waste of computational resources.
 	for (let col of csvData.columns) {
 		if (numericalColumnsSet.has(col)) {
 			dataStore.addCategory(new Category(col, minValMap.get(col), maxValMap.get(col)))
@@ -172,6 +176,19 @@ function parseCSV (fileReaderRes) {
 				ticks: categoricalDataMap.get(col).length, 
 				usesCategoricalData: true,
 				availableCategoricalValues: Array.from(categoricalDataMap.get(col))})
+
+			// If the number of unique categories exceed the default max limit, then the category is disabled.
+			// This is done to prevent wasting computational resources when the user accidentally imports large sets of unique categorical data.
+			if (categoricalDataCol.availableCategoricalValues.length > maxUniqueCategoryValues) {
+				// Disable category
+				categoricalDataCol.enabled =  false
+				// Warn the user
+				const warningPopup = new Popup('warning', 
+					`Disabled column: ${categoricalDataCol.displayTitle}`,
+					`Column with title "${categoricalDataCol.displayTitle}" has been disabled. This is because it contained a large set of unique categorical data, which costs a lot of computational resources to render. 
+					\nIf you want to visualize this data anyway, you can enable it in the "data settings" view.`)
+				layoutStore.queuePopup(warningPopup)
+			}
 			
 			dataStore.addCategory(categoricalDataCol)
 		} else {
