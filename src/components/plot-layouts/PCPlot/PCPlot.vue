@@ -326,6 +326,8 @@ function getSelectedCategoryTitle () {
 }
 
 function handleExportRequest (format) {
+	if (activeView.value !== 'pcp') return
+
 	if (format === 'svg') {
 		exportCSV()
 	} else if (format === 'png') {
@@ -338,7 +340,7 @@ function handleExportRequest (format) {
 
 function exportCSV () {
 	const csvElement = plotCanvas.value
-	var svgData = csvElement.innerHTML //put id of your svg element here
+	var svgData = csvElement.innerHTML 
 	var head = '<svg title="graph" version="1.1" xmlns="http://www.w3.org/2000/svg">'
 	
 	let style = `<style>`
