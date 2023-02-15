@@ -1,8 +1,9 @@
 <template>
     <div class="sidebar-grid" ref="sidebarLayoutContainer">
-		<div :hidden="hideMenu">
+		<div class="side-menu-container" :hidden="hideMenu">
         	<slot name="sidebar"></slot>
 		</div>
+
         <div class="resize-border-v" @mousedown="resizeMenu">
 
 			<button @click="toggleMenu" class="btn-toggle-menu"><span v-if="!hideMenu">&lt;</span><span v-else>&gt;</span></button>
