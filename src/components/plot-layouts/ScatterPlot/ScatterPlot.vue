@@ -296,7 +296,7 @@ function handleExportRequest (format) {
 
 function exportPNG () {
 	const csvElement = plotCanvas.value
-	saveSvgAsPng(csvElement, 'PCPlot.png', {encoderOptions: 1, backgroundColor: 'white', scale: 2})
+	saveSvgAsPng(csvElement, 'ScatterPlot.png', {encoderOptions: 1, backgroundColor: 'white', scale: 2})
 }
 
 function exportCSV () {
@@ -313,7 +313,7 @@ function exportCSV () {
 	style += '</style>'
 	var full_svg = head +  style + svgData + "</svg>"
 	var blob = new Blob([full_svg], {type: "image/svg+xml"});  
-	saveAs(blob, "PCPlot.svg");
+	saveAs(blob, "ScatterPlot.svg");
 }
 
 </script>
