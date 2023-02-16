@@ -33,6 +33,8 @@
     "vue-cli-plugin-pinia": "0.x" 
   },
   "overrides": {
-    "autoprefixer": "10.4.13"
- }
+    "autoprefixer": "10.x",
+    "svgo": "3.x",
+    "magic-string": "0.x"
+  }
 }
