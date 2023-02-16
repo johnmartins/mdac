@@ -1,15 +1,31 @@
-<template>
+<template> 
     <div class="double-sidebar-grid" ref="doubleSidebarLayoutContainer">
-        <slot name="sidebarA"></slot>
-        <div class="resize-border-v" @mousedown="resizeMenu($event, 'left')"></div>
+		<div class="side-menu-container" :hidden="hideMenuL">
+        	<slot name="sidebarA"></slot>
+		</div>
+
+        <div class="resize-border-v left" @mousedown="resizeMenu($event, 'left')">
+			<button @click="toggleMenuL" class="btn-toggle-menu"><span v-if="!hideMenuL">&lt;</span><span v-else>&gt;</span></button>
+		</div>
+
         <slot></slot>
-        <div class="resize-border-v" @mousedown="resizeMenu($event, 'right')"></div>
-        <slot name="sidebarB"></slot>
+
+        <div class="resize-border-v right" @mousedown="resizeMenu($event, 'right')">
+			<button @click="toggleMenuR" class="btn-toggle-menu"><span v-if="!hideMenuR">&gt;</span><span v-else>&lt;</span></button>
+		</div>
+		
+		<div class="side-menu-container" :hidden="hideMenuR">
+        	<slot name="sidebarB"></slot>
+		</div>
+
     </div>
 </template>
 
 <script setup>
 import { ref, inject } from "vue"
+
+let hideMenuL = ref(false)
+let hideMenuR = ref(false)
 
 const eventBus = inject('eventBus')
 const doubleSidebarLayoutContainer = ref(null)
@@ -18,6 +34,27 @@ const doubleSidebarLayoutContainer = ref(null)
 let resizing = false
 let leftWidth = 290
 let rightWidth = 290
+
+function toggleMenuL () {
+	hideMenuL.value = !hideMenuL.value
+	adjustLayout()
+}
+
+function toggleMenuR () {
+	hideMenuR.value = !hideMenuR.value
+	adjustLayout()
+}
+
+function adjustLayout () {
+	let left = hideMenuL.value ? "" : `${leftWidth}px `
+	let middle ="10px auto 10px"
+	let right = hideMenuR.value ? "" : ` ${rightWidth}px`
+
+	doubleSidebarLayoutContainer.value.style.gridTemplateColumns = left + middle + right
+
+	// Doing this immediately does not work. There needs to be a slight delay.
+	setTimeout(() => {eventBus.emit('Layout.contentResize')}, 250)
+}
 
 function resizeMenu (evt, side) {
 	resizing = true
@@ -42,7 +79,7 @@ function resizeMenu (evt, side) {
             throw new Error('Unclear layout resize instructions.')
         }
 
-        doubleSidebarLayoutContainer.value.style.gridTemplateColumns = `${leftWidth}px 4px auto 4px ${rightWidth}px`
+        doubleSidebarLayoutContainer.value.style.gridTemplateColumns = `${leftWidth}px 10px auto 10px ${rightWidth}px`
 
 
 		// Resize child component
@@ -57,14 +94,7 @@ function resizeMenu (evt, side) {
 	.double-sidebar-grid {
 		height: 100%;
 		display: grid;
-		grid-template-columns: 290px 4px auto 4px 290px;      // Menu, resize-border, workspace
-
-		.resize-border-v {
-			width: 4px;
-			cursor: w-resize;
-			height: 100%;
-			background-color: whitesmoke;
-		}
+		grid-template-columns: 290px 10px auto 10px 290px;      // Menu, resize-border, workspace
 	}
 
 </style>

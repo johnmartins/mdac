@@ -12,84 +12,88 @@
             @mouseup.prevent="dragFilterEnd"
             @mousemove="dragFilter"
             >
-            TEST
                 <!-- Full plot group -->
                 <g v-if="plotVariables.hasRendered"
                 :transform="`translate(${scatterStore.paddingLeft} ${scatterStore.paddingTop})`">
-                
-                    <g v-if="selectedPlot">
-                        <text 
-                        :x="(scatterStore.xAxisLength)/2 "
-                        :y="-scatterStore.xAxisTitleMargin"
-                        >
-                        {{selectedPlot.title}}</text>
-                    </g>
                     
-                    <!-- filter group -->
-                    <g>
-
-                        <rect
-                        class="filter-box-proto"
-                        v-if="filterVariables.mousedown"
-                        :x="protoFilterRectAttrs.x"
-                        :y="protoFilterRectAttrs.y"
-                        :width="protoFilterRectAttrs.width"
-                        :height="protoFilterRectAttrs.height"
-                        />
-
-                    </g>
-
-                    <!-- x-axis group -->
-                    <line 
-                    x1="0" :x2="scatterStore.xAxisLength" 
-                    :y1="scatterStore.yAxisLength" :y2="scatterStore.yAxisLength" />
-                    <g v-if="checkAxisIsDefined('x')">
-
-                        <!-- title -->
-                        <text class="scatter-axis-title-x" 
-                        :x="scatterStore.xAxisLength/2" 
-                        :y="scatterStore.yAxisLength + plotParameters.xAxisTitlePadding"
-                        >
-                            {{cx.displayTitle}}
-                        </text>
-
-                        <!-- ticks -->
-                        <g class="tick" v-for="(tick, index) in cx.getTickArray()" :key="index"> <!-- Tick group -->
-                            <text :x="scatterStore.xAxisLength - cx.scaleLinear(tick)*scatterStore.xAxisLength" :y="scatterStore.yAxisLength+ 20" class="tick-string">{{cx.getTickString(tick)}}</text>
-                            <line :x1="cx.scaleLinear(tick)*scatterStore.xAxisLength" :y1="scatterStore.yAxisLength" :x2="cx.scaleLinear(tick)*scatterStore.xAxisLength" :y2="scatterStore.yAxisLength+5"/>	<!-- Top tick -->
-                        </g>
-                    </g>
-
-                    <!-- y-axis group -->
-                    <g>
-                        <line 
-                        x1="0" :x2="0" 
-                        :y1="0" :y2="scatterStore.yAxisLength" 
-                        />
-                        <g v-if="checkAxisIsDefined('y')">
-                            <!-- title -->
-                            <text class="scatter-axis-title-y" 
-                            :x="-scatterStore.yAxisTitleMargin" 
-                            :y="scatterStore.yAxisLength/2"
-                            :transform="`rotate(-90 ${-scatterStore.yAxisTitleMargin} ${scatterStore.yAxisLength/2})`"
+                    <!-- Main plot group -->
+                    <g class="scatter-container">
+                        
+                        <g v-if="selectedPlot">
+                            <text 
+                            :x="(scatterStore.xAxisLength)/2 "
+                            :y="-scatterStore.xAxisTitleMargin"
                             >
-                                {{cy.displayTitle}}
+                            {{selectedPlot.title}}</text>
+                        </g>
+                        
+                        <!-- filter group -->
+                        <g>
+
+                            <rect
+                            class="filter-box-proto"
+                            v-if="filterVariables.mousedown"
+                            :x="protoFilterRectAttrs.x"
+                            :y="protoFilterRectAttrs.y"
+                            :width="protoFilterRectAttrs.width"
+                            :height="protoFilterRectAttrs.height"
+                            />
+
+                        </g>
+
+                        <!-- x-axis group -->
+                        <line 
+                        x1="0" :x2="scatterStore.xAxisLength" 
+                        :y1="scatterStore.yAxisLength" :y2="scatterStore.yAxisLength" />
+                        <g v-if="checkAxisIsDefined('x')">
+
+                            <!-- title -->
+                            <text class="scatter-axis-title-x" 
+                            :x="scatterStore.xAxisLength/2" 
+                            :y="scatterStore.yAxisLength + plotParameters.xAxisTitlePadding"
+                            >
+                                {{cx.displayTitle}}
                             </text>
 
                             <!-- ticks -->
-                            <g class="tick" v-for="(tick, index) in cy.getTickArray()" :key="index"> <!-- Tick group -->
-                                <text :x="- 7" :y="+ cy.scaleLinear(tick)*scatterStore.yAxisLength" class="tick-string" style="text-anchor: end;">{{cy.getTickString(tick)}}</text>
-                                <line x1="0" :y1="cy.scaleLinear(tick)*scatterStore.yAxisLength" x2="-5" :y2="cy.scaleLinear(tick)*scatterStore.yAxisLength"/>	<!-- Top tick -->
+                            <g class="tick tick-x" v-for="(tick, index) in cx.getTickArray()" :key="index"> <!-- Tick group -->
+                                <text :x="scatterStore.xAxisLength - cx.scaleLinear(tick)*scatterStore.xAxisLength" :y="scatterStore.yAxisLength+ 20" class="tick-string">{{cx.getTickString(tick)}}</text>
+                                <line :x1="cx.scaleLinear(tick)*scatterStore.xAxisLength" :y1="scatterStore.yAxisLength" :x2="cx.scaleLinear(tick)*scatterStore.xAxisLength" :y2="scatterStore.yAxisLength+5"/>	<!-- Top tick -->
                             </g>
                         </g>
-                    </g>
 
-                    <!-- data group -->
-                    <g v-if="selectedPlot">
-                        <ScatterPlotPointLayer />
-                    </g>
+                        <!-- y-axis group -->
+                        <g>
+                            <line 
+                            x1="0" :x2="0" 
+                            :y1="0" :y2="scatterStore.yAxisLength" 
+                            />
+                            <g v-if="checkAxisIsDefined('y')">
+                                <!-- title -->
+                                <text class="scatter-axis-title-y" 
+                                :x="-scatterStore.yAxisTitleMargin" 
+                                :y="scatterStore.yAxisLength/2"
+                                :transform="`rotate(-90 ${-scatterStore.yAxisTitleMargin} ${scatterStore.yAxisLength/2})`"
+                                >
+                                    {{cy.displayTitle}}
+                                </text>
 
-                    <g :transform="`translate(${scatterStore.xAxisLength + 20} 0)`">
+                                <!-- ticks -->
+                                <g class="tick tick-y" v-for="(tick, index) in cy.getTickArray()" :key="index"> <!-- Tick group -->
+                                    <text :x="- 7" :y="+ cy.scaleLinear(tick)*scatterStore.yAxisLength" class="tick-string">{{cy.getTickString(tick)}}</text>
+                                    <line x1="0" :y1="cy.scaleLinear(tick)*scatterStore.yAxisLength" x2="-5" :y2="cy.scaleLinear(tick)*scatterStore.yAxisLength"/>	<!-- Top tick -->
+                                </g>
+                            </g>
+                        </g>
+
+                        <!-- data group -->
+                        <g v-if="selectedPlot">
+                            <ScatterPlotPointLayer />
+                        </g>
+
+                    </g>
+                    
+                    <g class="scatter-plugin-container" :transform="`translate(${scatterStore.xAxisLength + 20} 0)`">
                         <RangeIndicator />
                     </g>
                 </g>
@@ -102,7 +106,9 @@
 <script setup>
 import { ref, reactive, inject, computed } from "vue"
 import { storeToRefs } from "pinia"
+import { saveSvgAsPng } from "save-svg-as-png"
 
+import {useStateStore} from "@/store/StateStore"
 import {useDataStore} from "@/store/DataStore"
 import {useScatterStore} from "@/store/ScatterStore"
 import SingleRangeFilter from "@/models/filters/SingleRangeFilter"
@@ -116,7 +122,10 @@ import RangeIndicator from "@/components/plot-features/RangeIndicator"
 
 const dataStore = useDataStore()
 const scatterStore = useScatterStore()
+const stateStore = useStateStore()
+
 const {selectedPlot} = storeToRefs(scatterStore)
+const {activeView} = storeToRefs(stateStore)
 
 // Plot references
 const plotCanvas = ref(null)
@@ -163,6 +172,7 @@ eventBus.on('Router.TabChange', (viewName) => {
     }
 })
 eventBus.on('Layout.contentResize', updateContainerSize)
+eventBus.on('ExportForm.exportRequest', handleExportRequest)
 
 function onMouseDown (evt) {
     clearSelections()
@@ -270,6 +280,41 @@ function checkAxisIsDefined (axis) {
     return true
 }
 
+function handleExportRequest (format) {
+	if (activeView.value !== 'scatter') return
+
+	if (format === 'svg') {
+		exportCSV()
+	} else if (format === 'png') {
+		exportPNG()
+	} 
+	else {
+		throw new Error('Unknown format in export request')
+	}
+}
+
+function exportPNG () {
+	const csvElement = plotCanvas.value
+	saveSvgAsPng(csvElement, 'ScatterPlot.png', {encoderOptions: 1, backgroundColor: 'white', scale: 2})
+}
+
+function exportCSV () {
+	const csvElement = plotCanvas.value
+	var svgData = csvElement.innerHTML 
+	var head = '<svg title="graph" version="1.1" xmlns="http://www.w3.org/2000/svg">'
+	
+	let style = `<style>`
+	style += 'svg {font-family: monospace;}'
+	style += '.scatter-container text {font-size: 0.8rem; text-anchor: middle; dominant-baseline: middle;}'
+	style += '.scatter-container line {stroke: black; fill-opacity: 0;}'
+    style += '.tick-y text { text-anchor: end; }'
+    style += '.tick-ub { dominant-baseline: hanging; }'
+	style += '</style>'
+	var full_svg = head +  style + svgData + "</svg>"
+	var blob = new Blob([full_svg], {type: "image/svg+xml"});  
+	saveAs(blob, "ScatterPlot.svg");
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -300,6 +345,10 @@ function checkAxisIsDefined (axis) {
         stroke-opacity: 0.8;
         fill: yellow;
         fill-opacity: 0.8;
+    }
+
+    .tick-y text {
+        text-anchor: end;
     }
 }
 

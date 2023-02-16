@@ -5,6 +5,7 @@
         <SampleInfo />
         <FiltersPanel />
         <ColorCodeForm />
+        <ExportForm />
     </div>
 </template>
 
@@ -14,6 +15,8 @@ import PlotSelectionForm from '@/components/tools/scatter-tools/PlotSelectionFor
 import FiltersPanel from '@/components/tools/FiltersPanel'
 import SampleInfo from '@/components/tools/SampleInfo'
 import ColorCodeForm from '@/components/tools/scatter-tools/ColorCodeForm'
+import ExportForm from '@/components/tools/ExportForm'
+
 </script>
 
 <style lang="scss" scoped>

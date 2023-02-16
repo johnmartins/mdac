@@ -59,7 +59,7 @@ function onClickOK () {
 <style lang="scss" scoped>
 
 $height: 80px;
-$width: 300px;
+$width: 400px;
 
 h1 {
     font-size: 1.2em;
@@ -77,8 +77,10 @@ h1 {
 }
 
 .popup-body {
-    text-align: left;
+    text-align: justify;
     font-size: 0.8em;
+    white-space: pre-line;
+    margin-top: 8px;
 }
 
 .popup-button-array {
@@ -95,7 +97,7 @@ h1 {
     background: whitesmoke;
     border: 1px solid silver;
     border-radius: 4px;
-    padding: 8px;
+    padding: 12px;
     overflow-y: auto;
     overflow-x: hidden;
     cursor: auto;
