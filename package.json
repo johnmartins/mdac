@@ -24,12 +24,15 @@
     "vue-router": "4.x"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "4.x",
-    "@vue/cli-plugin-router": "4.x",
-    "@vue/cli-service": "4.x",
+    "@vue/cli-plugin-babel": "5.x",
+    "@vue/cli-plugin-router": "5.x",
+    "@vue/cli-service": "5.x",
     "@vue/compiler-sfc": "3.x",
     "sass": "1.x",
-    "sass-loader": "7.x",
-    "vue-cli-plugin-pinia": "0.x"
-  }
+    "sass-loader": "13.x",
+    "vue-cli-plugin-pinia": "0.x" 
+  },
+  "overrides": {
+    "autoprefixer": "10.4.13"
+ }
 }
