@@ -4,7 +4,7 @@
         	<slot name="sidebar"></slot>
 		</div>
 
-        <div class="resize-border-v" @mousedown="resizeMenu">
+        <div class="resize-border-v left" @mousedown="resizeMenu">
 
 			<button @click="toggleMenu" class="btn-toggle-menu"><span v-if="!hideMenu">&lt;</span><span v-else>&gt;</span></button>
 
@@ -68,29 +68,6 @@ function resizeMenu () {
 		height: 100%;
 		display: grid;
 		grid-template-columns: 290px 10px auto;      // Menu, resize-border, workspace
-
-		.resize-border-v {
-			width: 10px;
-			cursor: w-resize;
-			height: 100%;
-			background-color: white;
-			border-left: 2px solid whitesmoke;
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-		}
-	}
-
-	.btn-toggle-menu {
-		border-width: 2px 2px 2px 0px;
-		border-style: solid;
-		border-color: whitesmoke;
-		margin: 0;
-		padding: 0;
-		background: transparent;
-		color: black;
-		font-family: monospace;
-		font-size: 0.8em;
 	}
 
 </style>
