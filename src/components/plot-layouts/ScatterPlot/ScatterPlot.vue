@@ -281,7 +281,6 @@ function checkAxisIsDefined (axis) {
 }
 
 function handleExportRequest (format) {
-    console.log(activeView.value)
 	if (activeView.value !== 'scatter') return
 
 	if (format === 'svg') {
