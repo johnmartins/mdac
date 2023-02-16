@@ -12,3 +12,39 @@
     cursor: not-allowed;
     background-color: rgba(0,0,0,0.60);
 }
+
+.resize-border-v {
+    width: 10px;
+    cursor: w-resize;
+    height: 100%;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .btn-toggle-menu {
+        border-style: solid;
+        border-color: whitesmoke;
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        color: black;
+        font-family: monospace;
+        font-size: 0.8em;
+    }
+}
+
+.resize-border-v.left {
+    border-left: 2px solid whitesmoke;
+    .btn-toggle-menu {
+        border-width: 2px 2px 2px 0px;
+    }
+}
+
+.resize-border-v.right {
+    border-right: 2px solid whitesmoke;
+    .btn-toggle-menu {
+        border-width: 2px 0px 2px 2px;
+    }
+}
+
