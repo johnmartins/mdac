@@ -37,7 +37,7 @@
                 </div>
                 
                 <div class="button-row mt-2">
-                    <button class="btn-sm btn-secondary close-button" 
+                    <button class="btn btn-sm btn-primary close-button" 
                     @click="showCategorySettingsWindow=false">
                         Close
                     </button>
