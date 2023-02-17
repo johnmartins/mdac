@@ -1,13 +1,14 @@
 <template>
 	<div class="component-container">
-		<div style="height: 100%;" class="svg-container">
+		<div style="height: 100%; border: 2px solid pink; position: relative;" class="svg-container">
+			<PCPlotPathLayer />
 			<svg 
-			class="pcp-plot svg-content-responsive" 
-			height="100%" 
-			width="100%" 
+			class="pcp-plot svg-content-responsive"  
 			ref="plotCanvas"
 			tabindex="0"
-			style="font-size: 1em; font-family: monospace;"
+			height="100%" 
+			width="100%" 
+			style="font-size: 1em; font-family: monospace; position: absolute; left: 0; top: 0; "
 			@mousemove.prevent="dragFilterBox"
 			@mouseup.prevent="dragFilterDone"
 			@keydown.delete="dataStore.deleteCategory(selectedCategory)"
@@ -15,9 +16,6 @@
 				<!-- Full graphics group -->
 				<g v-if="data.length > 0"
 				:transform="`translate(${plotParameters.padding} 0)`"> 
-					
-					<!-- Data line generator -->
-					<PCPlotPathLayer />
 
 					<!-- Axis group. Filter for enabled, sort by position, position using index. -->
 					<g 
@@ -149,6 +147,7 @@ const plotVariables = reactive({
 
 function updateContainerSize () {
 	if (activeView.value !== 'pcp') return
+
 	plotXBounds.value = getPlotXBounds()
 	plotYBounds.value = getPlotYBounds()
 }
