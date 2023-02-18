@@ -1,6 +1,6 @@
 <template>
-	<div style="width: 100%; height: 100%; border: 1px solid blue;" :style="{paddingTop: `${plotYBounds[0]}px`, paddingLeft: `${plotXBounds[0]}px`}" ref="canvasContainer">
-		<canvas ref="pathCanvas" width="400" height="400" style="border: 1px solid red;">
+	<div style="width: 100%; height: 100%;" :style="{paddingTop: `${plotYBounds[0]}px`, paddingLeft: `${plotXBounds[0]}px`}" ref="canvasContainer">
+		<canvas ref="pathCanvas" width="400" height="400">
 
 
 
@@ -71,39 +71,45 @@ watch(() => data.value.filter(dp => !dataStore.dataPointFilterCheck(dp)), () => 
 })
 
 function draw () {
-	console.log("Drawing! This is executed too many times. Why?")
+	console.log("Redrawing plot paths")
 	ctx.clearRect(0, 0, canvasContainer.value.offsetWidth, canvasContainer.value.offsetHeight)
 
 	const renderData = (d, color, opacity) => {
+		console.log(opacity)
 		ctx.beginPath();
 		lineGenerator(d)
 		ctx.lineWidth = 1;
-		ctx.opacity = 0.8;
+		ctx.globalAlpha = opacity;
 		ctx.strokeStyle = color
 		ctx.stroke();
 		ctx.closePath();
 	}
 
 	// Render excluded data
-	data.value
-		.filter(d => !dataStore.dataPointFilterCheck(d))
-		.forEach(d => renderData(d, '#bfbfbf', 0.5))
+	if (!optionsStore.hideExcluded) {
+		data.value
+			.filter(d => !dataStore.dataPointFilterCheck(d))
+			.forEach(d => renderData(d, '#bfbfbf', optionsStore.excludedDataOpacity))
+	}
 
 	// Render included data
 	data.value
 		.filter(dataStore.dataPointFilterCheck)
-		.forEach(d => renderData(d, getLineColor(d), 1)) 
+		.forEach(d => renderData(d, getLineColor(d), optionsStore.includedDataOpacity)) 
 	
 }
 
 function resizeCanvas () {
 	// if (activeView.value !== 'pcp') return
-	const w = canvasContainer.value.offsetWidth
-	const h = canvasContainer.value.offsetHeight
-    pathCanvas.value.width = w
-    pathCanvas.value.height = h
+	setTimeout( () => {
+		const w = canvasContainer.value.offsetWidth
+		const h = canvasContainer.value.offsetHeight
+		pathCanvas.value.width = w
+		pathCanvas.value.height = h
 
-	draw()
+		draw()
+	}, 250)
+
 }
 
 function lineGenerator(d) {

@@ -1,6 +1,6 @@
 <template>
 	<div class="component-container">
-		<div style="height: 100%; border: 2px solid pink; position: relative;" class="svg-container">
+		<div style="height: 100%; position: relative;" class="svg-container">
 			<PCPlotPathLayer />
 			<svg 
 			class="pcp-plot svg-content-responsive"  
