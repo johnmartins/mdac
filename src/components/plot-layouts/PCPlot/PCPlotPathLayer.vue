@@ -68,7 +68,7 @@ onMounted( () => {
 	resizeCanvas()
 })
 
-watch(() => data.value.filter(dp => !dataStore.dataPointFilterCheck(dp)), () => {
+watch(() => data.value.filter(dp => !dataStore.dataPointFilterCheck(dp), optionsStore.includedDataOpacity, optionsStore.excludedDataOpacity, stateStore.selectedCategory), () => {
 	draw()
 })
 
