@@ -130,7 +130,7 @@ const plotCanvas = ref(null)
 const pcpPlot = ref(null)
 
 const plotParameters = reactive({
-	padding: 50,
+	padding: 100,
 	axisTitlePadding: 150,
 	axisTitleRotation: 45,
 	filterMinDragTime: 125, // ms

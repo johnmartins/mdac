@@ -1,32 +1,11 @@
 <template>
 	<div style="width: 100%; height: 100%;" :style="{paddingTop: `${plotYBounds[0]}px`, paddingLeft: `${plotXBounds[0]}px`}" ref="canvasContainer">
-		<canvas ref="pathCanvas" width="400" height="400">
+		<canvas ref="pathCanvas">
 
 
 
 		</canvas>
 	</div>
-
-	<!--
-    <g stroke-width="1" fill="transparent" :transform="`translate(0 ${plotYBounds[0]})`">
-        <g v-if="!optionsStore.hideExcluded">
-            <path v-for="(d, index) in data.filter(dp => !dataStore.dataPointFilterCheck(dp))" 
-                :key="index" 
-                stroke="#bfbfbf"
-                :stroke-opacity="optionsStore.excludedDataOpacity"
-                :d="lineGenerator(d)"
-            />
-        </g>
-        
-        <path v-for="(d, index) in data.filter(dp => dataStore.dataPointFilterCheck(dp))" 
-            :key="index" 
-            :excluded="true"
-            :stroke='getLineColor(d)'
-            :stroke-opacity="optionsStore.includedDataOpacity"
-            :d="lineGenerator(d)"
-        />
-    </g>
-	-->
 
 </template>
 
@@ -61,6 +40,14 @@ let ctx = null
 // Events
 const eventBus = inject('eventBus')
 eventBus.on('Layout.contentResize', resizeCanvas)
+eventBus.on('Router.TabChange', (viewName) => {
+    if (viewName !== 'pcp') return
+	restartRedrawCountdown()
+})
+
+// Canvas draw variables
+let redrawTimerID = null
+let scale = 1
 
 
 onMounted( () => {
@@ -68,16 +55,41 @@ onMounted( () => {
 	resizeCanvas()
 })
 
-watch(() => data.value.filter(dp => !dataStore.dataPointFilterCheck(dp), optionsStore.includedDataOpacity, optionsStore.excludedDataOpacity, stateStore.selectedCategory), () => {
-	draw()
+watch([() => data.value.filter(dp => !dataStore.dataPointFilterCheck(dp), 
+optionsStore.includedDataOpacity, 
+optionsStore.excludedDataOpacity, 
+stateStore.selectedCategory)], () => {
+	restartRedrawCountdown()
 })
 
-function draw () {
+watch(() => dataStore.enabledCategoriesCount, () => {
+	restartRedrawCountdown()
+})
 
+function restartRedrawCountdown () {
+	let refreshDelay = 250
+
+	if (redrawTimerID) {
+		console.log("reset timer")
+		clearTimeout(redrawTimerID)
+	}
+
+	redrawTimerID = setTimeout( () => {
+		console.log("drawing")
+		draw(scale)
+		redrawTimerID = null
+	}, refreshDelay)
+}
+
+function draw (scale) {
 	stateStore.loadingReason = 'Redrawing PCP canvas'
+	const t0 = performance.now()
 
 	setTimeout(() => {
+		const t1 = performance.now()
 		ctx.clearRect(0, 0, canvasContainer.value.offsetWidth, canvasContainer.value.offsetHeight)
+		ctx.setTransform(scale,0,0,scale,0,0);
+		const t2 = performance.now()
 
 		const renderData = (d, color, opacity) => {
 			ctx.beginPath();
@@ -89,6 +101,7 @@ function draw () {
 			ctx.closePath();
 		}
 
+		const t3 = performance.now()
 		// Render excluded data
 		if (!optionsStore.hideExcluded) {
 			data.value
@@ -96,24 +109,32 @@ function draw () {
 				.forEach(d => renderData(d, '#bfbfbf', optionsStore.excludedDataOpacity))
 		}
 
+		const t4 = performance.now()
 		// Render included data
 		data.value
 			.filter(dataStore.dataPointFilterCheck)
 			.forEach(d => renderData(d, getLineColor(d), optionsStore.includedDataOpacity)) 
 
 		stateStore.clearLoading()
+
+		const t5 = performance.now()
+
+		console.log(`Total time elapsed for DRAW: ${t5-t0}, internal timeout: ${t5-t1}`)
+		console.log(`t54=${t5-t4} t43=${t4-t3} t32=${t3-t2} t21=${t2-t1} t10=${t1-t0}`)
 	}, 50)
 }
 
 function resizeCanvas () {
 	// if (activeView.value !== 'pcp') return
+	scale = 1 // < 1: low res, > 1: high res
 	setTimeout( () => {
 		const w = canvasContainer.value.offsetWidth
 		const h = canvasContainer.value.offsetHeight
-		pathCanvas.value.width = w
-		pathCanvas.value.height = h
-
-		draw()
+		pathCanvas.value.width = w * scale
+		pathCanvas.value.height = h * scale
+		pathCanvas.value.style.width = w + 'px'
+		pathCanvas.value.style.height = h + 'px'
+		restartRedrawCountdown()
 	}, 250)
 
 }
@@ -131,8 +152,8 @@ function lineGenerator(d) {
 		}
 
 		// Set data point coordinates
-		const x = truncateDecimals(dataStore.getTrueCategoryPosition(c.title)*horizontalOffset.value, 1)			// This needs to be moved
-		const y = truncateDecimals(c.scaleLinear(d[c.title])*axisLength.value, 1) 
+		const x = dataStore.getTrueCategoryPosition(c.title)*horizontalOffset.value
+		const y = c.scaleLinear(d[c.title])*axisLength.value
 
 		// Build data array
 		dataArray[c.position] = {
