@@ -41,11 +41,13 @@ import {truncateDecimals} from "@/utils/data-utils"
 import {useDataStore} from "../../../store/DataStore"
 import {usePCPStore} from "../../../store/PCPStore"
 import {useOptionsStore} from "../../../store/OptionsStore"
+import {useStateStore} from "../../../store/StateStore"
 
 // Store references
 const dataStore = useDataStore()
 const PCPStore = usePCPStore()
 const optionsStore = useOptionsStore()
+const stateStore = useStateStore()
 
 // Store refs
 const {horizontalOffset, axisLength, colorScaleCategory, colorScaleFunction, plotYBounds, plotXBounds} = storeToRefs(PCPStore)
@@ -71,32 +73,36 @@ watch(() => data.value.filter(dp => !dataStore.dataPointFilterCheck(dp)), () => 
 })
 
 function draw () {
-	console.log("Redrawing plot paths")
-	ctx.clearRect(0, 0, canvasContainer.value.offsetWidth, canvasContainer.value.offsetHeight)
 
-	const renderData = (d, color, opacity) => {
-		console.log(opacity)
-		ctx.beginPath();
-		lineGenerator(d)
-		ctx.lineWidth = 1;
-		ctx.globalAlpha = opacity;
-		ctx.strokeStyle = color
-		ctx.stroke();
-		ctx.closePath();
-	}
+	stateStore.loadingReason = 'Redrawing PCP canvas'
 
-	// Render excluded data
-	if (!optionsStore.hideExcluded) {
+	setTimeout(() => {
+		ctx.clearRect(0, 0, canvasContainer.value.offsetWidth, canvasContainer.value.offsetHeight)
+
+		const renderData = (d, color, opacity) => {
+			ctx.beginPath();
+			lineGenerator(d)
+			ctx.lineWidth = 1;
+			ctx.globalAlpha = opacity;
+			ctx.strokeStyle = color
+			ctx.stroke();
+			ctx.closePath();
+		}
+
+		// Render excluded data
+		if (!optionsStore.hideExcluded) {
+			data.value
+				.filter(d => !dataStore.dataPointFilterCheck(d))
+				.forEach(d => renderData(d, '#bfbfbf', optionsStore.excludedDataOpacity))
+		}
+
+		// Render included data
 		data.value
-			.filter(d => !dataStore.dataPointFilterCheck(d))
-			.forEach(d => renderData(d, '#bfbfbf', optionsStore.excludedDataOpacity))
-	}
+			.filter(dataStore.dataPointFilterCheck)
+			.forEach(d => renderData(d, getLineColor(d), optionsStore.includedDataOpacity)) 
 
-	// Render included data
-	data.value
-		.filter(dataStore.dataPointFilterCheck)
-		.forEach(d => renderData(d, getLineColor(d), optionsStore.includedDataOpacity)) 
-	
+		stateStore.clearLoading()
+	}, 50)
 }
 
 function resizeCanvas () {

@@ -1,6 +1,6 @@
 <template>
 	<div class="component-container">
-		<div style="height: 100%; position: relative;" class="svg-container">
+		<div style="height: 100%; position: relative;" class="svg-container" ref="pcpPlot">
 			<PCPlotPathLayer />
 			<svg 
 			class="pcp-plot svg-content-responsive"  
@@ -127,6 +127,7 @@ const dataExcluded = ref([])
 
 // Layout references
 const plotCanvas = ref(null)
+const pcpPlot = ref(null)
 
 const plotParameters = reactive({
 	padding: 50,
@@ -356,7 +357,7 @@ function exportCSV () {
 }
 
 function exportPNG () {
-	const csvElement = plotCanvas.value
+	const csvElement = pcpPlot.value
 	saveSvgAsPng(csvElement, 'PCPlot.png', {encoderOptions: 1, backgroundColor: 'white', scale: 2})
 }
 
