@@ -6,6 +6,7 @@ export const usePCPStore = defineStore('pcp', {
             axisLength: 100,
             colorScaleCategory: null,
             colorScaleFunction: () => 'black',
+            resolution: 2,
 
             // Bounds
             plotXBounds: [0, 500],

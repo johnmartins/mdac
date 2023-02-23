@@ -1,20 +1,13 @@
 <template>
 	<div style="width: 100%; height: 100%;" :style="{paddingTop: `${plotYBounds[0]}px`, paddingLeft: `${plotXBounds[0]}px`}" ref="canvasContainer">
-		<canvas ref="pathCanvas">
-
-
-
-		</canvas>
+		<canvas ref="pathCanvas" />
 	</div>
-
 </template>
 
 <script setup>
 import {onMounted, ref, inject, watch} from "vue"
 import { storeToRefs } from "pinia"
 import * as d3 from "d3"
-
-import {truncateDecimals} from "@/utils/data-utils"
 
 // Stores
 import {useDataStore} from "../../../store/DataStore"
@@ -29,7 +22,7 @@ const optionsStore = useOptionsStore()
 const stateStore = useStateStore()
 
 // Store refs
-const {horizontalOffset, axisLength, colorScaleCategory, colorScaleFunction, plotYBounds, plotXBounds} = storeToRefs(PCPStore)
+const {horizontalOffset, axisLength, colorScaleCategory, colorScaleFunction, plotYBounds, plotXBounds, resolution} = storeToRefs(PCPStore)
 const {data} = storeToRefs(dataStore)
 
 // Layout references
@@ -47,8 +40,6 @@ eventBus.on('Router.TabChange', (viewName) => {
 
 // Canvas draw variables
 let redrawTimerID = null
-let scale = 1
-
 
 onMounted( () => {
 	ctx = pathCanvas.value.getContext('2d')
@@ -70,26 +61,22 @@ function restartRedrawCountdown () {
 	let refreshDelay = 250
 
 	if (redrawTimerID) {
-		console.log("reset timer")
 		clearTimeout(redrawTimerID)
 	}
 
 	redrawTimerID = setTimeout( () => {
-		console.log("drawing")
-		draw(scale)
+		draw()
 		redrawTimerID = null
 	}, refreshDelay)
 }
 
-function draw (scale) {
+function draw () {
 	stateStore.loadingReason = 'Redrawing PCP canvas'
-	const t0 = performance.now()
+	const t_draw_start = performance.now()
 
 	setTimeout(() => {
-		const t1 = performance.now()
 		ctx.clearRect(0, 0, canvasContainer.value.offsetWidth, canvasContainer.value.offsetHeight)
-		ctx.setTransform(scale,0,0,scale,0,0);
-		const t2 = performance.now()
+		ctx.setTransform(resolution.value,0,0,resolution.value,0,0);
 
 		const renderData = (d, color, opacity) => {
 			ctx.beginPath();
@@ -101,7 +88,6 @@ function draw (scale) {
 			ctx.closePath();
 		}
 
-		const t3 = performance.now()
 		// Render excluded data
 		if (!optionsStore.hideExcluded) {
 			data.value
@@ -109,7 +95,6 @@ function draw (scale) {
 				.forEach(d => renderData(d, '#bfbfbf', optionsStore.excludedDataOpacity))
 		}
 
-		const t4 = performance.now()
 		// Render included data
 		data.value
 			.filter(dataStore.dataPointFilterCheck)
@@ -117,21 +102,19 @@ function draw (scale) {
 
 		stateStore.clearLoading()
 
-		const t5 = performance.now()
+		const t_draw_end = performance.now()
+		console.debug(`Draw time: ${(t_draw_end - t_draw_start)/1000} [s]`)
 
-		console.log(`Total time elapsed for DRAW: ${t5-t0}, internal timeout: ${t5-t1}`)
-		console.log(`t54=${t5-t4} t43=${t4-t3} t32=${t3-t2} t21=${t2-t1} t10=${t1-t0}`)
 	}, 50)
 }
 
 function resizeCanvas () {
 	// if (activeView.value !== 'pcp') return
-	scale = 1 // < 1: low res, > 1: high res
 	setTimeout( () => {
 		const w = canvasContainer.value.offsetWidth
 		const h = canvasContainer.value.offsetHeight
-		pathCanvas.value.width = w * scale
-		pathCanvas.value.height = h * scale
+		pathCanvas.value.width = w * resolution.value
+		pathCanvas.value.height = h * resolution.value
 		pathCanvas.value.style.width = w + 'px'
 		pathCanvas.value.style.height = h + 'px'
 		restartRedrawCountdown()
