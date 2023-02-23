@@ -6,7 +6,7 @@ export const usePCPStore = defineStore('pcp', {
             axisLength: 100,
             colorScaleCategory: null,
             colorScaleFunction: () => 'black',
-            resolution: 1,
+            resolution: 1.2,
             pathsDataUrl: null,
 
             // Bounds

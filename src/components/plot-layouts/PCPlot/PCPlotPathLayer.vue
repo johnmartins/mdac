@@ -32,7 +32,7 @@ const eventBus = inject('eventBus')
 eventBus.on('Layout.contentResize', resizeCanvas)
 eventBus.on('Router.TabChange', (viewName) => {
     if (viewName !== 'pcp') return
-	restartRedrawCountdown()
+	resizeCanvas()
 })
 
 // Canvas draw variables
