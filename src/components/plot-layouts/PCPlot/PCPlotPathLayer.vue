@@ -1,7 +1,6 @@
 <template>
-	<div style="width: 100%; height: 100%;" :style="{paddingTop: `${plotYBounds[0]}px`, paddingLeft: `${plotXBounds[0]}px`}" ref="canvasContainer">
-		<canvas ref="pathCanvas" />
-	</div>
+	<!-- This component does not provide any visual elements in the DOM. It only provides the PCP CSV element with an image of the paths/lines -->
+	<div style="width: 100%; height: 100%;" :style="{paddingTop: `${plotYBounds[0]}px`, paddingLeft: `${plotXBounds[0]}px`}" ref="canvasContainer" />
 </template>
 
 <script setup>
@@ -27,8 +26,6 @@ const {data} = storeToRefs(dataStore)
 
 // Layout references
 const canvasContainer = ref(null)
-const pathCanvas = ref(null)
-let ctx = null
 
 // Events
 const eventBus = inject('eventBus')
@@ -39,16 +36,22 @@ eventBus.on('Router.TabChange', (viewName) => {
 })
 
 // Canvas draw variables
+let pathCanvas = document.createElement('canvas')
+let ctx = pathCanvas.getContext('2d')
 let redrawTimerID = null
 
 onMounted( () => {
-	ctx = pathCanvas.value.getContext('2d')
+	resizeCanvas()
+})
+
+watch(() => PCPStore.resolution, () => {
 	resizeCanvas()
 })
 
 watch([() => data.value.filter(dp => !dataStore.dataPointFilterCheck(dp), 
 optionsStore.includedDataOpacity, 
 optionsStore.excludedDataOpacity, 
+optionsStore.curveType,
 stateStore.selectedCategory)], () => {
 	restartRedrawCountdown()
 })
@@ -105,6 +108,11 @@ function draw () {
 		const t_draw_end = performance.now()
 		console.debug(`Draw time: ${(t_draw_end - t_draw_start)/1000} [s]`)
 
+		const dUrl = pathCanvas.toDataURL()
+		const t_draw_post_url = performance.now()
+		console.log(`dUrl generated in ${(t_draw_post_url - t_draw_end) / 1000} seconds`)
+		PCPStore.pathsDataUrl = dUrl
+
 	}, 50)
 }
 
@@ -113,10 +121,10 @@ function resizeCanvas () {
 	setTimeout( () => {
 		const w = canvasContainer.value.offsetWidth
 		const h = canvasContainer.value.offsetHeight
-		pathCanvas.value.width = w * resolution.value
-		pathCanvas.value.height = h * resolution.value
-		pathCanvas.value.style.width = w + 'px'
-		pathCanvas.value.style.height = h + 'px'
+		pathCanvas.width = w * resolution.value
+		pathCanvas.height = h * resolution.value
+		pathCanvas.style.width = w + 'px'
+		pathCanvas.style.height = h + 'px'
 		restartRedrawCountdown()
 	}, 250)
 

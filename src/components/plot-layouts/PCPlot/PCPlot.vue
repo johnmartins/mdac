@@ -13,9 +13,13 @@
 			@mouseup.prevent="dragFilterDone"
 			@keydown.delete="dataStore.deleteCategory(selectedCategory)"
 			>
+				
+
 				<!-- Full graphics group -->
 				<g v-if="data.length > 0"
 				:transform="`translate(${plotParameters.padding} 0)`"> 
+
+					<image :href="pathsDataUrl" width="100%" height="100%" :y="getPlotYBounds()[0]" />
 
 					<!-- Axis group. Filter for enabled, sort by position, position using index. -->
 					<g 
@@ -119,7 +123,7 @@ const PCPStore = usePCPStore()
 
 const {data, filterIDMap, filters, categories} = storeToRefs(dataStore)
 const {activeView, selectedCategory} = storeToRefs(stateStore)
-const {horizontalOffset, axisLength, colorScaleCategory, colorScaleFunction, plotXBounds, plotYBounds} = storeToRefs(PCPStore)
+const {horizontalOffset, axisLength, colorScaleCategory, colorScaleFunction, plotXBounds, plotYBounds, pathsDataUrl} = storeToRefs(PCPStore)
 
 // Plotted data
 const dataIncluded = ref([])
@@ -357,7 +361,7 @@ function exportCSV () {
 }
 
 function exportPNG () {
-	const csvElement = pcpPlot.value
+	const csvElement = plotCanvas.value
 	saveSvgAsPng(csvElement, 'PCPlot.png', {encoderOptions: 1, backgroundColor: 'white', scale: 2})
 }
 
