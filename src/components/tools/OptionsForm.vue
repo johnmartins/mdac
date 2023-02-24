@@ -5,7 +5,7 @@
 
             <div class="labeled-form mb-2">
                 <span>Resolution: </span>
-                <select ref="lineFormatSelector" v-model="pcpStore.resolution">
+                <select ref="lineFormatSelector" @change="setResolutionManualOverride(true)" v-model="pcpStore.resolution">
                     <option :value="0.3">0.3 - Potato</option>
                     <option :value="0.5">0.5 - Terrible</option>
                     <option :value="0.8">0.8 - Bad</option>
@@ -60,14 +60,14 @@ import {usePCPStore} from "@/store/PCPStore"
 const optionsStore = useOptionsStore()
 const pcpStore = usePCPStore()
 
-function setDataOpacity (value) {
-    optionsStore.includedDataOpacity = parseFloat(value)
-}
-
 function setFilteredDataOpacity (evt) {
     console.log("CHANGE!")
     console.log(evt.target)
     optionsStore.setExcludedDataOpacity(parseFloat(evt.target.value)) 
+}
+
+function setResolutionManualOverride (override) {
+    pcpStore.resolutionManualOverride = override
 }
 
 </script>

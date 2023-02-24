@@ -166,7 +166,6 @@ function parseCSV (fileReaderRes) {
 
 		dataPoint[dataStore.idCol] = i
 		dataToPlot.push(dataPoint)
-
 	}
 	
 	// Loop through columns and create Categories used by the plots

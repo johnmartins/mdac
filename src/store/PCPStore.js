@@ -7,6 +7,7 @@ export const usePCPStore = defineStore('pcp', {
             colorScaleCategory: null,
             colorScaleFunction: () => 'black',
             resolution: 1.2,
+            resolutionManualOverride: false,
             pathsDataUrl: null,
 
             // Bounds
@@ -16,6 +17,8 @@ export const usePCPStore = defineStore('pcp', {
     getters: {},
     actions: {
         detectAppropriateResolution (samplesize) {
+            if (this.resolutionManualOverride) return
+
             if (samplesize <= 1000) {
                 this.resolution = 1.2
             } else if (samplesize <= 10000) {
@@ -23,8 +26,6 @@ export const usePCPStore = defineStore('pcp', {
             } else if (samplesize <= 100000) {
                 this.resolution = 0.8
             }
-
-            console.log('Set resolution to ' + this.resolution)
         }
     },
 })
