@@ -14,5 +14,17 @@ export const usePCPStore = defineStore('pcp', {
             plotYBounds: [0, 500]
         }),
     getters: {},
-    actions: {},
+    actions: {
+        detectAppropriateResolution (samplesize) {
+            if (samplesize <= 1000) {
+                this.resolution = 1.2
+            } else if (samplesize <= 10000) {
+                this.resolution = 1.0
+            } else if (samplesize <= 100000) {
+                this.resolution = 0.8
+            }
+
+            console.log('Set resolution to ' + this.resolution)
+        }
+    },
 })

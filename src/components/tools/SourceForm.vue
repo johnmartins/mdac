@@ -32,6 +32,7 @@ import * as d3 from "d3"
 import {useStateStore} from "@/store/StateStore"
 import {useDataStore} from "@/store/DataStore"
 import {useScatterStore} from "@/store/ScatterStore"
+import {usePCPStore} from "@/store/PCPStore"
 import {useLayoutStore} from "@/store/LayoutStore"
 import {isNumeric} from "@/utils/data-utils"
 
@@ -46,6 +47,7 @@ const scatterStore = useScatterStore()
 const dataStore = useDataStore()
 const stateStore = useStateStore()
 const layoutStore = useLayoutStore()
+const pcpStore = usePCPStore()
 const {data} = storeToRefs(dataStore)
 
 // Listeners
@@ -164,6 +166,7 @@ function parseCSV (fileReaderRes) {
 
 		dataPoint[dataStore.idCol] = i
 		dataToPlot.push(dataPoint)
+
 	}
 	
 	// Loop through columns and create Categories used by the plots
@@ -198,6 +201,9 @@ function parseCSV (fileReaderRes) {
 		}
 		
 	}
+	
+	// Update the PCP to use an appropriate resolution
+	pcpStore.detectAppropriateResolution(csvData.length)
 
 	// Commit the extracted data to the data store. This triggers the visualization.
 	dataStore.setData(dataToPlot)

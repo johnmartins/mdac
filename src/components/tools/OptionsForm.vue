@@ -6,11 +6,13 @@
             <div class="labeled-form mb-2">
                 <span>Resolution: </span>
                 <select ref="lineFormatSelector" v-model="pcpStore.resolution">
-                    <option :value="0.3">Potato</option>
-                    <option :value="0.5">Bad</option>
-                    <option :value="1">OK</option>
-                    <option :value="1.2">Decent</option>
-                    <option :value="2">Sharp</option>
+                    <option :value="0.3">0.3 - Potato</option>
+                    <option :value="0.5">0.5 - Terrible</option>
+                    <option :value="0.8">0.8 - Bad</option>
+                    <option :value="1.0">1.0 - OK</option>
+                    <option :value="1.2">1.2 - Decent</option>
+                    <option :value="1.5">1.5 - Sharp</option>
+                    <option :value="2.0">2.0 - Excellent</option>
                 </select>
             </div>
 
