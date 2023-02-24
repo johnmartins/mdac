@@ -76,6 +76,7 @@ function restartRedrawCountdown () {
 function draw () {
 	stateStore.loadingReason = 'Redrawing PCP canvas'
 	const t_draw_start = performance.now()
+	PCPStore.pathsDataUrl = null
 
 	setTimeout(() => {
 		ctx.clearRect(0, 0, canvasContainer.value.offsetWidth, canvasContainer.value.offsetHeight)

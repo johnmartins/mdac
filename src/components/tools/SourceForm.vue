@@ -146,7 +146,9 @@ function parseCSV (fileReaderRes) {
 		for (let col of csvData.columns) {
 			let value = row[col]
 
-			if (!isNumeric(value) && !numericalColumnsSet.has(col)) {
+			if (value === "") {
+				continue
+			} else if (!isNumeric(value) && !numericalColumnsSet.has(col)) {
 				_parseStringValue(value, col, categoricalDataMap)
 				categoricalColumnsSet.add(col)
 
