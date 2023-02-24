@@ -1,5 +1,5 @@
 <template>
-    <div class="modal-mask" v-if="categories.length > 0 && showCategorySettingsWindow">
+    <div class="modal-mask dark" v-if="categories.length > 0 && showCategorySettingsWindow">
         <div class="window box-shadow">
             <div class="window-header">
                 <strong>Category settings</strong>

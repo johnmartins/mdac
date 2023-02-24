@@ -1,5 +1,5 @@
 <template>
-    <div class="modal-mask modal-container" v-if="loadingReason">
+    <div class="modal-mask loading modal-container" v-if="loadingReason">
         <div class="message-container">
             <span>{{loadingReason}}</span><br />
             <span class="icon"><font-awesome-icon icon="fa-solid fa-spinner" class="anim-rotate-step-8" /></span>
@@ -28,10 +28,10 @@ const {loadingReason} = storeToRefs(stateStore)
         height: 100%;
         display: flex;
         justify-content: center; /*x-axis*/
-        align-items: center; /*y-axis*/
+        align-items: flex-start; /*y-axis*/
     }
 
     .message-container {
-        color: white;
+        color: black;
     }
 </style>

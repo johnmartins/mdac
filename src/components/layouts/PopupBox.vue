@@ -1,5 +1,5 @@
 <template>
-<div class="modal-mask">
+<div class="modal-mask dark">
     <div class="popup-box box-shadow" v-if="popup">
         <div class="popup-content" ref="contentContainer" :style="{height: `${height}px`}">
             <h1>{{popup.title}}</h1>

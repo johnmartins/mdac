@@ -10,7 +10,14 @@
     width: 100%;
     height: 100%;
     cursor: not-allowed;
+}
+
+.modal-mask.dark {
     background-color: rgba(0,0,0,0.60);
+}
+
+.modal-mask.loading {
+    cursor: wait !important;
 }
 
 .resize-border-v {
