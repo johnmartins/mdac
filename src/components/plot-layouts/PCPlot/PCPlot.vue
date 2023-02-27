@@ -3,8 +3,9 @@
 		<div style="height: 100%; position: relative;" class="svg-container" ref="pcpPlot">
 
 			<!-- Raster rendering layer -->
-			<PCPlotPathLayerRaster />
-			
+			<div v-if="PCPStore.renderingType === 'raster'" style="width: 100%; height: 100%;">
+				<PCPlotPathLayerRaster />
+			</div>
 			<svg 
 			class="pcp-plot svg-content-responsive"  
 			ref="plotCanvas"
@@ -23,9 +24,9 @@
 				:transform="`translate(${plotParameters.padding} 0)`"> 
 
 					<!-- Vector rendering layer -->
-					<PCPlotPathLayer />
+					<PCPlotPathLayerVector />
 
-					<image :href="pathsDataUrl" width="100%" height="100%" :y="getPlotYBounds()[0]" />
+					<image v-if="PCPStore.renderingType === 'raster'" :href="pathsDataUrl" width="100%" height="100%" :y="getPlotYBounds()[0]" />
 
 					<!-- Axis group. Filter for enabled, sort by position, position using index. -->
 					<g 
@@ -105,7 +106,7 @@ import { saveAs } from "file-saver"
 import { saveSvgAsPng } from "save-svg-as-png"
 
 // Components
-import PCPlotPathLayer from "./PCPlotPathLayer"
+import PCPlotPathLayerVector from "./PCPlotPathLayerVector"
 import PCPlotPathLayerRaster from "./PCPlotPathLayerRaster"
 
 // Models
