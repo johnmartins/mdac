@@ -1,135 +1,45 @@
 <template>
-	<!-- This component does not provide any visual elements in the DOM. It only provides the PCP CSV element with an image of the paths/lines -->
-	<div style="width: 100%; height: 100%;" :style="{paddingTop: `${plotYBounds[0]}px`, paddingLeft: `${plotXBounds[0]}px`}" ref="canvasContainer" />
+
+    <g stroke-width="1" fill="transparent" :transform="`translate(0 ${plotYBounds[0]})`">
+        <g v-if="!optionsStore.hideExcluded">
+            <path v-for="(d, index) in data.filter(dp => !dataStore.dataPointFilterCheck(dp))" 
+                :key="index" 
+                stroke="#bfbfbf"
+                :stroke-opacity="optionsStore.excludedDataOpacity"
+                :d="lineGenerator(d)"
+            />
+        </g>
+        
+        <path v-for="(d, index) in data.filter(dp => dataStore.dataPointFilterCheck(dp))" 
+            :key="index" 
+            :excluded="true"
+            :stroke='getLineColor(d)'
+            :stroke-opacity="optionsStore.includedDataOpacity"
+            :d="lineGenerator(d)"
+        />
+    </g>
+
 </template>
 
 <script setup>
-import {onMounted, ref, inject, watch} from "vue"
 import { storeToRefs } from "pinia"
 import * as d3 from "d3"
+
+import {truncateDecimals} from "@/utils/data-utils"
 
 // Stores
 import {useDataStore} from "../../../store/DataStore"
 import {usePCPStore} from "../../../store/PCPStore"
 import {useOptionsStore} from "../../../store/OptionsStore"
-import {useStateStore} from "../../../store/StateStore"
 
 // Store references
 const dataStore = useDataStore()
 const PCPStore = usePCPStore()
 const optionsStore = useOptionsStore()
-const stateStore = useStateStore()
 
 // Store refs
-const {horizontalOffset, axisLength, colorScaleCategory, colorScaleFunction, plotYBounds, plotXBounds, resolution} = storeToRefs(PCPStore)
+const {horizontalOffset, axisLength, colorScaleCategory, colorScaleFunction, plotYBounds} = storeToRefs(PCPStore)
 const {data} = storeToRefs(dataStore)
-
-// Layout references
-const canvasContainer = ref(null)
-
-// Events
-const eventBus = inject('eventBus')
-eventBus.on('Layout.contentResize', resizeCanvas)
-eventBus.on('Router.TabChange', (viewName) => {
-    if (viewName !== 'pcp') return
-	resizeCanvas()
-})
-
-// Canvas draw variables
-let pathCanvas = document.createElement('canvas')
-let ctx = pathCanvas.getContext('2d')
-let redrawTimerID = null
-
-onMounted( () => {
-	resizeCanvas()
-})
-
-watch(() => PCPStore.resolution, () => {
-	resizeCanvas()
-})
-
-watch([() => data.value.filter(dp => !dataStore.dataPointFilterCheck(dp), 
-optionsStore.includedDataOpacity, 
-optionsStore.excludedDataOpacity, 
-optionsStore.curveType,
-stateStore.selectedCategory)], () => {
-	restartRedrawCountdown()
-})
-
-watch(() => dataStore.enabledCategoriesCount, () => {
-	restartRedrawCountdown()
-})
-
-function restartRedrawCountdown () {
-	let refreshDelay = 250
-
-	if (redrawTimerID) {
-		clearTimeout(redrawTimerID)
-	}
-
-	redrawTimerID = setTimeout( () => {
-		draw()
-		redrawTimerID = null
-	}, refreshDelay)
-}
-
-function draw () {
-	stateStore.loadingReason = 'Redrawing PCP canvas'
-	const t_draw_start = performance.now()
-	PCPStore.pathsDataUrl = null
-
-	setTimeout(() => {
-		ctx.clearRect(0, 0, canvasContainer.value.offsetWidth, canvasContainer.value.offsetHeight)
-		ctx.setTransform(resolution.value,0,0,resolution.value,0,0);
-
-		const renderData = (d, color, opacity) => {
-			ctx.beginPath();
-			lineGenerator(d)
-			ctx.lineWidth = 1;
-			ctx.globalAlpha = opacity;
-			ctx.strokeStyle = color
-			ctx.stroke();
-			ctx.closePath();
-		}
-
-		// Render excluded data
-		if (!optionsStore.hideExcluded) {
-			data.value
-				.filter(d => !dataStore.dataPointFilterCheck(d))
-				.forEach(d => renderData(d, '#bfbfbf', optionsStore.excludedDataOpacity))
-		}
-
-		// Render included data
-		data.value
-			.filter(dataStore.dataPointFilterCheck)
-			.forEach(d => renderData(d, getLineColor(d), optionsStore.includedDataOpacity)) 
-
-		stateStore.clearLoading()
-
-		const t_draw_end = performance.now()
-		console.debug(`Draw time: ${(t_draw_end - t_draw_start)/1000} [s]`)
-
-		const dUrl = pathCanvas.toDataURL()
-		const t_draw_post_url = performance.now()
-		console.log(`dUrl generated in ${(t_draw_post_url - t_draw_end) / 1000} seconds`)
-		PCPStore.pathsDataUrl = dUrl
-
-	}, 50)
-}
-
-function resizeCanvas () {
-	// if (activeView.value !== 'pcp') return
-	setTimeout( () => {
-		const w = canvasContainer.value.offsetWidth
-		const h = canvasContainer.value.offsetHeight
-		pathCanvas.width = w * resolution.value
-		pathCanvas.height = h * resolution.value
-		pathCanvas.style.width = w + 'px'
-		pathCanvas.style.height = h + 'px'
-		restartRedrawCountdown()
-	}, 250)
-
-}
 
 function lineGenerator(d) {
 	let dataCats = Object.keys(d)
@@ -144,8 +54,8 @@ function lineGenerator(d) {
 		}
 
 		// Set data point coordinates
-		const x = dataStore.getTrueCategoryPosition(c.title)*horizontalOffset.value
-		const y = c.scaleLinear(d[c.title])*axisLength.value
+		const x = truncateDecimals(dataStore.getTrueCategoryPosition(c.title)*horizontalOffset.value, 1)			// This needs to be moved
+		const y = truncateDecimals(c.scaleLinear(d[c.title])*axisLength.value, 1)
 
 		// Build data array
 		dataArray[c.position] = {
@@ -167,7 +77,6 @@ function lineGenerator(d) {
 		.x((de) => {return de.x})
 		.y((de) => {return de.y})
 		.curve(d3CurveType)
-		.context(ctx)
 		(dataArray)
 }
 

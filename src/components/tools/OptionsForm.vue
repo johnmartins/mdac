@@ -4,6 +4,14 @@
             <strong>Graphical options</strong>
 
             <div class="labeled-form mb-2">
+                <span>Rendering: </span>
+                <select ref="lineFormatSelector" v-model="pcpStore.renderingType">
+                    <option value="raster">Rasterized</option>
+                    <option value="vector">Vectorized</option>
+                </select>
+            </div>
+
+            <div class="labeled-form mb-2">
                 <span>Resolution: </span>
                 <select ref="lineFormatSelector" @change="setResolutionManualOverride(true)" v-model="pcpStore.resolution">
                     <option :value="0.3">0.3 - Potato</option>

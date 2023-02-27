@@ -1,7 +1,10 @@
 <template>
 	<div class="component-container">
 		<div style="height: 100%; position: relative;" class="svg-container" ref="pcpPlot">
-			<PCPlotPathLayer />
+
+			<!-- Raster rendering layer -->
+			<PCPlotPathLayerRaster />
+			
 			<svg 
 			class="pcp-plot svg-content-responsive"  
 			ref="plotCanvas"
@@ -18,6 +21,9 @@
 				<!-- Full graphics group -->
 				<g v-if="data.length > 0"
 				:transform="`translate(${plotParameters.padding} 0)`"> 
+
+					<!-- Vector rendering layer -->
+					<PCPlotPathLayer />
 
 					<image :href="pathsDataUrl" width="100%" height="100%" :y="getPlotYBounds()[0]" />
 
@@ -100,6 +106,7 @@ import { saveSvgAsPng } from "save-svg-as-png"
 
 // Components
 import PCPlotPathLayer from "./PCPlotPathLayer"
+import PCPlotPathLayerRaster from "./PCPlotPathLayerRaster"
 
 // Models
 import SingleRangeFilter from "@/models/filters/SingleRangeFilter"
