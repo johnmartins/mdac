@@ -17,10 +17,13 @@ export const usePCPStore = defineStore('pcp', {
         }),
     getters: {},
     actions: {
-        detectAppropriateResolution (samplesize) {
+        detectAppropriateGraphicsSettings (samplesize) {
             if (this.resolutionManualOverride) return
-
-            if (samplesize <= 1000) {
+            
+            this.renderingType = 'raster'
+            if (samplesize <= 800) {
+                this.renderingType = 'vector'
+            } else if (samplesize <= 1000) {
                 this.resolution = 1.2
             } else if (samplesize <= 10000) {
                 this.resolution = 1.0

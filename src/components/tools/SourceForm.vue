@@ -204,11 +204,13 @@ function parseCSV (fileReaderRes) {
 	}
 	
 	// Update the PCP to use an appropriate resolution
-	pcpStore.detectAppropriateResolution(csvData.length)
+	pcpStore.detectAppropriateGraphicsSettings(csvData.length) 
 
 	// Commit the extracted data to the data store. This triggers the visualization.
-	dataStore.setData(dataToPlot)
-	eventBus.emit('SourceForm.readData', data.value)
+	setTimeout(() => {
+		dataStore.setData(dataToPlot)
+		eventBus.emit('SourceForm.readData', data.value)
+	}, 200)
 	
 } 
 

@@ -61,6 +61,8 @@ watch(() => dataStore.enabledCategoriesCount, () => {
 })
 
 function restartRedrawCountdown () {
+	if (PCPStore.renderingType !== 'raster') return
+
 	let refreshDelay = 250
 
 	if (redrawTimerID) {
@@ -74,6 +76,7 @@ function restartRedrawCountdown () {
 }
 
 function draw () {
+	if (PCPStore.renderingType !== 'raster') return
 	stateStore.loadingReason = 'Redrawing PCP canvas'
 	const t_draw_start = performance.now()
 	PCPStore.pathsDataUrl = null
