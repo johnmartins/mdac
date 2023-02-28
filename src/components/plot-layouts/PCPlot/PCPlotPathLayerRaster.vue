@@ -120,7 +120,7 @@ function draw () {
 function resizeCanvas () {
 	if (PCPStore.renderingType !== 'raster') return
 	if (!canvasContainer.value) return
-	// if (activeView.value !== 'pcp') return
+	PCPStore.pathsDataUrl = null	// Triggers the image in PCP to become hidden
 	setTimeout( () => {
 		const w = canvasContainer.value.offsetWidth
 		const h = canvasContainer.value.offsetHeight

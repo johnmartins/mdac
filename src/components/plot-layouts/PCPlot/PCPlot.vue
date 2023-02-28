@@ -18,7 +18,6 @@
 			@keydown.delete="dataStore.deleteCategory(selectedCategory)"
 			>
 				
-
 				<!-- Full graphics group -->
 				<g v-if="data.length > 0"
 				:transform="`translate(${plotParameters.padding} 0)`"> 
@@ -26,7 +25,7 @@
 					<!-- Vector rendering layer -->
 					<PCPlotPathLayerVector />
 
-					<image v-if="PCPStore.renderingType === 'raster'" :href="pathsDataUrl" width="100%" height="100%" :y="getPlotYBounds()[0]" />
+					<image v-if="PCPStore.renderingType === 'raster' && pathsDataUrl" :href="pathsDataUrl" width="100%" height="100%" :y="getPlotYBounds()[0]" />
 
 					<!-- Axis group. Filter for enabled, sort by position, position using index. -->
 					<g 

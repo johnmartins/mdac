@@ -66,8 +66,6 @@ const optionsStore = useOptionsStore()
 const pcpStore = usePCPStore()
 
 function setFilteredDataOpacity (evt) {
-    console.log("CHANGE!")
-    console.log(evt.target)
     optionsStore.setExcludedDataOpacity(parseFloat(evt.target.value)) 
 }
 
