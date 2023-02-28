@@ -1,23 +1,31 @@
 <template>
 	<div class="component-container">
-		<div style="height: 100%;" class="svg-container">
+		<div style="height: 100%; position: relative;" class="svg-container" ref="pcpPlot">
+
+			<!-- Raster rendering layer -->
+			<div v-if="PCPStore.renderingType === 'raster'" style="width: 100%; height: 100%;">
+				<PCPlotPathLayerRaster />
+			</div>
 			<svg 
-			class="pcp-plot svg-content-responsive" 
-			height="100%" 
-			width="100%" 
+			class="pcp-plot svg-content-responsive"  
 			ref="plotCanvas"
 			tabindex="0"
-			style="font-size: 1em; font-family: monospace;"
+			height="100%" 
+			width="100%" 
+			style="font-size: 1em; font-family: monospace; position: absolute; left: 0; top: 0; "
 			@mousemove.prevent="dragFilterBox"
 			@mouseup.prevent="dragFilterDone"
 			@keydown.delete="dataStore.deleteCategory(selectedCategory)"
 			>
+				
 				<!-- Full graphics group -->
 				<g v-if="data.length > 0"
 				:transform="`translate(${plotParameters.padding} 0)`"> 
-					
-					<!-- Data line generator -->
-					<PCPlotPathLayer />
+
+					<!-- Vector rendering layer -->
+					<PCPlotPathLayerVector />
+
+					<image v-if="PCPStore.renderingType === 'raster' && pathsDataUrl" :href="pathsDataUrl" width="100%" height="100%" :y="getPlotYBounds()[0]" />
 
 					<!-- Axis group. Filter for enabled, sort by position, position using index. -->
 					<g 
@@ -97,7 +105,8 @@ import { saveAs } from "file-saver"
 import { saveSvgAsPng } from "save-svg-as-png"
 
 // Components
-import PCPlotPathLayer from "./PCPlotPathLayer"
+import PCPlotPathLayerVector from "./PCPlotPathLayerVector"
+import PCPlotPathLayerRaster from "./PCPlotPathLayerRaster"
 
 // Models
 import SingleRangeFilter from "@/models/filters/SingleRangeFilter"
@@ -121,7 +130,7 @@ const PCPStore = usePCPStore()
 
 const {data, filterIDMap, filters, categories} = storeToRefs(dataStore)
 const {activeView, selectedCategory} = storeToRefs(stateStore)
-const {horizontalOffset, axisLength, colorScaleCategory, colorScaleFunction, plotXBounds, plotYBounds} = storeToRefs(PCPStore)
+const {horizontalOffset, axisLength, colorScaleCategory, colorScaleFunction, plotXBounds, plotYBounds, pathsDataUrl} = storeToRefs(PCPStore)
 
 // Plotted data
 const dataIncluded = ref([])
@@ -129,9 +138,10 @@ const dataExcluded = ref([])
 
 // Layout references
 const plotCanvas = ref(null)
+const pcpPlot = ref(null)
 
 const plotParameters = reactive({
-	padding: 50,
+	padding: 100,
 	axisTitlePadding: 150,
 	axisTitleRotation: 45,
 	filterMinDragTime: 125, // ms
@@ -149,6 +159,7 @@ const plotVariables = reactive({
 
 function updateContainerSize () {
 	if (activeView.value !== 'pcp') return
+
 	plotXBounds.value = getPlotXBounds()
 	plotYBounds.value = getPlotYBounds()
 }
@@ -328,32 +339,12 @@ function getSelectedCategoryTitle () {
 function handleExportRequest (format) {
 	if (activeView.value !== 'pcp') return
 
-	if (format === 'svg') {
-		exportCSV()
-	} else if (format === 'png') {
+	if (format === 'png') {
 		exportPNG()
 	} 
 	else {
 		throw new Error('Unknown format in export request')
 	}
-}
-
-function exportCSV () {
-	const csvElement = plotCanvas.value
-	var svgData = csvElement.innerHTML 
-	var head = '<svg title="graph" version="1.1" xmlns="http://www.w3.org/2000/svg">'
-	
-	let style = `<style>`
-	style += 'svg {font-family: monospace;}'
-	style += '.title {font-size: 0.8rem; text-anchor: start; x: 0px;}'
-	style += '.tick-string {font-size: 0.8rem; text-anchor: end; dominant-baseline: middle;}'
-	style += 'line {stroke: black; fill-opacity: 0;}'
-	style += 'path {fill-opacity: 0;}'
-	style += '.filter-box {stroke: white;stroke-opacity: 0.9;fill: purple; fill-opacity: 0.4;x: -8px;width: 16px;}'
-	style += '</style>'
-	var full_svg = head +  style + svgData + "</svg>"
-	var blob = new Blob([full_svg], {type: "image/svg+xml"});  
-	saveAs(blob, "PCPlot.svg");
 }
 
 function exportPNG () {

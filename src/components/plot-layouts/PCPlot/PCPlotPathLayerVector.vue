@@ -1,6 +1,6 @@
 <template>
 
-    <g stroke-width="1" fill="transparent" :transform="`translate(0 ${plotYBounds[0]})`">
+    <g v-if="PCPStore.renderingType === 'vector'" stroke-width="1" fill="transparent" :transform="`translate(0 ${plotYBounds[0]})`">
         <g v-if="!optionsStore.hideExcluded">
             <path v-for="(d, index) in data.filter(dp => !dataStore.dataPointFilterCheck(dp))" 
                 :key="index" 
