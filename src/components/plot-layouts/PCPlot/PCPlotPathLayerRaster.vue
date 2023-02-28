@@ -40,11 +40,11 @@ let pathCanvas = document.createElement('canvas')
 let ctx = pathCanvas.getContext('2d')
 let redrawTimerID = null
 
-onMounted( () => {
+onMounted(() => {
 	resizeCanvas()
 })
 
-watch(() => PCPStore.resolution, () => {
+watch([() => PCPStore.resolution, () => PCPStore.renderingType], () => {
 	resizeCanvas()
 })
 
@@ -118,6 +118,8 @@ function draw () {
 }
 
 function resizeCanvas () {
+	if (PCPStore.renderingType !== 'raster') return
+	if (!canvasContainer.value) return
 	// if (activeView.value !== 'pcp') return
 	setTimeout( () => {
 		const w = canvasContainer.value.offsetWidth

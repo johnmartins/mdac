@@ -11,7 +11,7 @@
                 </select>
             </div>
 
-            <div class="labeled-form mb-2">
+            <div class="labeled-form mb-2" v-if="pcpStore.renderingType==='raster'">
                 <span>Resolution: </span>
                 <select ref="lineFormatSelector" @change="setResolutionManualOverride(true)" v-model="pcpStore.resolution">
                     <option :value="0.3">0.3 - Potato</option>
@@ -47,9 +47,6 @@
                 <span>Excluded:</span>
                 <input type="number" step="0.05" max="1" min="0" @change="setFilteredDataOpacity" :value="optionsStore.excludedDataOpacity"/>
             </div>
-
-
-
         </div>
     </div>
 </template>
