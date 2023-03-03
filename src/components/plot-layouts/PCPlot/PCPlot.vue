@@ -31,7 +31,6 @@
 					<g 
 					class="axis" 
 					v-for="(c, cIndex) in dataStore.enabledCategoriesSorted" 
-					@click="onClickAxis(c)"
 					@mousedown.prevent="dragFilterStart($event, c)"
 					v-bind:class="{highlighted: getSelectedCategoryTitle() == c.title}"
 					:key="c.position" 
@@ -40,24 +39,37 @@
 						<!-- Hitbox -->
 						<rect 
 						class="filter-hitbox"
+						@click="onClickAxis(c)"
 						:height="truncateDecimals(getAxisLength()+40, 1)"
 						/>
+						
+						<!-- Axis label -->
+						<text 
+							:y="truncateDecimals(getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10),1)" 
+							class="title" 
+							@click="onClickAxis(c)"
+							:style="{fontSize: `${optionsStore.titleSize}em`}"
+							:transform="`rotate(${plotParameters.axisTitleRotation} 0 ${truncateDecimals(getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10),1)})`">
+							{{c.displayTitle}}
+						</text>
+						
+						<!-- Axis vertical line -->
+						<line 
+						x1="0" 
+						y1="0" 
+						x2="0" 
+						:y2="truncateDecimals(getPlotYBounds()[1]-(plotParameters.axisTitlePadding),2)"/>
+						
+						<!-- Axis tick group -->
+						<g class="tick" v-for="(tick, index) in c.getTickArray()" :key="index"> 
+							<text x="-10" :y="c.scaleLinear(tick)*getAxisLength()" class="tick-string" :style="{fontSize: `${optionsStore.tickSize}em`}">{{c.getTickString(tick)}}</text>
+							<line x1="0" :y1="c.scaleLinear(tick)*getAxisLength()" x2="-5" :y2="c.scaleLinear(tick)*getAxisLength()"/>	
+							<!-- Top tick -->
+						</g>
 
 						<!-- Axis Filters -->
 						<g v-for="(f, index) in filters[c.title]" :key="index">
-							<g v-if="f.type == 'single-range'">
-								<rect 
-								class="filter-box"
-								:y="truncateDecimals(c.scaleLinear(f.thresholdB)*getAxisLength(), 1)" 
-								:height="truncateDecimals((c.scaleLinear(f.thresholdA)-c.scaleLinear(f.thresholdB))*getAxisLength(), 1)" />
-							</g>
-							<g v-if="f.type == 'categoric'">
-								<rect
-								class="filter-box"
-								:y="truncateDecimals(f.lowerBoundRatio*getAxisLength(), 1)"
-								:height="truncateDecimals((f.upperBoundRatio - f.lowerBoundRatio)*getAxisLength(), 1)"
-								/>
-							</g>
+							<FilterBlock :f="f" :c="c" :csvElement="plotCanvas" />
 						</g>
 						
 						<!-- Proto axis filters -->
@@ -70,25 +82,7 @@
 								/>
 							</g>
 						</g>
-						
-						<!-- Axis label -->
-						<text 
-							:y="truncateDecimals(getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10),1)" 
-							class="title" 
-							:style="{fontSize: `${optionsStore.titleSize}em`}"
-							:transform="`rotate(${plotParameters.axisTitleRotation} 0 ${truncateDecimals(getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10),1)})`">
-							{{c.displayTitle}}
-						</text>
-						
-						<!-- Axis vertical line -->
-						<line x1="0" y1="0" x2="0" :y2="truncateDecimals(getPlotYBounds()[1]-(plotParameters.axisTitlePadding),2)"/>
-						
-						<!-- Axis tick group -->
-						<g class="tick" v-for="(tick, index) in c.getTickArray()" :key="index"> 
-							<text x="-10" :y="c.scaleLinear(tick)*getAxisLength()" class="tick-string" :style="{fontSize: `${optionsStore.tickSize}em`}">{{c.getTickString(tick)}}</text>
-							<line x1="0" :y1="c.scaleLinear(tick)*getAxisLength()" x2="-5" :y2="c.scaleLinear(tick)*getAxisLength()"/>	
-							<!-- Top tick -->
-						</g>
+
 					</g>
 				</g>
 			</svg>
@@ -107,6 +101,7 @@ import { saveSvgAsPng } from "save-svg-as-png"
 // Components
 import PCPlotPathLayerVector from "./PCPlotPathLayerVector"
 import PCPlotPathLayerRaster from "./PCPlotPathLayerRaster"
+import FilterBlock from "./FilterBlock"
 
 // Models
 import SingleRangeFilter from "@/models/filters/SingleRangeFilter"
