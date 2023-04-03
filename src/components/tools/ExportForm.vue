@@ -6,6 +6,7 @@
                 <span>Format: </span>
                 <select ref="formatSelector">
                     <option value="png">Image (PNG)</option>
+                    <option value="svg">Vector graphics (SVG)</option>
                 </select>
             </div>
             <div class="d-grid gap-2 mt-2">

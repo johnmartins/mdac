@@ -111,6 +111,7 @@ import PCPlotPathLayerRaster from "./PCPlotPathLayerRaster"
 // Models
 import SingleRangeFilter from "@/models/filters/SingleRangeFilter"
 import CategoricFilter from "@/models/filters/CategoricFilter"
+import Popup from '@/models/layout/Popup'
 
 // Misc
 import {truncateDecimals} from "@/utils/data-utils"
@@ -121,12 +122,14 @@ import {useDataStore} from "../../../store/DataStore"
 import {useOptionsStore} from "../../../store/OptionsStore"
 import {useStateStore} from "../../../store/StateStore"
 import {usePCPStore} from "../../../store/PCPStore"
+import {useLayoutStore} from "../../../store/LayoutStore"
 
 // Store references
 const dataStore = useDataStore()
 const optionsStore = useOptionsStore()
 const stateStore = useStateStore()
 const PCPStore = usePCPStore()
+const layoutStore = useLayoutStore()
 
 const {data, filterIDMap, filters, categories} = storeToRefs(dataStore)
 const {activeView, selectedCategory} = storeToRefs(stateStore)
@@ -342,6 +345,9 @@ function handleExportRequest (format) {
 	if (format === 'png') {
 		exportPNG()
 	} 
+	else if (format === 'svg') {
+		exportSVG()
+	}
 	else {
 		throw new Error('Unknown format in export request')
 	}
@@ -352,6 +358,33 @@ function exportPNG () {
 	saveSvgAsPng(csvElement, 'PCPlot.png', {encoderOptions: 1, backgroundColor: 'white', scale: 2})
 }
 
+function exportSVG () {
+	// Raster check
+	if (PCPStore.renderingType === 'raster') {
+		const errorPopup = new Popup('error', 'Invalid export configuration', 
+		'It is not possible to export a rasterized plot as an SVG file.' +
+		'\n\nEither change Export Format to PNG, or change Render mode to Vectorized.')
+		layoutStore.queuePopup(errorPopup)
+		return
+	}
+
+	const csvElement = plotCanvas.value
+	var svgData = csvElement.innerHTML 
+	var head = '<svg title="graph" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">'
+	
+	let style = `<style>`
+	style += 'svg {font-family: monospace;}'
+	style += '.title {font-size: 0.8rem; text-anchor: start; x: 0px;}'
+	style += '.tick-string {font-size: 0.8rem; text-anchor: end; dominant-baseline: middle;}'
+	style += 'line {stroke: black; fill-opacity: 0;}'
+	style += 'path {fill-opacity: 0;}'
+	style += '.filter-box {stroke: white;stroke-opacity: 0.9;stroke-width: 2px;fill: #595959; fill-opacity: 0.6;x: -8px;width: 16px;}' 
+	style += '</style>'
+	var full_svg = head +  style + svgData + "</svg>"
+	var blob = new Blob([full_svg], {type: "image/svg+xml"});  
+	saveAs(blob, "PCPlot.svg");
+}
+    
 </script>
 
 <style lang="scss" scoped>

@@ -286,6 +286,9 @@ function handleExportRequest (format) {
     if (format === 'png') {
 		exportPNG()
 	} 
+    else if (format === 'svg') {
+        exportSVG()
+    }
 	else {
 		throw new Error('Unknown format in export request')
 	}
@@ -294,6 +297,23 @@ function handleExportRequest (format) {
 function exportPNG () {
 	const csvElement = plotCanvas.value
 	saveSvgAsPng(csvElement, 'ScatterPlot.png', {encoderOptions: 1, backgroundColor: 'white', scale: 2})
+}
+
+function exportSVG () {
+    const csvElement = plotCanvas.value
+	var svgData = csvElement.innerHTML 
+	var head = '<svg title="graph" version="1.1" xmlns="http://www.w3.org/2000/svg">'
+	
+	let style = `<style>`
+	style += 'svg {font-family: monospace;}'
+	style += '.scatter-container text {font-size: 0.8rem; text-anchor: middle; dominant-baseline: middle;}'
+	style += '.scatter-container line {stroke: black; fill-opacity: 0;}'
+    style += '.tick-y text { text-anchor: end; }'
+    style += '.tick-ub { dominant-baseline: hanging; }'
+	style += '</style>'
+	var full_svg = head +  style + svgData + "</svg>"
+	var blob = new Blob([full_svg], {type: "image/svg+xml"});  
+	saveAs(blob, "ScatterPlot.svg");
 }
 
 </script>
