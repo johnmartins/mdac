@@ -27,6 +27,7 @@ import {computed} from 'vue'
 import {storeToRefs} from "pinia"
 
 import {truncateDecimals} from "@/utils/data-utils"
+import {getTrueEventCoordinates} from "@/utils/svg-utils"
 
 // Stores
 import {useDataStore} from "../../../store/DataStore"
@@ -36,6 +37,7 @@ const PCPStore = usePCPStore()
 const dataStore = useDataStore()
 
 const {axisLength} = storeToRefs(PCPStore)
+const emit = defineEmits(['interaction'])
 
 const props = defineProps({
     category: Object,
@@ -64,10 +66,20 @@ const height = computed( () => {
 
 function moveFilterTop () {
     console.log("Move filter top")
+    emit('interaction', {
+        filter: props.filter, 
+        category: props.category,
+        start: y.value + height.value
+    })
 }
 
 function moveFilterBot () {
     console.log("Move filter bot")
+    emit('interaction', {
+        filter: props.filter, 
+        category: props.category,
+        start: y.value
+    })
 }
 
 </script>
