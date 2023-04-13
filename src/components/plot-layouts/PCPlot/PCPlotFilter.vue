@@ -7,15 +7,15 @@
 
         <rect 
         class="filter-pull-box"
-        :y="y"
-        height="8px"
+        :y="y - capHeight"
+        :height="capHeight"
         @mousedown.prevent="moveFilterTop"
         />
 
         <rect 
         class="filter-pull-box"
-        :y="y + height - 8"
-        height="8px"
+        :y="y + height"
+        :height="capHeight"
         @mousedown.prevent="moveFilterBot"
         />
 
@@ -23,7 +23,7 @@
 </template>
 
 <script setup>
-import {computed} from 'vue'
+import {computed, ref} from 'vue'
 import {storeToRefs} from "pinia"
 
 import {truncateDecimals} from "@/utils/data-utils"
@@ -43,6 +43,8 @@ const props = defineProps({
     category: Object,
     filter: Object
 })
+
+const capHeight = ref(6)
 
 const y = computed(() => {
     if (props.filter.type === 'single-range') {
@@ -65,7 +67,6 @@ const height = computed( () => {
 })
 
 function moveFilterTop () {
-    console.log("Move filter top")
     emit('interaction', {
         filter: props.filter, 
         category: props.category,
@@ -74,7 +75,6 @@ function moveFilterTop () {
 }
 
 function moveFilterBot () {
-    console.log("Move filter bot")
     emit('interaction', {
         filter: props.filter, 
         category: props.category,
@@ -88,13 +88,12 @@ function moveFilterBot () {
     .filter-box {
         x: -8px;
         width: 16px; 
-        fill: blue;
         z-index: 99;
     }
     .filter-pull-box {
-        x: -8px;
-        width: 16px;
-        fill: red;
+        x: -10px;
+        width: 20px;
+        fill: transparentize($color: blue, $amount: 0.8);
         cursor: row-resize;
     }
 </style>
