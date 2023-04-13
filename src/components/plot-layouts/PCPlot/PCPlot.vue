@@ -150,10 +150,6 @@ const plotVariables = reactive({
 	hasRendered: false,
 	filterToRemove: null,			// Used when editing an existing filter to delete the original copy
 })
-const editFilterVariables = reactive({
-	mousedown: false,
-	filter: null,
-})
 
 function updateContainerSize () {
 	if (activeView.value !== 'pcp') return
@@ -208,10 +204,6 @@ function onFilterInteraction (evt) {
 	plotVariables.currentFilterStartTime = Date.now()
 	plotVariables.currentFilterDeltaTime = 0
 	plotVariables.filterToRemove = evt.filter		// Mark the original filter for deletion
-}
-
-function editFilter (evt) {
-	console.log('Editing filter..')
 }
 
 function getAxisLength () {
