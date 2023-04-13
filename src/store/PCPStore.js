@@ -2,10 +2,15 @@ import { defineStore } from 'pinia'
 
 export const usePCPStore = defineStore('pcp', {
     state: () => ({
+            // Layout parameters
             horizontalOffset: 100,
             axisLength: 100,
+
+            // Color coding
             colorScaleCategory: null,
             colorScaleFunction: () => 'black',
+
+            // Rendering
             renderingType: 'raster',
             resolution: 1.2,
             resolutionManualOverride: false,
@@ -13,7 +18,7 @@ export const usePCPStore = defineStore('pcp', {
 
             // Bounds
             plotXBounds: [0, 500],
-            plotYBounds: [0, 500]
+            plotYBounds: [0, 500],
         }),
     getters: {},
     actions: {

@@ -13,7 +13,7 @@
 			height="100%" 
 			width="100%" 
 			style="font-size: 1em; font-family: monospace; position: absolute; left: 0; top: 0; "
-			@mousemove.prevent="dragFilterBox"
+			@mousemove.prevent="onMouseMove"
 			@mouseup.prevent="dragFilterDone"
 			@keydown.delete="dataStore.deleteCategory(selectedCategory)"
 			>
@@ -31,33 +31,24 @@
 					<g 
 					class="axis" 
 					v-for="(c, cIndex) in dataStore.enabledCategoriesSorted" 
-					@click="onClickAxis(c)"
-					@mousedown.prevent="dragFilterStart($event, c)"
 					v-bind:class="{highlighted: getSelectedCategoryTitle() == c.title}"
 					:key="c.position" 
 					:transform="`translate(${truncateDecimals(cIndex*horizontalOffset,2)} ${truncateDecimals(getPlotYBounds()[0], 2)})`">	
+
+						<!-- Axis vertical line -->
+						<line x1="0" y1="0" x2="0" :y2="truncateDecimals(getPlotYBounds()[1]-(plotParameters.axisTitlePadding),2)"/>
 
 						<!-- Hitbox -->
 						<rect 
 						class="filter-hitbox"
 						:height="truncateDecimals(getAxisLength()+40, 1)"
+						@click="onClickAxis(c)"
+						@mousedown.prevent="dragFilterStart($event, c)"
 						/>
 
 						<!-- Axis Filters -->
 						<g v-for="(f, index) in filters[c.title]" :key="index">
-							<g v-if="f.type == 'single-range'">
-								<rect 
-								class="filter-box"
-								:y="truncateDecimals(c.scaleLinear(f.thresholdB)*getAxisLength(), 1)" 
-								:height="truncateDecimals((c.scaleLinear(f.thresholdA)-c.scaleLinear(f.thresholdB))*getAxisLength(), 1)" />
-							</g>
-							<g v-if="f.type == 'categoric'">
-								<rect
-								class="filter-box"
-								:y="truncateDecimals(f.lowerBoundRatio*getAxisLength(), 1)"
-								:height="truncateDecimals((f.upperBoundRatio - f.lowerBoundRatio)*getAxisLength(), 1)"
-								/>
-							</g>
+							<PCPlotFilter :filter="f" :category="c" @interaction="onFilterInteraction" />
 						</g>
 						
 						<!-- Proto axis filters -->
@@ -75,13 +66,11 @@
 						<text 
 							:y="truncateDecimals(getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10),1)" 
 							class="title" 
+							@click="onClickAxis(c)"
 							:style="{fontSize: `${optionsStore.titleSize}em`}"
 							:transform="`rotate(${plotParameters.axisTitleRotation} 0 ${truncateDecimals(getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10),1)})`">
 							{{c.displayTitle}}
 						</text>
-						
-						<!-- Axis vertical line -->
-						<line x1="0" y1="0" x2="0" :y2="truncateDecimals(getPlotYBounds()[1]-(plotParameters.axisTitlePadding),2)"/>
 						
 						<!-- Axis tick group -->
 						<g class="tick" v-for="(tick, index) in c.getTickArray()" :key="index"> 
@@ -107,6 +96,7 @@ import { saveSvgAsPng } from "save-svg-as-png"
 // Components
 import PCPlotPathLayerVector from "./PCPlotPathLayerVector"
 import PCPlotPathLayerRaster from "./PCPlotPathLayerRaster"
+import PCPlotFilter from "./PCPlotFilter.vue"
 
 // Models
 import SingleRangeFilter from "@/models/filters/SingleRangeFilter"
@@ -158,6 +148,11 @@ const plotVariables = reactive({
 	currentFilterEndValue: 0,
 	clickOnCooldown: false,
 	hasRendered: false,
+	filterToRemove: null,			// Used when editing an existing filter to delete the original copy
+})
+const editFilterVariables = reactive({
+	mousedown: false,
+	filter: null,
 })
 
 function updateContainerSize () {
@@ -202,6 +197,23 @@ watch([plotYBounds, () => plotParameters.axisTitlePadding], () => {
 	axisLength.value = getPlotYBounds()[1]-(plotParameters.axisTitlePadding)
 })
 
+function onMouseMove (evt) {
+	dragFilterBox(evt)
+}
+
+function onFilterInteraction (evt) {
+	plotVariables.mousedown = true
+	plotVariables.currentFilterCategory = evt.category 
+	plotVariables.currentFilterStartValue = evt.start + plotParameters.padding
+	plotVariables.currentFilterStartTime = Date.now()
+	plotVariables.currentFilterDeltaTime = 0
+	plotVariables.filterToRemove = evt.filter		// Mark the original filter for deletion
+}
+
+function editFilter (evt) {
+	console.log('Editing filter..')
+}
+
 function getAxisLength () {
 	return plotYBounds.value[1]-(plotParameters.axisTitlePadding)
 }
@@ -242,6 +254,7 @@ function resetFilterDrag () {
 	plotVariables.currentFilterStartValue = 0
 	plotVariables.currentFilterDeltaTime = 0
 	plotVariables.currentFilterEndValue = 0
+	plotVariables.filterToRemove = null
 }
 
 function dragFilterBox (evt) {
@@ -317,6 +330,11 @@ function dragFilterDone () {
 	} else {
 		const f = SingleRangeFilter.createFromRatios(c, y1Ratio, y2Ratio)
 		dataStore.addFilter(f)
+	}
+
+	// If this new filter is replacing an existing filter, then delete the original copy.
+	if (plotVariables.filterToRemove) {
+		dataStore.deleteFilter(plotVariables.filterToRemove)
 	}
 
 	resetFilterDrag()
