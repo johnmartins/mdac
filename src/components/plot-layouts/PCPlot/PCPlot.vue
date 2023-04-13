@@ -45,19 +45,7 @@
 
 						<!-- Axis Filters -->
 						<g v-for="(f, index) in filters[c.title]" :key="index">
-							<g v-if="f.type == 'single-range'">
-								<rect 
-								class="filter-box"
-								:y="truncateDecimals(c.scaleLinear(f.thresholdB)*getAxisLength(), 1)" 
-								:height="truncateDecimals((c.scaleLinear(f.thresholdA)-c.scaleLinear(f.thresholdB))*getAxisLength(), 1)" />
-							</g>
-							<g v-if="f.type == 'categoric'">
-								<rect
-								class="filter-box"
-								:y="truncateDecimals(f.lowerBoundRatio*getAxisLength(), 1)"
-								:height="truncateDecimals((f.upperBoundRatio - f.lowerBoundRatio)*getAxisLength(), 1)"
-								/>
-							</g>
+							<PCPlotFilter :filter="f" :category="c" />
 						</g>
 						
 						<!-- Proto axis filters -->
@@ -107,6 +95,7 @@ import { saveSvgAsPng } from "save-svg-as-png"
 // Components
 import PCPlotPathLayerVector from "./PCPlotPathLayerVector"
 import PCPlotPathLayerRaster from "./PCPlotPathLayerRaster"
+import PCPlotFilter from "./PCPlotFilter.vue"
 
 // Models
 import SingleRangeFilter from "@/models/filters/SingleRangeFilter"
