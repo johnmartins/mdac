@@ -31,16 +31,19 @@
 					<g 
 					class="axis" 
 					v-for="(c, cIndex) in dataStore.enabledCategoriesSorted" 
-					@click="onClickAxis(c)"
-					@mousedown.prevent="dragFilterStart($event, c)"
 					v-bind:class="{highlighted: getSelectedCategoryTitle() == c.title}"
 					:key="c.position" 
 					:transform="`translate(${truncateDecimals(cIndex*horizontalOffset,2)} ${truncateDecimals(getPlotYBounds()[0], 2)})`">	
+
+						<!-- Axis vertical line -->
+						<line x1="0" y1="0" x2="0" :y2="truncateDecimals(getPlotYBounds()[1]-(plotParameters.axisTitlePadding),2)"/>
 
 						<!-- Hitbox -->
 						<rect 
 						class="filter-hitbox"
 						:height="truncateDecimals(getAxisLength()+40, 1)"
+						@click="onClickAxis(c)"
+						@mousedown.prevent="dragFilterStart($event, c)"
 						/>
 
 						<!-- Axis Filters -->
@@ -67,9 +70,6 @@
 							:transform="`rotate(${plotParameters.axisTitleRotation} 0 ${truncateDecimals(getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10),1)})`">
 							{{c.displayTitle}}
 						</text>
-						
-						<!-- Axis vertical line -->
-						<line x1="0" y1="0" x2="0" :y2="truncateDecimals(getPlotYBounds()[1]-(plotParameters.axisTitlePadding),2)"/>
 						
 						<!-- Axis tick group -->
 						<g class="tick" v-for="(tick, index) in c.getTickArray()" :key="index"> 

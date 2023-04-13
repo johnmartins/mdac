@@ -4,6 +4,21 @@
         class="filter-box"
         :y="y" 
         :height="height" />
+
+        <rect 
+        class="filter-pull-box"
+        :y="y"
+        height="8px"
+        @mousedown.prevent="moveFilterTop"
+        />
+
+        <rect 
+        class="filter-pull-box"
+        :y="y + height - 8"
+        height="8px"
+        @mousedown.prevent="moveFilterBot"
+        />
+
     </g>
 </template>
 
@@ -47,11 +62,27 @@ const height = computed( () => {
     }
 })
 
+function moveFilterTop () {
+    console.log("Move filter top")
+}
+
+function moveFilterBot () {
+    console.log("Move filter bot")
+}
+
 </script>
 
 <style lang="scss" scoped>
     .filter-box {
         x: -8px;
         width: 16px; 
+        fill: blue;
+        z-index: 99;
+    }
+    .filter-pull-box {
+        x: -8px;
+        width: 16px;
+        fill: red;
+        cursor: row-resize;
     }
 </style>
