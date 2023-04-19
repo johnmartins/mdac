@@ -27,24 +27,22 @@
 <script setup>
 import { ref } from "vue"
 import { storeToRefs } from "pinia"
-import {useScatterStore} from "@/store/ScatterStore"
+import {useOptionsStore} from "@/store/OptionsStore"
 import {useDataStore} from "@/store/DataStore"
-import ScatterPlotConfig from "@/models/plots/ScatterPlotConfig"
 
-const scatterStore = useScatterStore()
+const optionsStore = useOptionsStore()
 const dataStore = useDataStore()
 
-const {plots, selectedPlotID, selectedColorCodeCategory, useSimilarityColorCoding, overrideColorCodeColumn, overrideColorCodeFunction, colorCodeUpperBound, colorCodeLowerBound} = storeToRefs(scatterStore)
+const {selectedColorCodeCategory, useSimilarityColorCoding, overrideColorCodeColumn, overrideColorCodeFunction, colorCodeUpperBound, colorCodeLowerBound} = storeToRefs(optionsStore)
 const {categories} = storeToRefs(dataStore)
 
 function onColorCategoryChange (evt) {
-    scatterStore.resetColorCodeOverride()
+    optionsStore.resetColorCodeOverride()
 }
 
 function onUseSimilarityColorCodingChange (evt) {
-    scatterStore.resetColorCodeOverride()
+    optionsStore.resetColorCodeOverride()
 }
-
 
 </script>
 

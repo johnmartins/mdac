@@ -111,6 +111,7 @@ import { saveSvgAsPng } from "save-svg-as-png"
 import {useStateStore} from "@/store/StateStore"
 import {useDataStore} from "@/store/DataStore"
 import {useScatterStore} from "@/store/ScatterStore"
+import {useOptionsStore} from "@/store/OptionsStore"
 import SingleRangeFilter from "@/models/filters/SingleRangeFilter"
 import {getTrueEventCoordinates} from "@/utils/svg-utils"
 import CategoricFilter from "@/models/filters/CategoricFilter"
@@ -119,10 +120,10 @@ import CategoricFilter from "@/models/filters/CategoricFilter"
 import ScatterPlotPointLayer from "./ScatterPlotPointLayer.vue"
 import RangeIndicator from "@/components/plot-features/RangeIndicator"
 
-
 const dataStore = useDataStore()
 const scatterStore = useScatterStore()
 const stateStore = useStateStore()
+const optionsStore = useOptionsStore()
 
 const {selectedPlot} = storeToRefs(scatterStore)
 const {activeView} = storeToRefs(stateStore)
@@ -181,6 +182,7 @@ function onMouseDown (evt) {
 
 function clearSelections() {
     scatterStore.resetDataSelection()
+    optionsStore.resetColorCodeOverride()
 }
 
 function dragFilterStart (evt) {

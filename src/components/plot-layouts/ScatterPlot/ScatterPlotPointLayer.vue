@@ -37,12 +37,15 @@ import {euclideanDistance} from "@/sadse/similarity"
 
 import {useDataStore} from "@/store/DataStore"
 import {useScatterStore} from "@/store/ScatterStore"
+import {useOptionsStore} from "@/store/OptionsStore"
 
 const dataStore = useDataStore()
 const scatterStore = useScatterStore()
+const optionsStore = useOptionsStore()
 
 const {data} = storeToRefs(dataStore)
-const {selectedPlot, selectedDataPoint, useSimilarityColorCoding, overrideColorCodeColumn, overrideColorCodeFunction, colorCodeUpperBound, colorCodeLowerBound} = storeToRefs(scatterStore)
+const {selectedPlot, selectedDataPoint} = storeToRefs(scatterStore)
+const {overrideColorCodeColumn, overrideColorCodeFunction, colorCodeUpperBound, colorCodeLowerBound, useSimilarityColorCoding} = storeToRefs(optionsStore)
 
 function setupSimilarityColorScale () {
     if (!useSimilarityColorCoding.value) return
@@ -141,7 +144,7 @@ function getFill (d) {
     const ID = d[dataStore.idCol]
     if (ID === scatterStore.selectedDataID) return 'white'
 
-    return scatterStore.getSampleColor(d)
+    return optionsStore.getSampleColor(d)
 }
 
 function getStroke (d) {
@@ -158,7 +161,7 @@ function getRadius (d) {
 }
 
 function getColor (d) {
-	return scatterStore.getSampleColor(d)
+	return optionsStore.getSampleColor(d)
 }
 
 function getOpacity (d) {

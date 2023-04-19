@@ -6,10 +6,6 @@ export const usePCPStore = defineStore('pcp', {
             horizontalOffset: 100,
             axisLength: 100,
 
-            // Color coding
-            colorScaleCategory: null,
-            colorScaleFunction: () => 'black',
-
             // Rendering
             renderingType: 'raster',
             resolution: 1.2,

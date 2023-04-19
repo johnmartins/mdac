@@ -30,11 +30,11 @@ import {computed} from "vue"
 import { storeToRefs } from "pinia"
 
 import {linspace} from "@/utils/data-utils"
-import {useScatterStore} from "../../store/ScatterStore"
+import {useOptionsStore} from "../../store/OptionsStore"
 import {useDataStore} from "../../store/DataStore"
 
-const scatterStore = useScatterStore()
-const {colorCodeUpperBound, colorCodeLowerBound} = storeToRefs(scatterStore)
+const optionsStore = useOptionsStore()
+const {colorCodeUpperBound, colorCodeLowerBound} = storeToRefs(optionsStore)
 const dataStore = useDataStore()
 const {data} = storeToRefs(dataStore)
 
@@ -44,7 +44,7 @@ const barHeight = 4
 const tickMargin = 8
 
 const column = computed(() => {
-    return scatterStore.getActiveColorCodeColumn()
+    return optionsStore.getActiveColorCodeColumn()
 })
 
 const spectrumArray = computed(() => {
@@ -53,7 +53,7 @@ const spectrumArray = computed(() => {
     let linearScale = linspace(colorCodeLowerBound.value, colorCodeUpperBound.value, resolution)
     let colorScale = []
     for (let value of linearScale) {
-        colorScale.push(scatterStore.getSampleColorWithValue(value))
+        colorScale.push(optionsStore.getSampleColorWithValue(value))
     }
     return colorScale
 })

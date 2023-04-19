@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import * as d3 from "d3"
 
 export const useScatterStore = defineStore('scatter', {
     state: () => {
@@ -16,13 +15,6 @@ export const useScatterStore = defineStore('scatter', {
             selectedSecondaryDataID: -1,
             selectedSecondaryDataPoint: null,
 
-            // Color coding
-            selectedColorCodeCategory: null,
-            overrideColorCodeColumn: null,
-            overrideColorCodeFunction: null,
-            colorCodeUpperBound: null,
-            colorCodeLowerBound: null,
-
             // Boundaries
             plotXBounds: [],
             plotYBounds: [],
@@ -34,9 +26,6 @@ export const useScatterStore = defineStore('scatter', {
             paddingRight: 200,
             xAxisTitleMargin: 40,
             yAxisTitleMargin: 100,
-
-            // Similarity
-            useSimilarityColorCoding: true,
         }
     },
     getters: {
@@ -68,49 +57,12 @@ export const useScatterStore = defineStore('scatter', {
         getSelectedPlot () {
             return this.selectedPlot
         },
-        getSampleColor (d) {
-            if (this.overrideColorCodeColumn) {
-                return this.getSampleColorWithValue(d[this.overrideColorCodeColumn])
-            } 
-            if (!this.selectedColorCodeCategory) return 'black'
-            return this.getSampleColorWithValue(d[this.selectedColorCodeCategory.title])
-        },
-        getSampleColorWithValue (value) {
-            if (this.overrideColorCodeFunction) return this.overrideColorCodeFunction(value)
-            if (!this.selectedColorCodeCategory) return () => 'black'
 
-            if (!this.selectedColorCodeCategory.usesCategoricalData) {
-                return d3.scaleSequential()
-                    .domain([this.selectedColorCodeCategory.lb, this.selectedColorCodeCategory.ub])
-                    .interpolator(d3.interpolateRgbBasis(["blue", "green", "yellow", "red"]))(value)
-            } else {
-                return d3.scaleOrdinal()
-                    .domain(this.selectedColorCodeCategory.availableCategoricalValues)
-                    .range(d3.schemeCategory10)(value)
-            }
-        },
-        resetColorCodeOverride () {
-            this.overrideColorCodeColumn = null
-            this.overrideColorCodeFunction = null
-
-            if (!this.selectedColorCodeCategory) return
-
-            this.colorCodeLowerBound = this.selectedColorCodeCategory.lb
-            this.colorCodeUpperBound = this.selectedColorCodeCategory.ub
-
-        },
         resetDataSelection () {
             this.selectedDataID = -1
             this.selectedDataPoint = null
             this.selectedSecondaryDataID = -1
             this.selectedSecondaryDataPoint = null
-
-            this.resetColorCodeOverride()
-        },
-        getActiveColorCodeColumn () {
-            if (this.overrideColorCodeColumn) return this.overrideColorCodeColumn
-            if (this.selectedColorCodeCategory) return this.selectedColorCodeCategory.title
-            return null
         }
     },
 })

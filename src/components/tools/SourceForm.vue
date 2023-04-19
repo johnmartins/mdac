@@ -34,6 +34,7 @@ import {useDataStore} from "@/store/DataStore"
 import {useScatterStore} from "@/store/ScatterStore"
 import {usePCPStore} from "@/store/PCPStore"
 import {useLayoutStore} from "@/store/LayoutStore"
+import {useOptionsStore} from "@/store/OptionsStore"
 import {isNumeric} from "@/utils/data-utils"
 
 import Category from "@/models/plots/Category"
@@ -48,6 +49,7 @@ const dataStore = useDataStore()
 const stateStore = useStateStore()
 const layoutStore = useLayoutStore()
 const pcpStore = usePCPStore()
+const optionsStore = useOptionsStore()
 const {data} = storeToRefs(dataStore)
 
 // Listeners
@@ -89,6 +91,7 @@ function readFile () {
 	stateStore.setLoading('Parsing imported file..')
 	// Reset existing data state (in case another file was previously loaded)
 	scatterStore.resetDataSelection() // TODO: This should ideally be in the state store.
+	optionsStore.resetColorCodeOverride()
 	dataStore.wipeAllData()
 	const reader = new FileReader()
 	reader.readAsText(new Blob([file], {"type": file.type}))	
