@@ -4,6 +4,7 @@
         <PlotConfigForm />
         <SampleInfo />
         <FiltersPanel />
+        <OptionsForm />
         <ColorCodeForm />
         <ExportForm />
     </div>
@@ -16,6 +17,8 @@ import FiltersPanel from '@/components/tools/FiltersPanel'
 import SampleInfo from '@/components/tools/SampleInfo'
 import ColorCodeForm from '@/components/tools/ColorCodeForm'
 import ExportForm from '@/components/tools/ExportForm'
+import OptionsForm from '@/components/tools/OptionsForm'
+
 
 </script>
 

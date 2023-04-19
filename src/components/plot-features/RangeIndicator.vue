@@ -1,9 +1,12 @@
 <template>
-    <g v-if="column">
-        <text class="title">{{column}}</text>
+    <g v-if="column" class="range-indicator">
+        <text 
+        :style="{fontSize: `${optionsStore.titleSize}em`}"
+        class="title">{{column}}</text>
         <g :transform="`translate(0 ${tickMargin})`">
             <text 
             class="tick-ub"
+            :style="{fontSize: `${optionsStore.tickSize}em`}"
             :x="barWidth + tickMargin">
                 {{parseFloat(colorCodeUpperBound).toFixed(4)}}
             </text>
@@ -17,6 +20,7 @@
 
             <text 
             class="text-lb"
+            :style="{fontSize: `${optionsStore.tickSize}em`}"
             :x="barWidth + tickMargin" 
             :y="4*resolution">
                 {{parseFloat(colorCodeLowerBound).toFixed(4)}}
@@ -63,12 +67,14 @@ const spectrumArray = computed(() => {
 
 <style lang="scss" scoped>
 
-text {
-    font-size: 0.9em;
-}
-
 .tick-ub {
     dominant-baseline: hanging;
+}
+
+.range-indicator {
+    text {
+        font-family: monospace;
+    }
 }
 
 </style>

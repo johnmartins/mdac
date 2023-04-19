@@ -54,8 +54,7 @@ optionsStore.includedDataOpacity,
 optionsStore.excludedDataOpacity, 
 optionsStore.curveType,
 optionsStore.selectedColorCodeCategory,
-optionsStore.overrideColorCodeColumn,
-stateStore.selectedCategory)], () => {
+optionsStore.overrideColorCodeColumn)], () => {
 	restartRedrawCountdown()
 })
 
@@ -65,6 +64,7 @@ watch(() => dataStore.enabledCategoriesCount, () => {
 
 function restartRedrawCountdown () {
 	if (PCPStore.renderingType !== 'raster') return
+	if (stateStore.activeView !== 'pcp') return
 
 	let refreshDelay = 250
 

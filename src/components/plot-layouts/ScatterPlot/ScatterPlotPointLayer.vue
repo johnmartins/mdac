@@ -6,10 +6,10 @@
             v-for="(d, index) in data.filter(de => !dataStore.dataPointFilterCheck(de))" :key="index" 
             :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
             :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
-            :fill="getFill(d)"
+            :fill="getFill(d, false)"
             :stroke="getStroke(d)"
             :r="getRadius(d)" 
-            :opacity="getOpacity(d)"
+            :opacity="getOpacity(d, false)"
             @click.self="onClick($event, d)"
             />
         </g>
@@ -20,8 +20,9 @@
             :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
             :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
             :r="getRadius(d)" 
-            :fill="getFill(d)"
+            :fill="getFill(d, true)"
             :stroke="getStroke(d)"
+            :opacity="getOpacity(d, true)"
             @click.self="onClick($event, d)"
             />
         </g>
@@ -140,9 +141,13 @@ function getScaledCoordinate (dataPoint, categoryName, axis) {
     return truncateDecimals(coordinate,2)
 }
 
-function getFill (d) {
+function getFill (d, included) {
     const ID = d[dataStore.idCol]
     if (ID === scatterStore.selectedDataID) return 'white'
+
+    if (!included) {
+        return '#bfbfbf'
+    } 
 
     return optionsStore.getSampleColor(d)
 }
@@ -151,23 +156,27 @@ function getStroke (d) {
     const ID = d[dataStore.idCol]
     if (ID === scatterStore.selectedDataID) return 'black';
 
-    return null
+    return 'transparent'
 }
 
 function getRadius (d) {
     const ID = d[dataStore.idCol]
     if (ID !== scatterStore.selectedDataID) return 5
-    return 7
+    return 6
 }
 
 function getColor (d) {
 	return optionsStore.getSampleColor(d)
 }
 
-function getOpacity (d) {
+function getOpacity (d, included) {
     const ID = d[dataStore.idCol]
-    if (ID !== scatterStore.selectedDataID) return 0.1
-    return 1
+    if (ID === scatterStore.selectedDataID) return 1
+
+    if (!included) {
+        return optionsStore.excludedDataOpacity
+    } 
+    return optionsStore.includedDataOpacity
 }
 
 
