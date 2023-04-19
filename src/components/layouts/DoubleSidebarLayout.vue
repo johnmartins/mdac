@@ -79,8 +79,7 @@ function resizeMenu (evt, side) {
             throw new Error('Unclear layout resize instructions.')
         }
 
-        doubleSidebarLayoutContainer.value.style.gridTemplateColumns = `${leftWidth}px 10px auto 10px ${rightWidth}px`
-
+		adjustLayout()
 
 		// Resize child component
         eventBus.emit('Layout.contentResize')
