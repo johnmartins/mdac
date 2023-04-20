@@ -15,8 +15,9 @@ const eventBus = mitt()
 const app = createApp(App)
 app.provide('eventBus', eventBus)
 app.use(createPinia())
-app.mount('#app')
 app.component("font-awesome-icon", faIcons)
+app.mount('#app')
+
 
 // Handle errors globally. Send via event bus
 app.config.errorHandler = (err, instance, info) => {
