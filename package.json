@@ -10,7 +10,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --mode production",
-    "build-sub": "vue-cli-servuce build --mode sub"
+    "build-sub": "vue-cli-service build --mode sub"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "6.x",
