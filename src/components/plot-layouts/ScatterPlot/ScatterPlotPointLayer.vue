@@ -1,7 +1,7 @@
 <template>
     <!-- Excluded data (through user applied filters) -->
     <g>
-        <g class="scatter-point">
+        <g class="scatter-point" v-if="!optionsStore.hideExcluded">
             <circle 
             v-for="(d, index) in data.filter(de => !dataStore.dataPointFilterCheck(de))" :key="index" 
             :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
