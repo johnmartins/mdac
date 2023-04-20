@@ -79,6 +79,10 @@
 							<!-- Top tick -->
 						</g>
 					</g>
+
+					<g class="scatter-plugin-container" :transform="`translate(${getPlotXBounds()[1] + 20} ${getPlotYBounds()[0]})`">
+						<RangeIndicator />
+					</g>
 				</g>
 			</svg>
 		</div>
@@ -97,6 +101,7 @@ import { saveSvgAsPng } from "save-svg-as-png"
 import PCPlotPathLayerVector from "./PCPlotPathLayerVector"
 import PCPlotPathLayerRaster from "./PCPlotPathLayerRaster"
 import PCPlotFilter from "./PCPlotFilter.vue"
+import RangeIndicator from "@/components/plot-features/RangeIndicator"
 
 // Models
 import SingleRangeFilter from "@/models/filters/SingleRangeFilter"
@@ -123,7 +128,7 @@ const layoutStore = useLayoutStore()
 
 const {data, filterIDMap, filters, categories} = storeToRefs(dataStore)
 const {activeView, selectedCategory} = storeToRefs(stateStore)
-const {horizontalOffset, axisLength, colorScaleCategory, colorScaleFunction, plotXBounds, plotYBounds, pathsDataUrl} = storeToRefs(PCPStore)
+const {horizontalOffset, axisLength, plotXBounds, plotYBounds, pathsDataUrl} = storeToRefs(PCPStore)
 
 // Plotted data
 const dataIncluded = ref([])
@@ -135,7 +140,7 @@ const pcpPlot = ref(null)
 
 const plotParameters = reactive({
 	padding: 100,
-	axisTitlePadding: 150,
+	axisTitlePadding: 200,
 	axisTitleRotation: 45,
 	filterMinDragTime: 125, // ms
 })
@@ -174,10 +179,6 @@ eventBus.on('Router.TabChange', (viewName) => {
 })
 
 // Listeners
-watch((selectedCategory), () => {
-	setColorScale(selectedCategory.value)
-})
-
 watch(() => filterIDMap.value.size, () => {
 	// This is a bit wasteful. Use reduce instead to get both in one loop?
 	dataIncluded.value = data.value.filter(de => dataStore.dataPointFilterCheck(de))
@@ -222,22 +223,6 @@ function getPlotYBounds () {
 function getPlotXBounds () {
 	const array = [plotParameters.padding, plotCanvas.value.getBoundingClientRect().width - plotParameters.padding - plotParameters.axisTitlePadding]
 	return array
-}
-
-function setColorScale (category) {
-	if (!category) {
-		colorScaleCategory.value = null
-		colorScaleFunction.value = () => 'black'
-		return
-	}
-
-	colorScaleCategory.value = category.title
-	if (!category.usesCategoricalData) {
-		colorScaleFunction.value = d3.scaleSequential().domain([category.lb, category.ub]).interpolator(d3.interpolateRgbBasis(["blue", "green", "yellow", "red"]))
-	} else {
-		colorScaleFunction.value = d3.scaleOrdinal().domain(category.availableCategoricalValues).range(d3.schemeCategory10)
-	}
-	
 }
 
 function resetFilterDrag () {

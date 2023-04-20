@@ -56,6 +56,7 @@
 					<template #sidebarB><ScatterSideMenuRight /></template>
 				</DoubleSidebarLayout>
 			</div>
+			<div class="author-banner">&copy; Julian Martinsson Bonde, <a href="https://github.com/johnmartins">https://github.com/johnmartins</a></div>
 		</div>
 
 		<div v-for="popup in popups" :key="popup.id">
@@ -64,6 +65,7 @@
 
 		<CategorySettings />
 		<LoadingModal />
+		
 	</div>
 </template>
 
@@ -186,5 +188,18 @@ onMounted( () => {
 	.content-container {
 		width: 100%;
 		height: calc(100% - $header-height);
+	}
+
+	.author-banner {
+		width: 100%;
+		position: absolute;
+		bottom: 0;
+		color: grey;
+		font-size: 0.8em;
+
+		a {
+			color: grey;
+			text-decoration: none;
+		}
 	}
 </style>

@@ -21,7 +21,8 @@ const optionsStore = useOptionsStore()
 const stateStore = useStateStore()
 
 // Store refs
-const {horizontalOffset, axisLength, colorScaleCategory, colorScaleFunction, plotYBounds, plotXBounds, resolution} = storeToRefs(PCPStore)
+const {selectedColorCodeCategory} = storeToRefs(optionsStore)
+const {horizontalOffset, axisLength, plotYBounds, plotXBounds, resolution} = storeToRefs(PCPStore)
 const {data} = storeToRefs(dataStore)
 
 // Layout references
@@ -52,7 +53,8 @@ watch([() => data.value.filter(dp => !dataStore.dataPointFilterCheck(dp),
 optionsStore.includedDataOpacity, 
 optionsStore.excludedDataOpacity, 
 optionsStore.curveType,
-stateStore.selectedCategory)], () => {
+optionsStore.selectedColorCodeCategory,
+optionsStore.overrideColorCodeColumn)], () => {
 	restartRedrawCountdown()
 })
 
@@ -62,6 +64,7 @@ watch(() => dataStore.enabledCategoriesCount, () => {
 
 function restartRedrawCountdown () {
 	if (PCPStore.renderingType !== 'raster') return
+	if (stateStore.activeView !== 'pcp') return
 
 	let refreshDelay = 250
 
@@ -176,10 +179,8 @@ function lineGenerator(d) {
 		(dataArray)
 }
 
-function getLineColor (dataPoint) {
-	if (!colorScaleCategory.value) return "black"
-	if (dataPoint[colorScaleCategory.value] === null || dataPoint[colorScaleCategory.value] === undefined) return "black"
-	return colorScaleFunction.value(dataPoint[colorScaleCategory.value])
+function getLineColor (d) {
+	return optionsStore.getSampleColor(d)
 }
 
 </script>

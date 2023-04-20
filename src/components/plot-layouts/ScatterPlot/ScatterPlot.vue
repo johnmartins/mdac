@@ -23,6 +23,7 @@
                             <text 
                             :x="(scatterStore.xAxisLength)/2 "
                             :y="-scatterStore.xAxisTitleMargin"
+                            :style="{fontSize: `${optionsStore.titleSize}em`}"
                             >
                             {{selectedPlot.title}}</text>
                         </g>
@@ -57,7 +58,13 @@
 
                             <!-- ticks -->
                             <g class="tick tick-x" v-for="(tick, index) in cx.getTickArray()" :key="index"> <!-- Tick group -->
-                                <text :x="scatterStore.xAxisLength - cx.scaleLinear(tick)*scatterStore.xAxisLength" :y="scatterStore.yAxisLength+ 20" class="tick-string">{{cx.getTickString(tick)}}</text>
+                                <text 
+                                :style="{fontSize: `${optionsStore.tickSize}em`}"
+                                :x="scatterStore.xAxisLength - cx.scaleLinear(tick)*scatterStore.xAxisLength" 
+                                :y="scatterStore.yAxisLength+ 20" 
+                                class="tick-string">
+                                {{cx.getTickString(tick)}}
+                                </text>
                                 <line :x1="cx.scaleLinear(tick)*scatterStore.xAxisLength" :y1="scatterStore.yAxisLength" :x2="cx.scaleLinear(tick)*scatterStore.xAxisLength" :y2="scatterStore.yAxisLength+5"/>	<!-- Top tick -->
                             </g>
                         </g>
@@ -71,6 +78,7 @@
                             <g v-if="checkAxisIsDefined('y')">
                                 <!-- title -->
                                 <text class="scatter-axis-title-y" 
+                                :style="{fontSize: `${optionsStore.titleSize}em`}"
                                 :x="-scatterStore.yAxisTitleMargin" 
                                 :y="scatterStore.yAxisLength/2"
                                 :transform="`rotate(-90 ${-scatterStore.yAxisTitleMargin} ${scatterStore.yAxisLength/2})`"
@@ -80,7 +88,13 @@
 
                                 <!-- ticks -->
                                 <g class="tick tick-y" v-for="(tick, index) in cy.getTickArray()" :key="index"> <!-- Tick group -->
-                                    <text :x="- 7" :y="+ cy.scaleLinear(tick)*scatterStore.yAxisLength" class="tick-string">{{cy.getTickString(tick)}}</text>
+                                    <text 
+                                    :style="{fontSize: `${optionsStore.tickSize}em`}"
+                                    :x="- 7" 
+                                    :y="+ cy.scaleLinear(tick)*scatterStore.yAxisLength" 
+                                    class="tick-string">
+                                    {{cy.getTickString(tick)}}
+                                    </text>
                                     <line x1="0" :y1="cy.scaleLinear(tick)*scatterStore.yAxisLength" x2="-5" :y2="cy.scaleLinear(tick)*scatterStore.yAxisLength"/>	<!-- Top tick -->
                                 </g>
                             </g>
@@ -111,6 +125,7 @@ import { saveSvgAsPng } from "save-svg-as-png"
 import {useStateStore} from "@/store/StateStore"
 import {useDataStore} from "@/store/DataStore"
 import {useScatterStore} from "@/store/ScatterStore"
+import {useOptionsStore} from "@/store/OptionsStore"
 import SingleRangeFilter from "@/models/filters/SingleRangeFilter"
 import {getTrueEventCoordinates} from "@/utils/svg-utils"
 import CategoricFilter from "@/models/filters/CategoricFilter"
@@ -119,10 +134,10 @@ import CategoricFilter from "@/models/filters/CategoricFilter"
 import ScatterPlotPointLayer from "./ScatterPlotPointLayer.vue"
 import RangeIndicator from "@/components/plot-features/RangeIndicator"
 
-
 const dataStore = useDataStore()
 const scatterStore = useScatterStore()
 const stateStore = useStateStore()
+const optionsStore = useOptionsStore()
 
 const {selectedPlot} = storeToRefs(scatterStore)
 const {activeView} = storeToRefs(stateStore)
@@ -181,6 +196,7 @@ function onMouseDown (evt) {
 
 function clearSelections() {
     scatterStore.resetDataSelection()
+    optionsStore.resetColorCodeOverride()
 }
 
 function dragFilterStart (evt) {

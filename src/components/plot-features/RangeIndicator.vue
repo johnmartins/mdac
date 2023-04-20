@@ -1,9 +1,12 @@
 <template>
-    <g v-if="column">
-        <text class="title">{{column}}</text>
+    <g v-if="column" class="range-indicator">
+        <text 
+        :style="{fontSize: `${optionsStore.titleSize}em`}"
+        class="title">{{column}}</text>
         <g :transform="`translate(0 ${tickMargin})`">
             <text 
             class="tick-ub"
+            :style="{fontSize: `${optionsStore.tickSize}em`}"
             :x="barWidth + tickMargin">
                 {{parseFloat(colorCodeUpperBound).toFixed(4)}}
             </text>
@@ -17,6 +20,7 @@
 
             <text 
             class="text-lb"
+            :style="{fontSize: `${optionsStore.tickSize}em`}"
             :x="barWidth + tickMargin" 
             :y="4*resolution">
                 {{parseFloat(colorCodeLowerBound).toFixed(4)}}
@@ -30,11 +34,11 @@ import {computed} from "vue"
 import { storeToRefs } from "pinia"
 
 import {linspace} from "@/utils/data-utils"
-import {useScatterStore} from "../../store/ScatterStore"
+import {useOptionsStore} from "../../store/OptionsStore"
 import {useDataStore} from "../../store/DataStore"
 
-const scatterStore = useScatterStore()
-const {colorCodeUpperBound, colorCodeLowerBound} = storeToRefs(scatterStore)
+const optionsStore = useOptionsStore()
+const {colorCodeUpperBound, colorCodeLowerBound} = storeToRefs(optionsStore)
 const dataStore = useDataStore()
 const {data} = storeToRefs(dataStore)
 
@@ -44,7 +48,7 @@ const barHeight = 4
 const tickMargin = 8
 
 const column = computed(() => {
-    return scatterStore.getActiveColorCodeColumn()
+    return optionsStore.getActiveColorCodeColumn()
 })
 
 const spectrumArray = computed(() => {
@@ -53,7 +57,7 @@ const spectrumArray = computed(() => {
     let linearScale = linspace(colorCodeLowerBound.value, colorCodeUpperBound.value, resolution)
     let colorScale = []
     for (let value of linearScale) {
-        colorScale.push(scatterStore.getSampleColorWithValue(value))
+        colorScale.push(optionsStore.getSampleColorWithValue(value))
     }
     return colorScale
 })
@@ -63,12 +67,14 @@ const spectrumArray = computed(() => {
 
 <style lang="scss" scoped>
 
-text {
-    font-size: 0.9em;
-}
-
 .tick-ub {
     dominant-baseline: hanging;
+}
+
+.range-indicator {
+    text {
+        font-family: monospace;
+    }
 }
 
 </style>
