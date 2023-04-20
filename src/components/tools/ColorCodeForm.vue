@@ -33,7 +33,7 @@ import {useDataStore} from "@/store/DataStore"
 const optionsStore = useOptionsStore()
 const dataStore = useDataStore()
 
-const {selectedColorCodeCategory, useSimilarityColorCoding, overrideColorCodeColumn, overrideColorCodeFunction, colorCodeUpperBound, colorCodeLowerBound} = storeToRefs(optionsStore)
+const {selectedColorCodeCategory, useSimilarityColorCoding} = storeToRefs(optionsStore)
 const {categories} = storeToRefs(dataStore)
 
 function onColorCategoryChange (evt) {

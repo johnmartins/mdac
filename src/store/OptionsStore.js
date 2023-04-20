@@ -67,6 +67,13 @@ export const useOptionsStore = defineStore('options', {
             this.colorCodeUpperBound = this.selectedColorCodeCategory.ub
 
         },
+        resetColorCoding () {
+            this.resetColorCodeOverride()
+            this.selectedColorCodeCategory = null,
+            this.colorCodeLowerBound = null
+            this.colorCodeUpperBound = null
+
+        },
         getActiveColorCodeColumn () {
             if (this.overrideColorCodeColumn) return this.overrideColorCodeColumn
             if (this.selectedColorCodeCategory) return this.selectedColorCodeCategory.title

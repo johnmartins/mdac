@@ -91,7 +91,7 @@ function readFile () {
 	stateStore.setLoading('Parsing imported file..')
 	// Reset existing data state (in case another file was previously loaded)
 	scatterStore.resetDataSelection() // TODO: This should ideally be in the state store.
-	optionsStore.resetColorCodeOverride()
+	optionsStore.resetColorCoding()
 	dataStore.wipeAllData()
 	const reader = new FileReader()
 	reader.readAsText(new Blob([file], {"type": file.type}))	

@@ -186,8 +186,8 @@ function getOpacity (d, included) {
 
     .scatter-point {
         cursor: pointer;
-        fill: white;
-        stroke: black;
+        fill: black;
+        stroke: transparent;
     }
 
 </style>
