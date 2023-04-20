@@ -1,9 +1,9 @@
 <template>
     <div class="card mt-3">
         <div class="control-group p-2">
-            <strong>Graphical options</strong>
+            <div><strong>Graphical options</strong></div>
 
-            <div class="labeled-form mb-2">
+            <div class="labeled-form mb-2" v-if="stateStore.activeView === 'pcp'">
                 <span>Rendering: </span>
                 <select ref="lineFormatSelector" v-model="pcpStore.renderingType">
                     <option value="raster">Rasterized</option>
@@ -11,7 +11,7 @@
                 </select>
             </div>
 
-            <div class="labeled-form mb-2" v-if="pcpStore.renderingType==='raster'">
+            <div class="labeled-form mb-2" v-if="stateStore.activeView === 'pcp' && pcpStore.renderingType==='raster'">
                 <span>Resolution: </span>
                 <select ref="lineFormatSelector" @change="setResolutionManualOverride(true)" v-model="pcpStore.resolution">
                     <option :value="0.3">0.3 - Potato</option>
@@ -24,7 +24,7 @@
                 </select>
             </div>
 
-            <div class="labeled-form mb-2">
+            <div class="labeled-form mb-2" v-if="stateStore.activeView === 'pcp'">
                 <span>Curve type: </span>
                 <select ref="lineFormatSelector" v-model="optionsStore.curveType">
                     <option value="curve">Curve</option>
@@ -60,10 +60,12 @@ import RangeInput from '@/components/inputs/RangeInput.vue'
 // State
 import {useOptionsStore} from "@/store/OptionsStore"
 import {usePCPStore} from "@/store/PCPStore"
+import {useStateStore} from "@/store/StateStore"
 
 // State references
 const optionsStore = useOptionsStore()
 const pcpStore = usePCPStore()
+const stateStore = useStateStore()
 
 function setFilteredDataOpacity (evt) {
     optionsStore.setExcludedDataOpacity(parseFloat(evt.target.value)) 

@@ -6,6 +6,7 @@
         <EditCategoryForm />
         <FiltersPanel />
         <OptionsForm />
+        <ColorCodeForm />
         <ExportForm />
 
     </div>
@@ -19,6 +20,7 @@ import EditCategoryForm from '@/components/tools/EditCategoryForm'
 import FiltersPanel from '@/components/tools/FiltersPanel'
 import SourceForm from '@/components/tools/SourceForm'
 import SampleInfo from '@/components/tools/SampleInfo'
+import ColorCodeForm from '@/components/tools/ColorCodeForm'
 
 </script>
 

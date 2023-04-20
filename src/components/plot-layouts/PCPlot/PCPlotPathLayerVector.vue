@@ -38,7 +38,7 @@ const PCPStore = usePCPStore()
 const optionsStore = useOptionsStore()
 
 // Store refs
-const {horizontalOffset, axisLength, colorScaleCategory, colorScaleFunction, plotYBounds} = storeToRefs(PCPStore)
+const {horizontalOffset, axisLength, plotYBounds} = storeToRefs(PCPStore)
 const {data} = storeToRefs(dataStore)
 
 function lineGenerator(d) {
@@ -80,10 +80,8 @@ function lineGenerator(d) {
 		(dataArray)
 }
 
-function getLineColor (dataPoint) {
-	if (!colorScaleCategory.value) return "black"
-	if (dataPoint[colorScaleCategory.value] === null || dataPoint[colorScaleCategory.value] === undefined) return "black"
-	return colorScaleFunction.value(dataPoint[colorScaleCategory.value])
+function getLineColor (d) {
+	return optionsStore.getSampleColor(d)
 }
 
 </script>
