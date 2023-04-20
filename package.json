@@ -1,7 +1,12 @@
 {
   "name": "md-analysis-cli",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "private": true,
+  "author": {
+    "name": "Julian Martinsson Bonde",
+    "email": "johnmartins1992@gmail.com",
+    "url": "https://github.com/johnmartins"
+  },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --mode production",
