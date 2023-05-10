@@ -10,14 +10,38 @@
                 <table class="table-fixed-header table table-sm table-striped">
                     <thead>
                         <tr>
-                            <th class="header" v-for="c in categories" :key="c.id">
-                                <div class="rotated-header"><span>{{ c.title }}</span></div>
+                            <th class="header" v-for="c in categoriesSorted" :key="c.id">
+                                <div class="rotated-header" :title="c.title"><span>{{ c.title }}</span></div>
+                                <div @click="shiftIO(c)" class="clickable">
+                                    <span v-if="c.io"><span :class="{'text-success': c.io == 'input', 'text-danger': c.io == 'output'}">[{{c.io.toUpperCase()}}]</span></span>
+                                    <span v-else class="text-info">[undef]</span>
+                                </div>
+                                <div class="header-tool-box">
+                                    <div>
+                                        <faicon class="clickable me-1" title="Move left" icon="fa-solid fa-circle-arrow-left" 
+                                        @click="moveCategory(c, -1)" />
+                                    </div>
+                                    <div>
+                                        <faicon class="clickable me-1" :class="{'text-info': sortCategoryID === c.id}" title="Sort" icon="fa-solid fa-sort" @click="sortBy(c)" />
+
+                                        <span v-if="!c.enabled" class="text-danger" @click="toggleDisableEnable(c)">
+                                            <faicon class="clickable me-1" title="Disabled" icon="fa-solid fa-circle-xmark" />
+                                        </span>
+                                        <span v-else class="text-success" @click="toggleDisableEnable(c)">
+                                            <faicon class="clickable me-1" title="Enabled" icon="fa-solid fa-circle-check" />
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <faicon class="clickable me-1" title="Move right" icon="fa-solid fa-circle-arrow-right" 
+                                        @click="moveCategory(c, 1)" />
+                                    </div>
+                                </div>
                             </th>
                         </tr>
                     </thead>
                     <tbody class="table-bordered">
-                        <tr v-for="(d, index) in data.filter(dataStore.dataPointFilterCheck)" :key="index">
-                            <td v-for="c in categories" :key="c.id">
+                        <tr v-for="(d, index) in data.filter(dataStore.dataPointFilterCheck).sort(sortFunction)" :key="index">
+                            <td v-for="c in categoriesSorted" :key="c.id">
                                 {{ d[c.title] }}
                             </td>
                         </tr>
@@ -34,24 +58,87 @@ import { reactive, ref, onMounted, onUpdated } from "vue"
 import { storeToRefs } from "pinia"
 
 import {useDataStore} from "@/store/DataStore"
+import {useStateStore} from "@/store/StateStore"
 
 const dataStore = useDataStore()
-const {data, filters, categories} = storeToRefs(dataStore)
+const stateStore = useStateStore()
+const {data, filters, categoriesSorted} = storeToRefs(dataStore)
+
+// Sorting
+const sortCategoryID = ref(null)
+const sortReversed = ref(false)
+const sortFunction = ref((a,b) => {
+    return a
+})
+
+function shiftIO (category) {
+    if (category.io === 'input') category.io = 'output'
+    else if (category.io === 'output') category.io = null
+    else if (category.io === null) category.io = 'input'
+}
+
+function moveCategory (category, n) {
+    dataStore.moveCategory(category, n)
+}
+
+
+function sortBy (category) {
+    stateStore.setLoading('Sorting data')
+
+    if (sortCategoryID.value) {
+        if (sortCategoryID.value === category.id) {
+            sortReversed.value = !sortReversed.value
+        }
+    }
+    
+    setTimeout(() => {
+        sortFunction.value = (a,b) => {
+            let valA = a[category.title]
+            let valB = b[category.title]
+            if (!category.usesCategoricalData) {
+                valA = parseFloat(valA)
+                valB = parseFloat(valB)
+            }
+            if (valA > valB) return sortReversed.value ? -1 : 1
+            if (valA < valB) return sortReversed.value ? 1 : -1
+            return 0
+        }
+        sortCategoryID.value = category.id
+        stateStore.clearLoading()
+    }, 100)
+
+}
+
+function toggleDisableEnable (category) {
+    category.enabled = !category.enabled
+}
 
 </script>
 
 <style lang="scss" scoped>
     .table-fixed-header {
-        font-size: 0.7em;
+        font-size: 0.8em;
         font-family: monospace;
         overflow: auto;
         border-collapse: separate;
         border-spacing: 0;
+        
+        .header-tool-box {
+            border: 1px solid whitesmoke; 
+            text-align: left;
+            padding: 2px 5px 0px 5px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            font-size: 0.9rem;
+
+            div {
+                text-align: center;
+            }
+        }
 
         .header {
             vertical-align: bottom;
         }
-
         thead tr {
             position: sticky;
             top: 0;
@@ -60,7 +147,7 @@ const {data, filters, categories} = storeToRefs(dataStore)
         }
 
         th {
-            height: 140px;
+            height: 200px;
             white-space: nowrap;
             padding: 0 !important;
             border-bottom: 2px solid black;

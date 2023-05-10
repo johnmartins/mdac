@@ -36,6 +36,13 @@ export const useDataStore = defineStore('data', {
             })
             return enabledCats.length
         },
+        categoriesSorted: (state) => {
+            return state.categories.sort((a, b) => {
+                if (a.position > b.position) return 1
+                if (a.position < b.position) return -1
+                return 0
+            })
+        },
         /**
          * Returns all enabled categories, sorted by position
          * @param {*} state 
@@ -185,6 +192,39 @@ export const useDataStore = defineStore('data', {
                 normalizedArray.push(scaledValue)
             }
             return normalizedArray
+        },
+        /**
+         * 
+         * @param {*} category category to move
+         * @param {*} n negative numbers moves to left, positive to the right
+         */
+        moveCategory (category, n) {
+            if (n === 0) return 
+            if (category.position === 0 && n < 0) {
+                return 
+            }
+            if (category.position === this.categories.length - 1 && n > 0) {
+                return 
+            }  
+
+            const p0 = category.position
+            category.position += n
+            
+            this.categories.forEach((c) => {
+                if (c.id == category.id) return c
+                if (n < 0) {
+                    // Down-shift
+                    if (c.position >= p0 + n && c.position < p0) {
+                        c.position += 1
+                    }
+                } else {
+                    // Up-shift
+                    if (c.position <= p0 + n && c.position > p0) {
+                        c.position -= 1
+                    }
+                }
+                return c
+            })
         }
     },
 })

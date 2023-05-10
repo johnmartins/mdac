@@ -2,7 +2,7 @@
     <div class="modal-mask loading modal-container" v-if="loadingReason">
         <div class="message-container anim-pulse">
             <span>{{loadingReason}}</span><br />
-            <span class="icon"><font-awesome-icon icon="fa-solid fa-spinner" class="anim-rotate-step-8" /></span>
+            <span class="icon"><faicon icon="fa-solid fa-spinner" class="anim-rotate-step-8" /></span>
         </div>
     </div>
 </template>
