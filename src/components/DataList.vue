@@ -124,7 +124,7 @@ function toggleDisableEnable (category) {
         overflow: auto;
         border-collapse: separate;
         border-spacing: 0;
-
+        
         .header-tool-box {
             border: 1px solid whitesmoke; 
             text-align: left;
@@ -141,7 +141,6 @@ function toggleDisableEnable (category) {
         .header {
             vertical-align: bottom;
         }
-
         thead tr {
             position: sticky;
             top: 0;
