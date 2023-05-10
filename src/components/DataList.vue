@@ -12,8 +12,9 @@
                         <tr>
                             <th class="header" v-for="c in categoriesSorted" :key="c.id">
                                 <div class="rotated-header" :title="c.title"><span>{{ c.title }}</span></div>
-                                <div>
-                                    [INPUT]
+                                <div @click="shiftIO(c)" class="clickable">
+                                    <span v-if="c.io"><span :class="{'text-success': c.io == 'input', 'text-danger': c.io == 'output'}">[{{c.io.toUpperCase()}}]</span></span>
+                                    <span v-else class="text-info">[undef]</span>
                                 </div>
                                 <div class="header-tool-box">
                                     <div>
@@ -69,6 +70,13 @@ const sortReversed = ref(false)
 const sortFunction = ref((a,b) => {
     return a
 })
+
+function shiftIO (category) {
+    console.log("Shifting")
+    if (category.io === 'input') category.io = 'output'
+    else if (category.io === 'output') category.io = null
+    else if (category.io === null) category.io = 'input'
+}
 
 function moveCategory (category, n) {
     dataStore.moveCategory(category, n)
