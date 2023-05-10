@@ -72,7 +72,6 @@ const sortFunction = ref((a,b) => {
 })
 
 function shiftIO (category) {
-    console.log("Shifting")
     if (category.io === 'input') category.io = 'output'
     else if (category.io === 'output') category.io = null
     else if (category.io === null) category.io = 'input'
@@ -88,7 +87,6 @@ function sortBy (category) {
 
     if (sortCategoryID.value) {
         if (sortCategoryID.value === category.id) {
-            console.log('yes')
             sortReversed.value = !sortReversed.value
         }
     }
