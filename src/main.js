@@ -15,7 +15,7 @@ const eventBus = mitt()
 const app = createApp(App)
 app.provide('eventBus', eventBus)
 app.use(createPinia())
-app.component("font-awesome-icon", faIcons)
+app.component("faicon", faIcons)
 app.mount('#app')
 
 
