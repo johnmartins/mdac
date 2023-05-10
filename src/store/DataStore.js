@@ -207,11 +207,6 @@ export const useDataStore = defineStore('data', {
                 return 
             }  
 
-            console.log("\n\nbefore:")
-            for (let c of this.categoriesSorted) {
-                console.log(`${c.displayTitle} ${c.position}`)
-            }
-
             const p0 = category.position
             category.position += n
             
@@ -220,23 +215,16 @@ export const useDataStore = defineStore('data', {
                 if (n < 0) {
                     // Down-shift
                     if (c.position >= p0 + n && c.position < p0) {
-                        console.log(`Moving ${c.displayTitle} up`)
                         c.position += 1
                     }
                 } else {
                     // Up-shift
                     if (c.position <= p0 + n && c.position > p0) {
-                        console.log(`Moving ${c.displayTitle} down`)
                         c.position -= 1
                     }
                 }
                 return c
             })
-
-            console.log("\n\nafter:")
-            for (let c of this.categoriesSorted) {
-                console.log(`${c.displayTitle} ${c.position}`)
-            }
         }
     },
 })

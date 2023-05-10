@@ -21,7 +21,8 @@
                                         @click="moveCategory(c, -1)" />
                                     </div>
                                     <div>
-                                        <faicon class="clickable me-1" title="Sort" icon="fa-solid fa-sort" />
+                                        <faicon class="clickable me-1" :class="{'text-info': sortCategoryID === c.id}" title="Sort" icon="fa-solid fa-sort" @click="sortBy(c)" />
+
                                         <span v-if="!c.enabled" class="text-danger" @click="toggleDisableEnable(c)">
                                             <faicon class="clickable me-1" title="Disabled" icon="fa-solid fa-circle-xmark" />
                                         </span>
@@ -38,7 +39,7 @@
                         </tr>
                     </thead>
                     <tbody class="table-bordered">
-                        <tr v-for="(d, index) in data.filter(dataStore.dataPointFilterCheck)" :key="index">
+                        <tr v-for="(d, index) in data.filter(dataStore.dataPointFilterCheck).sort(sortFunction)" :key="index">
                             <td v-for="c in categoriesSorted" :key="c.id">
                                 {{ d[c.title] }}
                             </td>
@@ -56,9 +57,18 @@ import { reactive, ref, onMounted, onUpdated } from "vue"
 import { storeToRefs } from "pinia"
 
 import {useDataStore} from "@/store/DataStore"
+import {useStateStore} from "@/store/StateStore"
 
 const dataStore = useDataStore()
+const stateStore = useStateStore()
 const {data, filters, categoriesSorted} = storeToRefs(dataStore)
+
+// Sorting
+const sortCategoryID = ref(null)
+const sortReversed = ref(false)
+const sortFunction = ref((a,b) => {
+    return a
+})
 
 function moveCategory (category, n) {
     dataStore.moveCategory(category, n)
@@ -66,6 +76,30 @@ function moveCategory (category, n) {
 
 
 function sortBy (category) {
+    stateStore.setLoading('Sorting data')
+
+    if (sortCategoryID.value) {
+        if (sortCategoryID.value === category.id) {
+            console.log('yes')
+            sortReversed.value = !sortReversed.value
+        }
+    }
+    
+    setTimeout(() => {
+        sortFunction.value = (a,b) => {
+            let valA = a[category.title]
+            let valB = b[category.title]
+            if (!category.usesCategoricalData) {
+                valA = parseFloat(valA)
+                valB = parseFloat(valB)
+            }
+            if (valA > valB) return sortReversed.value ? -1 : 1
+            if (valA < valB) return sortReversed.value ? 1 : -1
+            return 0
+        }
+        sortCategoryID.value = category.id
+        stateStore.clearLoading()
+    }, 100)
 
 }
 
