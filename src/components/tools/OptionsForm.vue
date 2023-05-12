@@ -3,7 +3,7 @@
         <div class="control-group p-2">
             <div><strong>Graphical options</strong></div>
 
-            <div class="labeled-form mb-2" v-if="stateStore.activeView === 'pcp'">
+            <div v-if="stateStore.activeView === 'pcp'" class="labeled-form mb-2">
                 <span>Rendering: </span>
                 <select ref="lineFormatSelector" v-model="pcpStore.renderingType">
                     <option value="raster">Rasterized</option>
@@ -11,9 +11,9 @@
                 </select>
             </div>
 
-            <div class="labeled-form mb-2" v-if="stateStore.activeView === 'pcp' && pcpStore.renderingType==='raster'">
+            <div v-if="stateStore.activeView === 'pcp' && pcpStore.renderingType==='raster'" class="labeled-form mb-2">
                 <span>Resolution: </span>
-                <select ref="lineFormatSelector" @change="setResolutionManualOverride(true)" v-model="pcpStore.resolution">
+                <select ref="lineFormatSelector" v-model="pcpStore.resolution" @change="setResolutionManualOverride(true)">
                     <option :value="0.3">0.3 - Potato</option>
                     <option :value="0.5">0.5 - Terrible</option>
                     <option :value="0.8">0.8 - Bad</option>
@@ -24,7 +24,7 @@
                 </select>
             </div>
 
-            <div class="labeled-form mb-2" v-if="stateStore.activeView === 'pcp'">
+            <div v-if="stateStore.activeView === 'pcp'" class="labeled-form mb-2">
                 <span>Curve type: </span>
                 <select ref="lineFormatSelector" v-model="optionsStore.curveType">
                     <option value="curve">Curve</option>
@@ -33,19 +33,19 @@
             </div>
 
             <span class="title">Font size</span>
-            <div class="labeled-form">
+            <div class="labeled-form size-and-opacity-forms">
                 <span>Title size:</span>
-                <input class="me-2" type="number" step="0.1" max="5" min="0" v-model="optionsStore.titleSize"/>
+                <input v-model="optionsStore.titleSize" class="me-2" type="number" step="0.1" max="5" min="0">
                 <span>Tick size:</span>
-                <input type="number" step="0.1" max="5" min="0" v-model="optionsStore.tickSize"/>
+                <input v-model="optionsStore.tickSize" type="number" step="0.1" max="5" min="0">
             </div>
 
             <span class="title">Data opacity</span>
-            <div class="labeled-form">
+            <div class="labeled-form size-and-opacity-forms">
                 <span>Included:</span>
-                <input class="me-2" type="number" step="0.05" max="1" min="0" v-model="optionsStore.includedDataOpacity"/>
+                <input v-model="optionsStore.includedDataOpacity" class="me-2" type="number" step="0.05" max="1" min="0">
                 <span>Excluded:</span>
-                <input type="number" step="0.05" max="1" min="0" @change="setFilteredDataOpacity" :value="optionsStore.excludedDataOpacity"/>
+                <input type="number" step="0.05" max="1" min="0" :value="optionsStore.excludedDataOpacity" @change="setFilteredDataOpacity">
             </div>
         </div>
     </div>
@@ -82,4 +82,12 @@ function setResolutionManualOverride (override) {
         font-size: 0.8em;
         font-weight: bold;
     }
+
+    .labeled-form.size-and-opacity-forms {
+
+        span {
+            min-width: 50px !important;
+        }
+    }
+
 </style>

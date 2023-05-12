@@ -1,7 +1,7 @@
 <template>
-    <div class="modal-mask loading modal-container" v-if="loadingReason">
+    <div v-if="loadingReason" class="modal-mask loading modal-container">
         <div class="message-container anim-pulse">
-            <span>{{loadingReason}}</span><br />
+            <span>{{ loadingReason }}</span><br>
             <span class="icon"><faicon icon="fa-solid fa-spinner" class="anim-rotate-step-8" /></span>
         </div>
     </div>

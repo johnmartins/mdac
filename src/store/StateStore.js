@@ -2,16 +2,16 @@ import { defineStore } from 'pinia'
 
 export const useStateStore = defineStore('state', {
     state: () => ({
-            // Layout
-            activeView: 'pcp',
-            showCategorySettingsWindow: false,
+        // Layout
+        activeView: 'pcp',
+        showCategorySettingsWindow: false,
 
-            // Data
-            selectedCategory: null,
+        // Data
+        selectedCategory: null,
 
-            // Misc
-            loadingReason: null,        // If not null, then something is loading, preventing the user from interacting with the interface.
-        }),
+        // Misc
+        loadingReason: null,        // If not null, then something is loading, preventing the user from interacting with the interface.
+    }),
     getters: {},
     actions: {
         setView(view) {

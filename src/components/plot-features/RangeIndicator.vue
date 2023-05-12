@@ -1,29 +1,36 @@
 <template>
     <g v-if="column" class="range-indicator">
         <text 
-        :style="{fontSize: `${optionsStore.titleSize}em`}"
-        class="title">{{column}}</text>
+            :style="{fontSize: `${optionsStore.titleSize}em`}"
+            class="title"
+        >
+            {{ column }}
+        </text>
         <g :transform="`translate(0 ${tickMargin})`">
             <text 
-            class="tick-ub"
-            :style="{fontSize: `${optionsStore.tickSize}em`}"
-            :x="barWidth + tickMargin">
-                {{parseFloat(colorCodeUpperBound).toFixed(4)}}
+                class="tick-ub"
+                :style="{fontSize: `${optionsStore.tickSize}em`}"
+                :x="barWidth + tickMargin"
+            >
+                {{ parseFloat(colorCodeUpperBound).toFixed(4) }}
             </text>
 
-            <rect v-for="(color, index) in spectrumArray" 
-            :key="index" 
-            :fill="color" 
-            :y="barHeight*resolution - (index+1) * barHeight" 
-            :width="barWidth" 
-            :height="barHeight"/>
+            <rect
+                v-for="(color, index) in spectrumArray" 
+                :key="index" 
+                :fill="color" 
+                :y="barHeight*resolution - (index+1) * barHeight" 
+                :width="barWidth" 
+                :height="barHeight"
+            />
 
             <text 
-            class="text-lb"
-            :style="{fontSize: `${optionsStore.tickSize}em`}"
-            :x="barWidth + tickMargin" 
-            :y="4*resolution">
-                {{parseFloat(colorCodeLowerBound).toFixed(4)}}
+                class="text-lb"
+                :style="{fontSize: `${optionsStore.tickSize}em`}"
+                :x="barWidth + tickMargin" 
+                :y="4*resolution"
+            >
+                {{ parseFloat(colorCodeLowerBound).toFixed(4) }}
             </text>
         </g>
     </g>

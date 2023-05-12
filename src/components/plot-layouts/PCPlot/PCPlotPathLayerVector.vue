@@ -1,8 +1,8 @@
 <template>
-
     <g v-if="PCPStore.renderingType === 'vector'" stroke-width="1" fill="transparent" :transform="`translate(0 ${plotYBounds[0]})`">
         <g v-if="!optionsStore.hideExcluded">
-            <path v-for="(d, index) in data.filter(dp => !dataStore.dataPointFilterCheck(dp))" 
+            <path
+                v-for="(d, index) in data.filter(dp => !dataStore.dataPointFilterCheck(dp))" 
                 :key="index" 
                 stroke="#bfbfbf"
                 :stroke-opacity="optionsStore.excludedDataOpacity"
@@ -10,15 +10,15 @@
             />
         </g>
         
-        <path v-for="(d, index) in data.filter(dp => dataStore.dataPointFilterCheck(dp))" 
+        <path
+            v-for="(d, index) in data.filter(dp => dataStore.dataPointFilterCheck(dp))" 
             :key="index" 
             :excluded="true"
-            :stroke='getLineColor(d)'
+            :stroke="getLineColor(d)"
             :stroke-opacity="optionsStore.includedDataOpacity"
             :d="lineGenerator(d)"
         />
     </g>
-
 </template>
 
 <script setup>
@@ -42,46 +42,46 @@ const {horizontalOffset, axisLength, plotYBounds} = storeToRefs(PCPStore)
 const {data} = storeToRefs(dataStore)
 
 function lineGenerator(d) {
-	let dataCats = Object.keys(d)
-	let dataArray = Array(dataCats.length).fill(null)
+    let dataCats = Object.keys(d)
+    let dataArray = Array(dataCats.length).fill(null)
 
-	for (let i = 0; i < dataCats.length; i++) {		
-		let c = dataStore.getCategoryWithName(dataCats[i])
+    for (let i = 0; i < dataCats.length; i++) {		
+        let c = dataStore.getCategoryWithName(dataCats[i])
 
-		// Ignore disabled categories
-		if (!c || !c.enabled)  {
-			continue
-		}
+        // Ignore disabled categories
+        if (!c || !c.enabled)  {
+            continue
+        }
 
-		// Set data point coordinates
-		const x = truncateDecimals(dataStore.getTrueCategoryPosition(c.title)*horizontalOffset.value, 1)			// This needs to be moved
-		const y = truncateDecimals(c.scaleLinear(d[c.title])*axisLength.value, 1)
+        // Set data point coordinates
+        const x = truncateDecimals(dataStore.getTrueCategoryPosition(c.title)*horizontalOffset.value, 1)			// This needs to be moved
+        const y = truncateDecimals(c.scaleLinear(d[c.title])*axisLength.value, 1)
 
-		// Build data array
-		dataArray[c.position] = {
-			x: x, 
-			y: y
-		}
-	}
+        // Build data array
+        dataArray[c.position] = {
+            x: x, 
+            y: y
+        }
+    }
 
-	dataArray = dataArray.filter((obj) => { return obj != null })
+    dataArray = dataArray.filter((obj) => { return obj != null })
 
-	let d3CurveType = d3.curveMonotoneX
-	if (optionsStore.curveType === 'curve') {
-		d3CurveType = d3.curveMonotoneX
-	} else if (optionsStore.curveType === 'line') {
-		d3CurveType = d3.curveLinear
-	}
+    let d3CurveType = d3.curveMonotoneX
+    if (optionsStore.curveType === 'curve') {
+        d3CurveType = d3.curveMonotoneX
+    } else if (optionsStore.curveType === 'line') {
+        d3CurveType = d3.curveLinear
+    }
 	
-	return d3.line([])
-		.x((de) => {return de.x})
-		.y((de) => {return de.y})
-		.curve(d3CurveType)
-		(dataArray)
+    return d3.line([])
+        .x((de) => {return de.x})
+        .y((de) => {return de.y})
+        .curve(d3CurveType)
+        (dataArray)
 }
 
 function getLineColor (d) {
-	return optionsStore.getSampleColor(d)
+    return optionsStore.getSampleColor(d)
 }
 
 </script>

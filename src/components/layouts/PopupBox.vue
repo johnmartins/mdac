@@ -1,17 +1,17 @@
 <template>
-<div class="modal-mask dark">
-    <div class="popup-box box-shadow" v-if="popup">
-        <div class="popup-content" ref="contentContainer" :style="{height: `${height}px`}">
-            <h1>{{popup.title}}</h1>
-            <div class="popup-body">
-                {{popup.body}}
+    <div class="modal-mask dark">
+        <div v-if="popup" class="popup-box box-shadow">
+            <div ref="contentContainer" class="popup-content" :style="{height: `${height}px`}">
+                <h1>{{ popup.title }}</h1>
+                <div class="popup-body">
+                    {{ popup.body }}
+                </div>
+                <div class="popup-button-array">
+                    <button class="btn btn-sm btn-primary" @click="onClickOK">OK</button>
+                </div>
             </div>
-            <div class="popup-button-array">
-                <button class="btn btn-sm btn-primary" @click="onClickOK">OK</button>
-            </div>
-        </div>
-    </div>  
-</div>
+        </div>  
+    </div>
 </template>
 
 <script setup>

@@ -1,29 +1,29 @@
 <template>
     <!-- Excluded data (through user applied filters) -->
     <g>
-        <g class="scatter-point" v-if="!optionsStore.hideExcluded">
+        <g v-if="!optionsStore.hideExcluded" class="scatter-point">
             <circle 
-            v-for="(d, index) in data.filter(de => !dataStore.dataPointFilterCheck(de))" :key="index" 
-            :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
-            :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
-            :fill="getFill(d, false)"
-            :stroke="getStroke(d)"
-            :r="getRadius(d)" 
-            :opacity="getOpacity(d, false)"
-            @click.self="onClick($event, d)"
+                v-for="(d, index) in data.filter(de => !dataStore.dataPointFilterCheck(de))" :key="index" 
+                :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
+                :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
+                :fill="getFill(d, false)"
+                :stroke="getStroke(d)"
+                :r="getRadius(d)" 
+                :opacity="getOpacity(d, false)"
+                @click.self="onClick($event, d)"
             />
         </g>
         <!-- Included data -->
         <g class="scatter-point">
             <circle 
-            v-for="(d, index) in data.filter(dataStore.dataPointFilterCheck)" :key="index"
-            :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
-            :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
-            :r="getRadius(d)" 
-            :fill="getFill(d, true)"
-            :stroke="getStroke(d)"
-            :opacity="getOpacity(d, true)"
-            @click.self="onClick($event, d)"
+                v-for="(d, index) in data.filter(dataStore.dataPointFilterCheck)" :key="index"
+                :cx="getScaledCoordinate(d, selectedPlot.xAxisCategoryName, 'x')"
+                :cy="getScaledCoordinate(d, selectedPlot.yAxisCategoryName, 'y')" 
+                :r="getRadius(d)" 
+                :fill="getFill(d, true)"
+                :stroke="getStroke(d)"
+                :opacity="getOpacity(d, true)"
+                @click.self="onClick($event, d)"
             />
         </g>
     </g>
@@ -166,7 +166,7 @@ function getRadius (d) {
 }
 
 function getColor (d) {
-	return optionsStore.getSampleColor(d)
+    return optionsStore.getSampleColor(d)
 }
 
 function getOpacity (d, included) {

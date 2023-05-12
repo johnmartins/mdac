@@ -1,72 +1,77 @@
 <template>
-	<div style="height: 100%;" id="app">
-		<div class="mdac-header pt-3 px-3">
-			
-			<div class="title-container">
-				MDAC
-			</div>
+    <div id="app" style="height: 100%;">
+        <div class="mdac-header pt-3 px-3">
+            <div class="title-container">
+                MDAC
+            </div>
 
-			<div class="nav-container">
-				<span class="link" 
-				@click="setView('pcp')" 
-				:class="{active: activeView === 'pcp'}">
-					PCP
-				</span>
+            <div class="nav-container">
+                <span
+                    class="link" 
+                    :class="{active: activeView === 'pcp'}" 
+                    @click="setView('pcp')"
+                >
+                    PCP
+                </span>
 
-				<span class="link" 
-				@click="setView('scatter')" 
-				:class="{active: activeView === 'scatter'}">
-					Scatter
-				</span>
-				<span class="link" 
-				@click="setView('data')" 
-				:class="{active: activeView === 'data'}">
-					Data
-				</span>
-				<span class="link" 
-				v-if="categories.length > 0"
-				@click="showCategorySettingsWindow=true" 
-				:class="{active: showCategorySettingsWindow === true}">
-					Data settings
-				</span>
+                <span
+                    class="link" 
+                    :class="{active: activeView === 'scatter'}" 
+                    @click="setView('scatter')"
+                >
+                    Scatter
+                </span>
+                <span
+                    class="link" 
+                    :class="{active: activeView === 'data'}" 
+                    @click="setView('data')"
+                >
+                    Data
+                </span>
+                <span
+                    v-if="categories.length > 0" 
+                    class="link"
+                    :class="{active: showCategorySettingsWindow === true}" 
+                    @click="showCategorySettingsWindow=true"
+                >
+                    Data settings
+                </span>
+            </div>
 
-			</div>
+            <div class="version-container">
+                Version {{ appVersion }}
+            </div>
+        </div>
+        <div class="content-container">
+            <div ref="pcpContainer" class="fill-content">
+                <SidebarLayout>
+                    <template #sidebar><PCPSideMenu /></template>
+                    <PCPlot ref="plot" />
+                </SidebarLayout>
+            </div>
+            <div ref="dataContainer" class="fill-content" style="display: none;">
+                <BoxLayout>
+                    <DataList />
+                </BoxLayout>
+            </div>
+            <div ref="scatterContainer" class="fill-content" style="display: none;">
+                <DoubleSidebarLayout>
+                    <template #sidebarA><ScatterSideMenu /></template>
+                    <ScatterPlot />
+                    <template #sidebarB><ScatterSideMenuRight /></template>
+                </DoubleSidebarLayout>
+            </div>
+        </div>
 
-			<div class="version-container">
-				Version {{appVersion}}
-			</div>
+        <div class="author-banner">&copy; Julian Martinsson Bonde, <a href="https://github.com/johnmartins">https://github.com/johnmartins</a></div>
 
-		</div>
-		<div class="content-container">
-			<div ref="pcpContainer" class="fill-content">
-				<SidebarLayout>
-					<template #sidebar><PCPSideMenu /></template>
-					<PCPlot ref="plot"/>
-				</SidebarLayout>
-			</div>
-			<div  ref="dataContainer" class="fill-content" style="display: none;">
-				<BoxLayout>
-					<DataList/>
-				</BoxLayout>
-			</div>
-			<div ref="scatterContainer" class="fill-content" style="display: none;">
-				<DoubleSidebarLayout>
-					<template #sidebarA><ScatterSideMenu /></template>
-					<ScatterPlot/>
-					<template #sidebarB><ScatterSideMenuRight /></template>
-				</DoubleSidebarLayout>
-			</div>
-		</div>
+        <div v-for="popup in popups" :key="popup.id">
+            <PopupBox :popup-i-d="popup.id" />
+        </div>
 
-		<div class="author-banner">&copy; Julian Martinsson Bonde, <a href="https://github.com/johnmartins">https://github.com/johnmartins</a></div>
-
-		<div v-for="popup in popups" :key="popup.id">
-			<PopupBox :popupID="popup.id" />
-		</div>
-
-		<CategorySettings />
-		<LoadingModal />
-	</div>
+        <CategorySettings />
+        <LoadingModal />
+    </div>
 </template>
 
 <script setup>
@@ -110,37 +115,37 @@ const appVersion = ref(process.env.VUE_APP_VERSION)
 const eventBus = inject('eventBus')
 
 eventBus.on('main.error', (err) => {
-	const errorPopup = new Popup('error', 'Unhandled exception', err.message)
-	layoutStore.queuePopup(errorPopup)
+    const errorPopup = new Popup('error', 'Unhandled exception', err.message)
+    layoutStore.queuePopup(errorPopup)
 })
 
 function setView (viewName) {
-	pcpContainer.value.style.display="none"
-	scatterContainer.value.style.display="none"
-	dataContainer.value.style.display="none"
-	switch(viewName) {
-		case "pcp":
-			pcpContainer.value.style.display="block"
-			break
-		case "scatter":
-			scatterContainer.value.style.display="block"
-			break
-		case "data":
-			dataContainer.value.style.display="block"
-			break
-		default:
-			throw new Error('No such view')
-			return
-	}
-	stateStore.setView(viewName)
-	eventBus.emit('Router.TabChange', viewName)
+    pcpContainer.value.style.display="none"
+    scatterContainer.value.style.display="none"
+    dataContainer.value.style.display="none"
+    switch(viewName) {
+    case "pcp":
+        pcpContainer.value.style.display="block"
+        break
+    case "scatter":
+        scatterContainer.value.style.display="block"
+        break
+    case "data":
+        dataContainer.value.style.display="block"
+        break
+    default:
+        throw new Error('No such view')
+        return
+    }
+    stateStore.setView(viewName)
+    eventBus.emit('Router.TabChange', viewName)
 }
 
 onMounted( () => {
-	// Add listener for resize
-	window.onresize = () => {
-		eventBus.emit('Layout.contentResize')
-	}
+    // Add listener for resize
+    window.onresize = () => {
+        eventBus.emit('Layout.contentResize')
+    }
 })
 
 </script>

@@ -3,17 +3,16 @@
         <strong>Data info</strong>
         <div class="information-box">                
             <span class="title">Samples: </span>
-            <span class="value">{{data.length}}</span>
+            <span class="value">{{ data.length }}</span>
         </div>
         <div class="information-box">                
             <span class="title">Visible samples: </span>
-            <span class="value">{{data.filter(dataStore.dataPointFilterCheck).length}}</span>
+            <span class="value">{{ data.filter(dataStore.dataPointFilterCheck).length }}</span>
         </div>
         <div class="information-box">                
             <span class="title">Filtered samples: </span>
-            <span class="value">{{data.length - data.filter(dataStore.dataPointFilterCheck).length}}</span>
+            <span class="value">{{ data.length - data.filter(dataStore.dataPointFilterCheck).length }}</span>
         </div>
-
     </div>
 </template>
 

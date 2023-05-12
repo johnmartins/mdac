@@ -3,13 +3,13 @@ import Category from "@/models/plots/Category"
 
 export const useDataStore = defineStore('data', {
     state: () => ({
-            data: [],
-            categories: [],
-            categoryNameMap: new Map(),
-            filters: {},         // "ColumnID" -> [filterA, filterB, ..]
-            filterIDMap: new Map(),
-            idCol: '$ID$',
-        }),
+        data: [],
+        categories: [],
+        categoryNameMap: new Map(),
+        filters: {},         // "ColumnID" -> [filterA, filterB, ..]
+        filterIDMap: new Map(),
+        idCol: '$ID$',
+    }),
     getters: {
         inputColumns: (state) => {
             let icols = []

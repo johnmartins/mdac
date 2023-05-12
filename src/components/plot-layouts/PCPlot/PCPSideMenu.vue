@@ -1,14 +1,13 @@
 <template>
     <div class="container side-menu-container">
-
         <SourceForm />
         <SampleInfo />
         <EditCategoryForm />
         <FiltersPanel />
         <OptionsForm />
         <ColorCodeForm />
+        <SimilarityAnalysisPanel />
         <ExportForm />
-
     </div>
 </template>
 
@@ -21,6 +20,7 @@ import FiltersPanel from '@/components/tools/FiltersPanel'
 import SourceForm from '@/components/tools/SourceForm'
 import SampleInfo from '@/components/tools/SampleInfo'
 import ColorCodeForm from '@/components/tools/ColorCodeForm'
+import SimilarityAnalysisPanel from '@/components/tools/analysis/SimilarityAnalysisPanel'
 
 </script>
 

@@ -1,30 +1,30 @@
 <template>
-    <div class="card mt-3" v-if="selectedDataPoint">
+    <div v-if="selectedDataPoint" class="card mt-3">
         <div class="control-group p-2">
             <strong>Data comparison</strong>
 
             <div class="font-monospace">
                 <div v-if="selectionSimilarity >= 0" style="font-size: 0.9em">
-                    <span>Similarity to selection: <strong>{{parseFloat(selectionSimilarity).toFixed(3)}}</strong></span>
+                    <span>Similarity to selection: <strong>{{ parseFloat(selectionSimilarity).toFixed(3) }}</strong></span>
                 </div>
                 
-                <div class="element-container" v-if="selectedSecondaryDataPoint">
+                <div v-if="selectedSecondaryDataPoint" class="element-container">
                     <div class="grid-header">Variable</div>
-                    <div class="grid-header"></div>
+                    <div class="grid-header" />
                     <div class="grid-header">Value</div>
                     <div class="grid-header">Delta</div>
 
-                    <DataPointComparisonElement v-for="c in categories" 
-                    :key="c.id" 
-                    :category="c" 
-                    :value="selectedSecondaryDataPoint[c.title]"
-                    :valueToCompareWith="selectedDataPoint[c.title]"
+                    <DataPointComparisonElement
+                        v-for="c in categories" 
+                        :key="c.id" 
+                        :category="c" 
+                        :value="selectedSecondaryDataPoint[c.title]"
+                        :value-to-compare-with="selectedDataPoint[c.title]"
                     />
                 </div>
                 
                 <div v-else>No sample selected. Click on a data point <strong>while holding the CTRL-key</strong> to select it.</div>
             </div>
-        
         </div>
     </div>
 </template>

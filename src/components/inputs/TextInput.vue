@@ -1,23 +1,22 @@
 <template>
     <div class="input-group input-group-sm mb-1">
         <div class="input-group-prepend">
-            <span class="input-group-text" id="inputGroup-sizing-sm"><slot></slot></span>
+            <span id="inputGroup-sizing-sm" class="input-group-text"><slot /></span>
         </div>
         <input 
-        type="text" 
-        class="form-control" 
-        aria-label="Small" 
-        aria-describedby="inputGroup-sizing-sm" 
-        :value="modelValue"
-        @input="$emit('update:modelValue', $event.target.value)"
+            type="text" 
+            class="form-control" 
+            aria-label="Small" 
+            aria-describedby="inputGroup-sizing-sm" 
+            :value="modelValue"
+            @input="$emit('update:modelValue', $event.target.value)"
         >
     </div>
-  
 </template>
 
 <script setup>
-    defineProps(['modelValue'])
-    defineEmits(['update:modelValue'])
+defineProps(['modelValue'])
+defineEmits(['update:modelValue'])
 
 </script>
 

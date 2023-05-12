@@ -10,16 +10,18 @@
                 <table class="table-fixed-header table table-sm table-striped">
                     <thead>
                         <tr>
-                            <th class="header" v-for="c in categoriesSorted" :key="c.id">
+                            <th v-for="c in categoriesSorted" :key="c.id" class="header">
                                 <div class="rotated-header" :title="c.title"><span>{{ c.title }}</span></div>
-                                <div @click="shiftIO(c)" class="clickable">
-                                    <span v-if="c.io"><span :class="{'text-success': c.io == 'input', 'text-danger': c.io == 'output'}">[{{c.io.toUpperCase()}}]</span></span>
+                                <div class="clickable" @click="shiftIO(c)">
+                                    <span v-if="c.io"><span :class="{'text-success': c.io == 'input', 'text-danger': c.io == 'output'}">[{{ c.io.toUpperCase() }}]</span></span>
                                     <span v-else class="text-info">[undef]</span>
                                 </div>
                                 <div class="header-tool-box">
                                     <div>
-                                        <faicon class="clickable me-1" title="Move left" icon="fa-solid fa-circle-arrow-left" 
-                                        @click="moveCategory(c, -1)" />
+                                        <faicon
+                                            class="clickable me-1" title="Move left" icon="fa-solid fa-circle-arrow-left" 
+                                            @click="moveCategory(c, -1)"
+                                        />
                                     </div>
                                     <div>
                                         <faicon class="clickable me-1" :class="{'text-info': sortCategoryID === c.id}" title="Sort" icon="fa-solid fa-sort" @click="sortBy(c)" />
@@ -32,8 +34,10 @@
                                         </span>
                                     </div>
                                     <div>
-                                        <faicon class="clickable me-1" title="Move right" icon="fa-solid fa-circle-arrow-right" 
-                                        @click="moveCategory(c, 1)" />
+                                        <faicon
+                                            class="clickable me-1" title="Move right" icon="fa-solid fa-circle-arrow-right" 
+                                            @click="moveCategory(c, 1)"
+                                        />
                                     </div>
                                 </div>
                             </th>

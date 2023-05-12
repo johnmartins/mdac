@@ -1,42 +1,44 @@
 <template>
-<div class="title"><slot></slot></div>
+    <div class="title"><slot /></div>
     <div class="range-input-container">
         <div>
             <input 
-            type="range" 
-            class="form-range" 
-            id="customRange1" 
-            min="0"
-            max="1"
-            ref="rangeInput"
-            step="0.01"
-            :value="props.value" 
-            @change="onChange"/>
+                id="customRange1" 
+                ref="rangeInput" 
+                type="range" 
+                class="form-range"
+                min="0"
+                max="1"
+                step="0.01"
+                :value="props.value" 
+                @change="onChange"
+            >
         </div>
         <div>
             <input 
-            type="number" 
-            step="0.01" 
-            :value="props.value"
-            ref="numberInput" disabled>
+                ref="numberInput" 
+                type="number" 
+                step="0.01"
+                :value="props.value" disabled
+            >
         </div>
     </div>
 </template>
 
 <script setup>
-    import { reactive, ref, onMounted, onUpdated, inject } from "vue"
+import { reactive, ref, onMounted, onUpdated, inject } from "vue"
 
-    const props = defineProps({
-        value: Number
-    })
-    const emit = defineEmits(['change'])
+const props = defineProps({
+    value: Number
+})
+const emit = defineEmits(['change'])
 
-    const numberInput = ref(null)
+const numberInput = ref(null)
 
-    function onChange (evt) {
-        numberInput.value.value = evt.target.value
-        emit('change', parseFloat(evt.target.value))
-    }
+function onChange (evt) {
+    numberInput.value.value = evt.target.value
+    emit('change', parseFloat(evt.target.value))
+}
 
 </script>
 
