@@ -27,7 +27,7 @@
                 </select>
             </div>
             <div class="d-grid">
-                <button class="btn btn-sm btn-primary" :disabled="!similarityAnalysisAvailable" @click="calculateIntersimilarity">
+                <button class="btn btn-sm btn-primary" :disabled="!similarityAnalysisAvailable" @click="requestIntersimCalc">
                     Calculate inter-similarity
                 </button>
             </div>
@@ -37,11 +37,16 @@
 <script setup>
 
 import Category from "@/models/plots/Category"
-import { euclideanDistance } from "@/sadse/similarity"
+import WorkerMessage from "@/models/WorkerMessage"
+import { calculateIntersimilarity } from "@/sadse/similarity"
+import { useStateStore } from "@/store/StateStore"
 import { storeToRefs } from "pinia"
 import { computed, ref } from "vue"
 import { useDataStore } from "../../../store/DataStore"
 
+const analysisWorker = new Worker('analysis.js')
+
+const stateStore = useStateStore()
 const dataStore = useDataStore()
 const { categories } = storeToRefs(dataStore)
 
@@ -66,64 +71,22 @@ function filterCategoricalColumns (c) {
     return false
 }
 
-function calculateIntersimilarity () {
-    let cols = []
-    if (ioType.value === 'input') {
-        cols = dataStore.inputColumns
-    } else if (ioType.value === 'output') {
-        cols = dataStore.outputColumns
-    } else {
-        throw new Error('Unsupported analysis configuration.')
-    }
-
-    const normalized = true
-    const intersimCol = '$intersim$'
+async function requestIntersimCalc () {
     const fidelityColumnTitle = fidelityColumn.value.title
     const targetColValue = fidelityValue.value
+    const ioSelection = ioType.value
 
-    const lofiData = dataStore.data.filter(d => d[fidelityColumnTitle] !== targetColValue)
-    const hifiData = dataStore.data.filter(d => d[fidelityColumnTitle] === targetColValue)
+    analysisWorker.postMessage(new WorkerMessage('channel name here', 'payload message or object or whatever really.'))
 
-    // Add an $inter-similarity$ category
-    const intersimCategory = new Category(intersimCol, 0, 1, {
-        usesCategoricalData: false,
-    })
-    dataStore.addCategory(intersimCategory)
-
-    let maxIntersim = 0
-
-    for (let dlf of lofiData) {
-        // Lofi data loop
-
-        // Get identifier
-        const vlf = dataStore.getArrayFromDataPoint(dlf, cols, {normalize: normalized})
-
-        let closestSimilarityValue = null
-
-        for (let dhf of hifiData) {
-            // Hifi data loop
-            const vhf = dataStore.getArrayFromDataPoint(dhf, cols, {normalize: normalized}) // TODO: We only really need to do this once for each data doint. This should be outside the loops.
-
-            // Calculate similarity
-            const s = euclideanDistance(vlf, vhf, normalized)
-
-            // Store nearest similarity value
-            if (!closestSimilarityValue) {
-                closestSimilarityValue = s
-            } else if (closestSimilarityValue > s) {
-                closestSimilarityValue = s
-            }
-
-            dhf[intersimCol] = 0
-        }
-
-        dlf[intersimCol] = closestSimilarityValue
-        if (closestSimilarityValue > maxIntersim) maxIntersim = closestSimilarityValue
+    stateStore.setLoading('Running similarity analysis')
+    try {
+        // Use a worker for this shit
+        await calculateIntersimilarity(fidelityColumnTitle, targetColValue, ioSelection)
+    } catch (err) {
+        throw err
+    } finally {
+        stateStore.clearLoading()
     }
-
-    intersimCategory.lb = 0
-    intersimCategory.ub = maxIntersim
-    intersimCategory.displayTitle = 'INTER-SIMILARITY'
 }
 
 
