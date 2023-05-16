@@ -20,10 +20,14 @@ async function calculateIntersimilarity (fidelityColumnTitle, targetColValue, io
     const hifiData = dataStore.data.filter(d => d[fidelityColumnTitle] === targetColValue)
 
     // Add an $inter-similarity$ category
-    const intersimCategory = new Category(intersimCol, 0, 1, {
-        usesCategoricalData: false,
-    })
-    dataStore.addCategory(intersimCategory)
+    let intersimCategory = dataStore.getCategoryWithName(intersimCol)
+    if (!intersimCategory) {
+        intersimCategory = new Category(intersimCol, 0, 1, {
+            usesCategoricalData: false,
+            undefinedIO: true
+        })
+        dataStore.addCategory(intersimCategory)
+    }
 
     let maxIntersim = 0
 

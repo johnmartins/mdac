@@ -11,7 +11,7 @@
                     <thead>
                         <tr>
                             <th v-for="c in categoriesSorted" :key="c.id" class="header">
-                                <div class="rotated-header" :title="c.title"><span>{{ c.title }}</span></div>
+                                <div class="rotated-header" :title="c.displayTitle"><span>{{ c.displayTitle }}</span></div>
                                 <div class="clickable" @click="shiftIO(c)">
                                     <span v-if="c.io"><span :class="{'text-success': c.io == 'input', 'text-danger': c.io == 'output'}">[{{ c.io.toUpperCase() }}]</span></span>
                                     <span v-else class="text-info">[undef]</span>

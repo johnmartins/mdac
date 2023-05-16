@@ -4,7 +4,7 @@
             :style="{fontSize: `${optionsStore.titleSize}em`}"
             class="title"
         >
-            {{ column }}
+            {{ column.displayTitle }}
         </text>
         <g :transform="`translate(0 ${tickMargin})`">
             <text 

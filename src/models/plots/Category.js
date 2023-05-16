@@ -13,7 +13,7 @@ class Category {
         position=Category.lookupTable.size, 
         usesCategoricalData=false,
         availableCategoricalValues=[],
-        
+        undefinedIO=false
     } = {}) { 
 
         // Validate input
@@ -32,7 +32,14 @@ class Category {
         this.magnitude = Math.abs(this.ub) > 0  ? Math.floor(Math.log10(this.ub)) : 0
         this.id = Category.count
         this.enabled = true
-        this.io = usesCategoricalData ? null : 'input' // Input or output column. Can be 'input', 'output', or null.
+
+        // Set IO type
+        if (undefinedIO === true) {
+            this.io = null
+        } else {
+            // Input or output column. Can be 'input', 'output', or null.
+            this.io = usesCategoricalData ? null : 'input' 
+        }
 
         // Categorical data variables
         this.usesCategoricalData = usesCategoricalData
