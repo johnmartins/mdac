@@ -74,11 +74,14 @@ export const useOptionsStore = defineStore('options', {
             this.colorCodeUpperBound = null
 
         },
-        getActiveColorCodeColumn () {
+        getActiveColorCodeColumnTitle () {
             if (this.overrideColorCodeColumn) return this.overrideColorCodeColumn
             if (this.selectedColorCodeCategory) return this.selectedColorCodeCategory.title
             return null
         },
-    
+        getActiveColorCodeColumn () {
+            if (this.overrideColorCodeColumn) return this.overrideColorCodeColumn
+            if (this.selectedColorCodeCategory) return this.selectedColorCodeCategory
+        }
     },
 })

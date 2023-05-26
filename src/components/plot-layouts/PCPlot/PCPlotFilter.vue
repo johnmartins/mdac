@@ -1,24 +1,24 @@
 <template>
     <g>
         <rect 
-        class="filter-box"
-        :y="y" 
-        :height="height" />
-
-        <rect 
-        class="filter-pull-box"
-        :y="y - capHeight"
-        :height="capHeight"
-        @mousedown.prevent="moveFilterTop"
+            class="filter-box"
+            :y="y" 
+            :height="height"
         />
 
         <rect 
-        class="filter-pull-box"
-        :y="y + height"
-        :height="capHeight"
-        @mousedown.prevent="moveFilterBot"
+            class="filter-pull-box"
+            :y="y - capHeight"
+            :height="capHeight"
+            @mousedown.prevent="moveFilterTop"
         />
 
+        <rect 
+            class="filter-pull-box"
+            :y="y + height"
+            :height="capHeight"
+            @mousedown.prevent="moveFilterBot"
+        />
     </g>
 </template>
 

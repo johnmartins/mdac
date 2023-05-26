@@ -5,7 +5,7 @@
             
             <div v-if="Object.keys(filters).length > 0">
                 <div v-for="(filterKey, index) in Object.keys(filters)" :key="index">
-                    <FilterElement v-for="filter in filters[filterKey]" :key="filter.id" :filterID="filter.id"/>
+                    <FilterElement v-for="filter in filters[filterKey]" :key="filter.id" :filter-i-d="filter.id" />
                 </div>
             </div>
             <div v-else>

@@ -6,14 +6,13 @@
                 <span>Plot:</span>
                 <select ref="plotSelector" v-model="selectedPlotID" @change="changePlot">
                     <option :value="null">None</option>
-                    <option v-for="plot in plots" :value="plot.id" :key="plot.id"> {{plot.title}}</option>
+                    <option v-for="plot in plots" :key="plot.id" :value="plot.id"> {{ plot.title }}</option>
                 </select>
             </div>
             <div class="d-grid mt-2">
                 <button class="btn d-block btn-sm btn-success" @click="newPlot">Create new plot</button>
             </div>
         </div>
-        
     </div>
 </template>
 

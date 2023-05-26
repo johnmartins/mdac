@@ -1,15 +1,13 @@
 <template>
-    <div class="sidebar-grid" ref="sidebarLayoutContainer">
-		<div class="side-menu-container" :hidden="hideMenu">
-        	<slot name="sidebar"></slot>
-		</div>
+    <div ref="sidebarLayoutContainer" class="sidebar-grid">
+        <div class="side-menu-container" :hidden="hideMenu">
+            <slot name="sidebar" />
+        </div>
 
         <div class="resize-border-v left" @mousedown="resizeMenu">
-
-			<button @click="toggleMenu" class="btn-toggle-menu"><span v-if="!hideMenu">&lt;</span><span v-else>&gt;</span></button>
-
-		</div>
-        <slot></slot>
+            <button class="btn-toggle-menu" @click="toggleMenu"><span v-if="!hideMenu">&lt;</span><span v-else>&gt;</span></button>
+        </div>
+        <slot />
     </div>
 </template>
 
@@ -25,39 +23,39 @@ let hideMenu = ref(false)
 let menuWidth = 290
 
 function toggleMenu () {
-	hideMenu.value = !hideMenu.value
-	if (hideMenu.value) {
-		sidebarLayoutContainer.value.style.gridTemplateColumns = `10px auto`
-	} else {
-		sidebarLayoutContainer.value.style.gridTemplateColumns = `${menuWidth}px 10px auto`
-	}
+    hideMenu.value = !hideMenu.value
+    if (hideMenu.value) {
+        sidebarLayoutContainer.value.style.gridTemplateColumns = `10px auto`
+    } else {
+        sidebarLayoutContainer.value.style.gridTemplateColumns = `${menuWidth}px 10px auto`
+    }
 
-	// Doing this immediately does not work. There needs to be a slight delay.
-	setTimeout(() => {eventBus.emit('Layout.contentResize')}, 250)
+    // Doing this immediately does not work. There needs to be a slight delay.
+    setTimeout(() => {eventBus.emit('Layout.contentResize')}, 250)
 }
 
 function resizeMenu () {
-	// Don't attempt resize if menu is hidden.
-	if (hideMenu.value) return
+    // Don't attempt resize if menu is hidden.
+    if (hideMenu.value) return
 
-	resizing = true
+    resizing = true
 
-	document.body.onmouseup = () => {
-		resizing = false
-		document.body.onmousemove = null
-	}
+    document.body.onmouseup = () => {
+        resizing = false
+        document.body.onmousemove = null
+    }
 
-	document.body.onmousemove = (evt) => {
-		const minWidth = 220 // px
-		if (!resizing) return
-		let mouseX = evt.clientX
-		if (mouseX < minWidth) mouseX = minWidth
-		sidebarLayoutContainer.value.style.gridTemplateColumns = `${mouseX}px 10px auto`
-		menuWidth = mouseX
+    document.body.onmousemove = (evt) => {
+        const minWidth = 220 // px
+        if (!resizing) return
+        let mouseX = evt.clientX
+        if (mouseX < minWidth) mouseX = minWidth
+        sidebarLayoutContainer.value.style.gridTemplateColumns = `${mouseX}px 10px auto`
+        menuWidth = mouseX
 
-		// Resize child component
+        // Resize child component
         eventBus.emit('Layout.contentResize')
-	}
+    }
 }
 
 </script>

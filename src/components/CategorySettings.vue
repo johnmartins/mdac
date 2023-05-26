@@ -1,5 +1,5 @@
 <template>
-    <div class="modal-mask dark" v-if="categories.length > 0 && showCategorySettingsWindow">
+    <div v-if="categories.length > 0 && showCategorySettingsWindow" class="modal-mask dark">
         <div class="window box-shadow">
             <div class="window-header">
                 <strong>Category settings</strong>
@@ -7,7 +7,6 @@
             
             <div>
                 <div class="list-container">
-                        
                     <div class="c-element header">
                         <div>Column name</div>
                         <div>Data type</div>
@@ -18,10 +17,10 @@
                 
                     <div v-for="c in categories.sort(positionSort)" :key="c.id" class="c-element">
                         <div>
-                            {{c.displayTitle}}
+                            {{ c.displayTitle }}
                         </div>
                         <div>
-                            {{c.usesCategoricalData ? "Categorical" : "Numeric"}}
+                            {{ c.usesCategoricalData ? "Categorical" : "Numeric" }}
                         </div>
                         <div>
                             <select ref="formatSelector" v-model="c.io" :disabled="c.usesCategoricalData">
@@ -31,18 +30,19 @@
                             </select>
                         </div>
                         <div>
-                            <input class="form-check-input" type="checkbox" v-model="c.enabled">
+                            <input v-model="c.enabled" class="form-check-input" type="checkbox">
                         </div>
                     </div>
                 </div>
                 
                 <div class="button-row mt-2">
-                    <button class="btn btn-sm btn-primary close-button" 
-                    @click="showCategorySettingsWindow=false">
+                    <button
+                        class="btn btn-sm btn-primary close-button" 
+                        @click="showCategorySettingsWindow=false"
+                    >
                         Close
                     </button>
                 </div>
-
             </div>
         </div>
     </div>

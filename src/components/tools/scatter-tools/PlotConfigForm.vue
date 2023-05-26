@@ -1,23 +1,23 @@
 <template>
-    <div class="card mt-3" v-if="selectedPlot">
+    <div v-if="selectedPlot" class="card mt-3">
         <div class="control-group p-2">
             <strong>Plot configuration</strong>
             <div class="labeled-form">                
                 <span>Title:</span>
-                <input type="text" ref="yAxisSelector" v-model="selectedPlot.title" @change="onTitleChange">
+                <input ref="yAxisSelector" v-model="selectedPlot.title" type="text" @change="onTitleChange">
             </div>
             <div class="labeled-form mt-1">                
                 <span>X-axis:</span>
                 <select ref="xAxisSelector" v-model="selectedPlot.xAxisCategoryName" @change="onAxisChange">
                     <option :value="null" selected>None</option>
-                    <option v-for="category in categories" :value="category.title" :key="category.id"> {{category.displayTitle}}</option>
+                    <option v-for="category in categories" :key="category.id" :value="category.title"> {{ category.displayTitle }}</option>
                 </select>
             </div>
             <div class="labeled-form mt-1">                
                 <span>Y-axis:</span>
                 <select ref="yAxisSelector" v-model="selectedPlot.yAxisCategoryName" @change="onAxisChange">
                     <option :value="null" selected>None</option>
-                    <option v-for="category in categories" :value="category.title" :key="category.id"> {{category.displayTitle}}</option>
+                    <option v-for="category in categories" :key="category.id" :value="category.title"> {{ category.displayTitle }}</option>
                 </select>
             </div>
         </div>

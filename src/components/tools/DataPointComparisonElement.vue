@@ -1,15 +1,15 @@
 <template>
-    <div class="text-truncate">{{props.category.displayTitle}}</div>
+    <div class="text-truncate">{{ props.category.displayTitle }}</div>
     <div>=</div>
     <div class="text-truncate">
-        <span v-if="props.category.usesCategoricalData">{{props.value}}</span>
-        <span v-else>{{props.category.getFormattedNumericValue(props.value)}}</span>
+        <span v-if="props.category.usesCategoricalData">{{ props.value }}</span>
+        <span v-else>{{ props.category.getFormattedNumericValue(props.value) }}</span>
     </div>
     <div class="text-truncate">
         <strong>
-            <span v-if="props.category.usesCategoricalData">{{props.valueToCompareWith}}</span>
+            <span v-if="props.category.usesCategoricalData">{{ props.valueToCompareWith }}</span>
             <span v-else :class="{'negative': delta < 0, 'positive': delta > 0, 'equal': delta == 0}">
-                {{props.category.getFormattedNumericValue(delta)}}
+                {{ props.category.getFormattedNumericValue(delta) }}
             </span>
         </strong>
     </div>

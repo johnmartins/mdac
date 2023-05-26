@@ -7,13 +7,14 @@
         display: inline-block;
         margin-right: 8px;
         white-space: nowrap;
-        min-width: 50px;
+        min-width: 100px;
     }
     select {
         width: 100%;
         padding-top: 0;
         padding-bottom: 0;
         height: 1.8em;
+        font-family: monospace;
     }
     input {
         width: 100%;
@@ -26,4 +27,8 @@
 .control-group {
     user-select: none;
     text-align: left;
+}
+
+button {
+    border-radius: 0px !important;
 }

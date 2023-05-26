@@ -5,22 +5,24 @@
             <div class="labeled-form">                
                 <span>Property:</span>
                 <select 
-                v-model="selectedColorCodeCategory" 
-                @change="onColorCategoryChange">
+                    v-model="selectedColorCodeCategory" 
+                    @change="onColorCategoryChange"
+                >
                     <option :value="null">None</option>
-                    <option v-for="c in categories" :value="c" :key="c.id"> {{c.displayTitle}}</option>
+                    <option v-for="c in categories" :key="c.id" :value="c"> {{ c.displayTitle }}</option>
                 </select>
             </div>
             <div class="form-check" title="If enabled, data points will be color coded based on input similarity (euclidean proximity).">
-                <input class="form-check-input" type="checkbox" 
-                v-model="useSimilarityColorCoding" 
-                @change="onUseSimilarityColorCodingChange">
+                <input
+                    v-model="useSimilarityColorCoding" class="form-check-input" 
+                    type="checkbox" 
+                    @change="onUseSimilarityColorCodingChange"
+                >
                 <label class="form-check-label" for="flexCheckDefault">
                     Use similarity color coding
                 </label>
             </div>
         </div>
-        
     </div>
 </template>
 

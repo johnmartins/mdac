@@ -1,44 +1,43 @@
 <template>
-    <div class="filter-element-container" v-if="filter">
-
+    <div v-if="filter" class="filter-element-container">
         <!-- single range filter -->
-        <div class="single-range-filter-container" v-if="filter.type == 'single-range'">
+        <div v-if="filter.type == 'single-range'" class="single-range-filter-container">
             <div>
-                <input type="number" 
-                v-model="filter.thresholdA"
-                :step="componentParameters.stepSize"
-                />
+                <input
+                    v-model="filter.thresholdA" 
+                    type="number"
+                    :step="componentParameters.stepSize"
+                >
             </div>
             <div>
                 <span v-if="filter.thresholdA <= filter.thresholdB">&le;</span> <span v-else>&ge;</span>
             </div>
             <div class="category-container">
-                <span v-if="targetCategory" :title="targetCategory.displayTitle">{{targetCategory.displayTitle}}</span>
+                <span v-if="targetCategory" :title="targetCategory.displayTitle">{{ targetCategory.displayTitle }}</span>
             </div>
             <div>
                 <span v-if="filter.thresholdA <= filter.thresholdB">&le;</span> <span v-else>&ge;</span>
             </div>
             <div>
-                <input type="number" 
-                v-model="filter.thresholdB"
-                :step="componentParameters.stepSize"
-                />
-                
+                <input
+                    v-model="filter.thresholdB" 
+                    type="number"
+                    :step="componentParameters.stepSize"
+                >
             </div>
         </div>
 
         <!-- Categoric filter -->
-        <div class="categoric-filter-container" v-if="filter.type == 'categoric'">
+        <div v-if="filter.type == 'categoric'" class="categoric-filter-container">
             <div class="overflow-ellipsis" :title="`${targetCategory.displayTitle} in ${Array.from(filter.includedValueSet).toString()}`">
-                <span v-if="targetCategory" class="category-container">{{targetCategory.displayTitle}}</span>
+                <span v-if="targetCategory" class="category-container">{{ targetCategory.displayTitle }}</span>
                 <span>
                     IN [
                     <span v-for="(v, index) in filter.includedValueSet" :key="index">
-                    {{v}}<span v-if="index < (filter.includedValueSet.size - 1 )">, </span>    
+                        {{ v }}<span v-if="index < (filter.includedValueSet.size - 1 )">, </span>    
                     </span>
                     ]
                 </span>
-
             </div>
         </div>
 

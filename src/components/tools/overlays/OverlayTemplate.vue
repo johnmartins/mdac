@@ -1,15 +1,13 @@
 <template>
-
     <div class="dp-info-overlay p-2" :style="{left: props.x+'px', top: props.y+'px'}">
         <div class="header">
-            <button class="btn-close btn-sm mb-2 mt-0" style=""></button>
+            <button class="btn-close btn-sm mb-2 mt-0" style="" />
         </div>
         
         <div class="content p-2">
-            <slot></slot>
+            <slot />
         </div>
     </div>
-
 </template>
 
 <script setup>

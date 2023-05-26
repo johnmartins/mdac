@@ -2,7 +2,7 @@
     <div class="card mt-3">
         <div class="control-group p-2">
             <strong>Selected sample info</strong>
-            <div class="element-container" v-if="selectedDataPoint">
+            <div v-if="selectedDataPoint" class="element-container">
                 <DataPointInfoElement v-for="c in categories" :key="c.id" :category="c" :value="selectedDataPoint[c.title]" />
             </div>
             <div v-else>No sample selected. Click on a data point to select it.</div>
