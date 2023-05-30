@@ -47,7 +47,7 @@ async function calculateIntersimilarity (fidelityColumnTitle, targetColValue, io
             const s = euclideanDistance(vlf, vhf, normalized)
 
             // Store nearest similarity value
-            if (!closestSimilarityValue) {
+            if (!closestSimilarityValue && closestSimilarityValue !== 0) {
                 closestSimilarityValue = s
             } else if (closestSimilarityValue > s) {
                 closestSimilarityValue = s
