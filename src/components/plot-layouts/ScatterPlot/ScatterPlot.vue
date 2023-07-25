@@ -193,7 +193,7 @@ eventBus.on('Router.TabChange', (viewName) => {
     }
 })
 eventBus.on('Layout.contentResize', updateContainerSize)
-eventBus.on('ExportForm.exportRequest', handleExportRequest)
+eventBus.on('ExportForm.exportFigureRequest', handleExportRequest)
 
 function onMouseDown (evt) {
     clearSelections()
