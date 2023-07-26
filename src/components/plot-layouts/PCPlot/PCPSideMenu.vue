@@ -15,7 +15,7 @@
 
 import ExportForm from '@/components/sidemenu/import-export/ExportForm'
 import OptionsForm from '@/components/sidemenu/settings/OptionsForm'
-import EditCategoryForm from '@/components/tools/EditCategoryForm'
+import EditCategoryForm from '@/components/sidemenu/settings/EditCategoryForm'
 import FiltersPanel from '@/components/sidemenu/analysis/FiltersPanel'
 import SourceForm from '@/components/sidemenu/import-export/SourceForm'
 import SampleInfo from '@/components/sidemenu/import-export/SampleInfo'

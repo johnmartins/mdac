@@ -1,21 +1,29 @@
 <template>    
-    <div v-if="editedCategory" class="card mt-3">
-        <div class="control-group p-2">
-            <strong>Edit selected category</strong>
-            <TextInput v-model="editedCategory.displayTitle">Title</TextInput>
-            <div v-if="editedCategory.usesCategoricalData == false">
-                <TextInput v-model.number="editedCategory.ub">UB</TextInput>
-                <TextInput v-model.number="editedCategory.lb">LB</TextInput>
-                <TextInput v-model.number="editedCategory.ticks">Ticks</TextInput>
-            </div>
+    <SidebarSection 
+        title="Modify category"
+        :start-maximized="false"
+    >
+        <div v-if="editedCategory">
+            <div class="control-group">
+                <strong>Edit selected category</strong>
+                <TextInput v-model="editedCategory.displayTitle">Title</TextInput>
+                <div v-if="editedCategory.usesCategoricalData == false">
+                    <TextInput v-model.number="editedCategory.ub">UB</TextInput>
+                    <TextInput v-model.number="editedCategory.lb">LB</TextInput>
+                    <TextInput v-model.number="editedCategory.ticks">Ticks</TextInput>
+                </div>
 
-            <div class="btn-group" style="width: 100%">
-                <button class="btn btn-success btn-sm" @click="editCategory">Update</button>
-                <button v-if="selectedCategory.enabled" class="btn btn-danger btn-sm" @click="disableCategory">Disable</button>
-                <button v-if="!selectedCategory.enabled" class="btn btn-primary btn-sm" @click="enableCategory">Enable</button>
+                <div class="btn-group" style="width: 100%">
+                    <button class="btn btn-success btn-sm" @click="editCategory">Update</button>
+                    <button v-if="selectedCategory.enabled" class="btn btn-danger btn-sm" @click="disableCategory">Disable</button>
+                    <button v-if="!selectedCategory.enabled" class="btn btn-primary btn-sm" @click="enableCategory">Enable</button>
+                </div>
             </div>
         </div>
-    </div>
+        <div v-else>
+            <span>Select a column header in the PCP plot</span>
+        </div>
+    </SidebarSection>
 </template>
 
 <script setup>
@@ -28,6 +36,7 @@ import {useStateStore} from "@/store/StateStore"
 
 // Components
 import TextInput from '@/components/inputs/TextInput'
+import SidebarSection from '@/components/layouts/SidebarSection'
     
 // Models
 import Category from '@/models/plots/Category'
