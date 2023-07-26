@@ -169,7 +169,7 @@ function updateContainerSize () {
 // Event buss listeners and triggers
 const eventBus = inject('eventBus')
 
-eventBus.on('ExportForm.exportRequest', handleExportRequest)
+eventBus.on('ExportForm.exportFigureRequest', handleExportRequest)
 
 // Update container size if certain events occur
 eventBus.on('SourceForm.readData', updateContainerSize)
