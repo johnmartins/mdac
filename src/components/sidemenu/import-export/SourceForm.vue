@@ -1,6 +1,9 @@
 <template>
-    <div class="card mt-3">
-        <div class="control-group p-2">
+    <SidebarSection
+        title="Import data"
+        :start-maximized="true"
+    >
+        <div class="control-group">
             <strong>Data source</strong>
             <input 
                 id="formFileSm"
@@ -22,7 +25,7 @@
                 </select>
             </div>
         </div>
-    </div>
+    </SidebarSection>
 </template>
 
 <script setup>
@@ -37,6 +40,8 @@ import {usePCPStore} from "@/store/PCPStore"
 import {useLayoutStore} from "@/store/LayoutStore"
 import {useOptionsStore} from "@/store/OptionsStore"
 import {isNumeric} from "@/utils/data-utils"
+
+import SidebarSection from "@/components/layouts/SidebarSection.vue"
 
 import Category from "@/models/plots/Category"
 import Popup from '@/models/layout/Popup'

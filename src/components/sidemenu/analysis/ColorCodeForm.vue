@@ -1,6 +1,9 @@
 <template>
-    <div class="card mt-3">
-        <div class="control-group p-2">
+    <SidebarSection 
+        title="Color Coding" 
+        :start-maximized="false"
+    >
+        <div class="control-group">
             <strong>Color coding</strong>
             <div class="labeled-form">                
                 <span>Property:</span>
@@ -23,12 +26,13 @@
                 </label>
             </div>
         </div>
-    </div>
+    </SidebarSection>
 </template>
 
 <script setup>
 import { ref } from "vue"
 import { storeToRefs } from "pinia"
+import SidebarSection from "@/components/layouts/SidebarSection"
 import {useOptionsStore} from "@/store/OptionsStore"
 import {useDataStore} from "@/store/DataStore"
 

@@ -1,6 +1,9 @@
 <template>
-    <div class="card mt-3">
-        <div class="control-group p-2">
+    <SidebarSection 
+        title="Plot Options" 
+        :start-maximized="false"
+    >
+        <div class="control-group">
             <div><strong>Graphical options</strong></div>
 
             <div v-if="stateStore.activeView === 'pcp'" class="labeled-form mb-2">
@@ -48,7 +51,7 @@
                 <input type="number" step="0.05" max="1" min="0" :value="optionsStore.excludedDataOpacity" @change="setFilteredDataOpacity">
             </div>
         </div>
-    </div>
+    </SidebarSection>
 </template>
 
 <script setup>
@@ -56,6 +59,7 @@ import { reactive, ref } from "vue"
 
 // Components
 import RangeInput from '@/components/inputs/RangeInput.vue'
+import SidebarSection from "@/components/layouts/SidebarSection.vue"
 
 // State
 import {useOptionsStore} from "@/store/OptionsStore"

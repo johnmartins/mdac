@@ -1,8 +1,9 @@
 <template>
-    <div class="card mt-3">
-        <div class="control-group p-2">
-            <strong>Filters</strong>
-            
+    <SidebarSection 
+        title="Filters" 
+        :start-maximized="false"
+    >
+        <div class="control-group">       
             <div v-if="Object.keys(filters).length > 0">
                 <div v-for="(filterKey, index) in Object.keys(filters)" :key="index">
                     <FilterElement v-for="filter in filters[filterKey]" :key="filter.id" :filter-i-d="filter.id" />
@@ -12,7 +13,7 @@
                 <span style="font-size: 0.8em;">No filters have been applied</span>
             </div>
         </div>
-    </div>
+    </SidebarSection>
 </template>
 
 <script setup>
@@ -20,7 +21,8 @@ import { reactive, ref, inject } from "vue"
 import { storeToRefs } from "pinia"
 
 import {useDataStore} from "@/store/DataStore"
-import FilterElement from '@/components/tools/FilterElement'
+import FilterElement from '@/components/sidemenu/analysis/FilterElement'
+import SidebarSection from "@/components/layouts/SidebarSection.vue"
 
 const dataStore = useDataStore()
 const {data, filters} = storeToRefs(dataStore)

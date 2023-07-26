@@ -1,6 +1,9 @@
 <template>
-    <div class="card mt-3">
-        <div class="control-group p-2">
+    <SidebarSection
+        title="Plot selection"
+        :start-maximized="true"
+    >
+        <div class="control-group">
             <strong>Scatter plot selection</strong>
             <div class="labeled-form">                
                 <span>Plot:</span>
@@ -13,7 +16,7 @@
                 <button class="btn d-block btn-sm btn-success" @click="newPlot">Create new plot</button>
             </div>
         </div>
-    </div>
+    </SidebarSection>
 </template>
 
 <script setup>
@@ -21,6 +24,7 @@ import { ref } from "vue"
 import { storeToRefs } from "pinia"
 import {useScatterStore} from "@/store/ScatterStore"
 import ScatterPlotConfig from "@/models/plots/ScatterPlotConfig"
+import SidebarSection from "@/components/layouts/SidebarSection.vue"
 
 const scatterStore = useScatterStore()
 const {plots, selectedPlotID} = storeToRefs(scatterStore)
