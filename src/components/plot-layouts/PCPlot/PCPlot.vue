@@ -366,8 +366,13 @@ function exportSVG () {
     }
 
     const csvElement = plotCanvas.value
-    var svgData = csvElement.innerHTML 
-    var head = '<svg title="graph" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">'
+
+    // Prevents exported SVG from being cropped when imported into e.g. Inkscape or PowerPoint
+    let viewboxWidth = csvElement.getBoundingClientRect().width;
+    let viewboxHeight = csvElement.getBoundingClientRect().height;
+
+    const svgData = csvElement.innerHTML 
+    const head = `<svg viewBox="0 0 ${viewboxWidth} ${viewboxHeight}" title="graph" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">`
 	
     let style = `<style>`
     style += 'svg {font-family: monospace;}'
@@ -377,8 +382,8 @@ function exportSVG () {
     style += 'path {fill-opacity: 0;}'
     style += '.filter-box {stroke: white;stroke-opacity: 0.9;stroke-width: 2px;fill: #595959; fill-opacity: 0.6;x: -8px;width: 16px;}' 
     style += '</style>'
-    var full_svg = head +  style + svgData + "</svg>"
-    var blob = new Blob([full_svg], {type: "image/svg+xml"});  
+    const full_svg = head +  style + svgData + "</svg>"
+    const blob = new Blob([full_svg], {type: "image/svg+xml"});  
     saveAs(blob, "PCPlot.svg");
 }
     
