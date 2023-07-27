@@ -1,32 +1,40 @@
 <template>
-    <div v-if="selectedDataPoint" class="card mt-3">
-        <div class="control-group p-2">
-            <strong>Data comparison</strong>
+    <SidebarSection
+        title="Data point comparison"
+        :start-maximized="true"
+    >
+        <div v-if="selectedDataPoint">
+            <div class="control-group">
+                <div class="font-monospace">
+                    <div v-if="selectionSimilarity >= 0" style="font-size: 0.9em">
+                        <span>Similarity to selection: <strong>{{ parseFloat(selectionSimilarity).toFixed(3) }}</strong></span>
+                    </div>
+                    
+                    <div v-if="selectedSecondaryDataPoint" class="element-container">
+                        <div class="grid-header">Variable</div>
+                        <div class="grid-header" />
+                        <div class="grid-header">Value</div>
+                        <div class="grid-header">Delta</div>
 
-            <div class="font-monospace">
-                <div v-if="selectionSimilarity >= 0" style="font-size: 0.9em">
-                    <span>Similarity to selection: <strong>{{ parseFloat(selectionSimilarity).toFixed(3) }}</strong></span>
+                        <DataPointComparisonElement
+                            v-for="c in categories" 
+                            :key="c.id" 
+                            :category="c" 
+                            :value="selectedSecondaryDataPoint[c.title]"
+                            :value-to-compare-with="selectedDataPoint[c.title]"
+                        />
+                    </div>
+                    
+                    <div v-else style="text-align: left;">
+                        No sample selected. Click on a data point <strong>while holding the CTRL-key</strong> to select it.
+                    </div>
                 </div>
-                
-                <div v-if="selectedSecondaryDataPoint" class="element-container">
-                    <div class="grid-header">Variable</div>
-                    <div class="grid-header" />
-                    <div class="grid-header">Value</div>
-                    <div class="grid-header">Delta</div>
-
-                    <DataPointComparisonElement
-                        v-for="c in categories" 
-                        :key="c.id" 
-                        :category="c" 
-                        :value="selectedSecondaryDataPoint[c.title]"
-                        :value-to-compare-with="selectedDataPoint[c.title]"
-                    />
-                </div>
-                
-                <div v-else>No sample selected. Click on a data point <strong>while holding the CTRL-key</strong> to select it.</div>
             </div>
         </div>
-    </div>
+        <div v-else style="text-align: left;">
+            <span>No data point has been selected</span>
+        </div>
+    </SidebarSection>
 </template>
 
 <script setup>
@@ -38,6 +46,7 @@ import {storeToRefs} from 'pinia'
 import {euclideanDistance} from "../../sadse/similarity"
 
 // Components
+import SidebarSection from "@/components/layouts/SidebarSection.vue"
 import DataPointComparisonElement from './DataPointComparisonElement'
 
 const dataStore = useDataStore()
