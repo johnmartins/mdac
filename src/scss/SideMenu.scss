@@ -1,3 +1,11 @@
+@import 'Colors.scss';
+
+.side-menu-container {
+    font-size: 0.8rem;
+    overflow-y: auto;
+    background-color: $color-light;
+}
+
 .information-box {
     display: flex;
     justify-content: space-between;
@@ -16,3 +24,50 @@
         text-align: right;
     }
 }
+
+.side-menu-view-container {
+    padding: 0;
+}
+
+.side-menu-section {
+    color: $color-black;
+    background-color: $color-light;
+
+    .side-menu-section-content {
+        padding: 8px;
+        transform: scaleY(1);
+        transform-origin: top;
+        transition: transform 0.25s ease, max-height 0.2s ease, padding 0.25s ease;
+        max-height: 1000px;
+
+        &.collapsed {
+            overflow: hidden;
+            transform: scaleY(0);
+            max-height: 0px;
+            padding: 0;
+            transition: transform 0.25s ease, max-height 0.5s ease, padding 0.5s ease;
+        }
+    }
+
+    .title-block {
+        padding-left: 4px !important;  // Overwrite to make titles close to the left edge more readable
+        display: flex !important;
+        justify-content: space-between !important;
+        margin-bottom: 0 !important;
+        background-color: $color-primary;
+        color: $color-light;
+        user-select: none;
+    }
+}
+
+.title-block {
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    margin: 0px 0 10px 0;
+    padding: 4px 8px 4px 0px;
+    color: black;
+    display: flex;
+    align-content: center;
+    text-transform: uppercase;
+}
+

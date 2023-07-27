@@ -1,7 +1,9 @@
 <template>
-    <div class="card mt-3">
-        <div class="control-group p-2">
-            <strong>Color coding</strong>
+    <SidebarSection 
+        title="Color Coding" 
+        :start-maximized="false"
+    >
+        <div class="control-group">
             <div class="labeled-form">                
                 <span>Property:</span>
                 <select 
@@ -18,17 +20,18 @@
                     type="checkbox" 
                     @change="onUseSimilarityColorCodingChange"
                 >
-                <label class="form-check-label" for="flexCheckDefault">
+                <label class="form-check-label m-0" for="flexCheckDefault">
                     Use similarity color coding
                 </label>
             </div>
         </div>
-    </div>
+    </SidebarSection>
 </template>
 
 <script setup>
 import { ref } from "vue"
 import { storeToRefs } from "pinia"
+import SidebarSection from "@/components/layouts/SidebarSection"
 import {useOptionsStore} from "@/store/OptionsStore"
 import {useDataStore} from "@/store/DataStore"
 

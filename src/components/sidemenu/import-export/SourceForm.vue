@@ -1,7 +1,9 @@
 <template>
-    <div class="card mt-3">
-        <div class="control-group p-2">
-            <strong>Data source</strong>
+    <SidebarSection
+        title="Import data"
+        :start-maximized="true"
+    >
+        <div class="control-group">
             <input 
                 id="formFileSm"
                 ref="fileInput" 
@@ -22,7 +24,7 @@
                 </select>
             </div>
         </div>
-    </div>
+    </SidebarSection>
 </template>
 
 <script setup>
@@ -37,6 +39,8 @@ import {usePCPStore} from "@/store/PCPStore"
 import {useLayoutStore} from "@/store/LayoutStore"
 import {useOptionsStore} from "@/store/OptionsStore"
 import {isNumeric} from "@/utils/data-utils"
+
+import SidebarSection from "@/components/layouts/SidebarSection.vue"
 
 import Category from "@/models/plots/Category"
 import Popup from '@/models/layout/Popup'
@@ -95,6 +99,7 @@ function readFile () {
     optionsStore.resetColorCoding()
     dataStore.wipeAllData()
     const reader = new FileReader()
+    stateStore.importedFileName = file.name
     reader.readAsText(new Blob([file], {"type": file.type}))	
     reader.onloadend = (res) => {
         parseCSV(res)

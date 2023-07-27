@@ -1,6 +1,6 @@
 <template>
     <div id="app" style="height: 100%;">
-        <div class="mdac-header pt-3 px-3">
+        <div class="mdac-header px-3">
             <div class="title-container">
                 MDAC
             </div>
@@ -115,7 +115,7 @@ const appVersion = ref(process.env.VUE_APP_VERSION)
 const eventBus = inject('eventBus')
 
 eventBus.on('main.error', (err) => {
-    const errorPopup = new Popup('error', 'Unhandled exception', err.message)
+    const errorPopup = new Popup('error', 'Error', err.message)
     layoutStore.queuePopup(errorPopup)
 })
 
@@ -153,7 +153,7 @@ onMounted( () => {
 <style lang="scss">
   @import "@/scss/GlobalStyles.scss";
 	
-  $header-height: 50px;
+  $header-height: 40px;
   $nav-height: 60px;
 
   #app {
@@ -161,7 +161,7 @@ onMounted( () => {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
-    color: #2c3e50;
+    color: $color-light;
     height: 100%;
     max-height: 100%;
   }
@@ -171,8 +171,9 @@ onMounted( () => {
 		display: grid;
 		grid-template-columns: 100px auto 200px;
 		text-align: left;
-		vertical-align: top;
-		border-bottom: 1px solid whitesmoke;
+        align-items: center;
+		border-bottom: 1px solid black;
+        background-color: $color-primary-base;
 
 		.title-container {
 			font-weight: bold;
@@ -218,6 +219,7 @@ onMounted( () => {
 		bottom: 0;
 		color: grey;
 		font-size: 0.8em;
+        pointer-events: none;
 
 		a {
 			color: grey;

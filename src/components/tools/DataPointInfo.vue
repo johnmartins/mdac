@@ -1,13 +1,15 @@
 <template>
-    <div class="card mt-3">
-        <div class="control-group p-2">
-            <strong>Selected sample info</strong>
+    <SidebarSection
+        title="Sample info"
+        :start-maximized="true"
+    >
+        <div class="control-group">
             <div v-if="selectedDataPoint" class="element-container">
                 <DataPointInfoElement v-for="c in categories" :key="c.id" :category="c" :value="selectedDataPoint[c.title]" />
             </div>
             <div v-else>No sample selected. Click on a data point to select it.</div>
         </div>
-    </div>
+    </SidebarSection>
 </template>
 
 <script setup>
@@ -18,6 +20,7 @@ import {storeToRefs} from 'pinia'
 
 // Components
 import DataPointInfoElement from './DataPointInfoElement'
+import SidebarSection from "../layouts/SidebarSection.vue"
 
 const dataStore = useDataStore()
 const scatterStore = useScatterStore()

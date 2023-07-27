@@ -95,7 +95,6 @@
 <script setup>
 import { reactive, ref, onMounted, onUpdated, inject, computed, watch} from "vue"
 import { storeToRefs } from "pinia"
-import * as d3 from "d3"
 
 import { saveAs } from "file-saver"
 import { saveSvgAsPng } from "save-svg-as-png"

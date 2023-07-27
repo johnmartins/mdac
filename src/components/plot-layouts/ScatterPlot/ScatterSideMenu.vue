@@ -1,5 +1,5 @@
 <template>
-    <div class="container side-menu-container">
+    <div class="side-menu-container">
         <PlotSelectionForm />
         <PlotConfigForm />
         <SampleInfo />
@@ -11,13 +11,13 @@
 </template>
 
 <script setup>
-import PlotConfigForm from '@/components/tools/scatter-tools/PlotConfigForm'
-import PlotSelectionForm from '@/components/tools/scatter-tools/PlotSelectionForm'
-import FiltersPanel from '@/components/tools/FiltersPanel'
-import SampleInfo from '@/components/tools/SampleInfo'
-import ColorCodeForm from '@/components/tools/ColorCodeForm'
-import ExportForm from '@/components/tools/ExportForm'
-import OptionsForm from '@/components/tools/OptionsForm'
+import PlotConfigForm from '@/components/sidemenu/scatter/PlotConfigForm'
+import PlotSelectionForm from '@/components/sidemenu/scatter/PlotSelectionForm'
+import FiltersPanel from '@/components/sidemenu/analysis/FiltersPanel'
+import SampleInfo from '@/components/sidemenu/import-export/SampleInfo'
+import ColorCodeForm from '@/components/sidemenu/analysis/ColorCodeForm'
+import ExportForm from '@/components/sidemenu/import-export/ExportForm'
+import OptionsForm from '@/components/sidemenu/settings/OptionsForm'
 
 
 </script>

@@ -1,6 +1,9 @@
 <template>
-    <div class="card mt-3">
-        <div class="control-group p-2">
+    <SidebarSection 
+        title="Export" 
+        :start-maximized="false"
+    >
+        <div class="control-group">
             <strong>Plot export</strong>
             <div class="labeled-form">
                 <span>Format: </span>
@@ -13,7 +16,7 @@
                 <button class="btn btn-sm btn-primary" @click="exportRequest">Download</button>
             </div>
         </div>
-        <div class="control-group p-2">
+        <div class="control-group">
             <strong>Data export</strong>
             <div style="display: flex; justify-content: space-between; flex-direction: row;">
                 <!-- Checkbox filtered data -->
@@ -24,11 +27,13 @@
                 <button class="btn btn-sm btn-primary" @click="exportDataRequest(includeFilteredData)">Download CSV</button>
             </div>
         </div>
-    </div>
+    </SidebarSection>
 </template>
 
 <script setup>
 import { ref, inject } from "vue"
+
+import SidebarSection from "@/components/layouts/SidebarSection.vue"
 
 import { useDataStore } from "@/store/DataStore"
 

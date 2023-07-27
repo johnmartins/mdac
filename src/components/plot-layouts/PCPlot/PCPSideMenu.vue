@@ -1,5 +1,5 @@
 <template>
-    <div class="container side-menu-container">
+    <div class="side-menu-container">
         <SourceForm />
         <SampleInfo />
         <EditCategoryForm />
@@ -13,14 +13,14 @@
 
 <script setup>
 
-import ExportForm from '@/components/tools/ExportForm'
-import OptionsForm from '@/components/tools/OptionsForm'
-import EditCategoryForm from '@/components/tools/EditCategoryForm'
-import FiltersPanel from '@/components/tools/FiltersPanel'
-import SourceForm from '@/components/tools/SourceForm'
-import SampleInfo from '@/components/tools/SampleInfo'
-import ColorCodeForm from '@/components/tools/ColorCodeForm'
-import SimilarityAnalysisPanel from '@/components/tools/analysis/SimilarityAnalysisPanel'
+import ExportForm from '@/components/sidemenu/import-export/ExportForm'
+import OptionsForm from '@/components/sidemenu/settings/OptionsForm'
+import EditCategoryForm from '@/components/sidemenu/settings/EditCategoryForm'
+import FiltersPanel from '@/components/sidemenu/analysis/FiltersPanel'
+import SourceForm from '@/components/sidemenu/import-export/SourceForm'
+import SampleInfo from '@/components/sidemenu/import-export/SampleInfo'
+import ColorCodeForm from '@/components/sidemenu/analysis/ColorCodeForm'
+import SimilarityAnalysisPanel from '@/components/sidemenu/analysis/SimilarityAnalysisPanel'
 
 </script>
 
