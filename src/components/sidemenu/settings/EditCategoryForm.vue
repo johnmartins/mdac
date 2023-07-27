@@ -1,5 +1,6 @@
 <template>    
     <SidebarSection 
+        ref="sidebarSection"
         title="Modify category"
         :start-maximized="false"
     >
@@ -41,6 +42,9 @@ import SidebarSection from '@/components/layouts/SidebarSection'
 // Models
 import Category from '@/models/plots/Category'
 
+// DOM
+const sidebarSection = ref(null)
+
 const dataStore = useDataStore()
 const stateStore = useStateStore()
 
@@ -52,6 +56,8 @@ watch(selectedCategory, () => {
         editedCategory.value = null
         return
     }
+
+    sidebarSection.value.maximized = true
 
     // The reason we do this insead of using v-models directly on the inputs is because
     // utilizing v-models for huge data sets can be very slow. Decoupling the edited and real variable

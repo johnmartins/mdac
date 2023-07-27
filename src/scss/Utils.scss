@@ -1,3 +1,11 @@
 .clickable {
     cursor: pointer;
 }
+
+.clickable-icon {
+    cursor: pointer;
+
+    &:hover {
+        color: darkgray;
+    }
+}

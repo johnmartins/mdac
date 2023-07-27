@@ -1,5 +1,5 @@
 <template>
-    <div class="container side-menu-container">
+    <div class="side-menu-container">
         <SourceForm />
         <SampleInfo />
         <EditCategoryForm />
