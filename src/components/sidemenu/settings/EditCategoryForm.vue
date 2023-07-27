@@ -21,7 +21,7 @@
                 </div>
             </div>
         </div>
-        <div v-else>
+        <div v-else style="text-align: left;">
             <span>Select a column header in the PCP plot</span>
         </div>
     </SidebarSection>

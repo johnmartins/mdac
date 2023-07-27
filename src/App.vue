@@ -115,7 +115,7 @@ const appVersion = ref(process.env.VUE_APP_VERSION)
 const eventBus = inject('eventBus')
 
 eventBus.on('main.error', (err) => {
-    const errorPopup = new Popup('error', 'Unhandled exception', err.message)
+    const errorPopup = new Popup('error', 'Error', err.message)
     layoutStore.queuePopup(errorPopup)
 })
 

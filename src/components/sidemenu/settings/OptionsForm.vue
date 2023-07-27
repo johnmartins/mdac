@@ -4,8 +4,6 @@
         :start-maximized="false"
     >
         <div class="control-group">
-            <div><strong>Graphical options</strong></div>
-
             <div v-if="stateStore.activeView === 'pcp'" class="labeled-form mb-2">
                 <span>Rendering: </span>
                 <select ref="lineFormatSelector" v-model="pcpStore.renderingType">

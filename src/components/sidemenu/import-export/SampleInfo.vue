@@ -1,9 +1,8 @@
 <template>
     <SidebarSection 
         title="Sample info"
-        :start-maximized="false"
+        :start-maximized="true"
     >
-        <strong>Data info</strong>
         <div class="information-box">                
             <span class="title">Samples: </span>
             <span class="value">{{ data.length }}</span>

@@ -4,7 +4,6 @@
         :start-maximized="true"
     >
         <div class="control-group">
-            <strong>Data source</strong>
             <input 
                 id="formFileSm"
                 ref="fileInput" 

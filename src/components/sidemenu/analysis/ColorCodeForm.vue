@@ -4,7 +4,6 @@
         :start-maximized="false"
     >
         <div class="control-group">
-            <strong>Color coding</strong>
             <div class="labeled-form">                
                 <span>Property:</span>
                 <select 
@@ -21,7 +20,7 @@
                     type="checkbox" 
                     @change="onUseSimilarityColorCodingChange"
                 >
-                <label class="form-check-label" for="flexCheckDefault">
+                <label class="form-check-label m-0" for="flexCheckDefault">
                     Use similarity color coding
                 </label>
             </div>

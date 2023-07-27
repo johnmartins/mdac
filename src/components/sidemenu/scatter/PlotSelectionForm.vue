@@ -4,7 +4,6 @@
         :start-maximized="true"
     >
         <div class="control-group">
-            <strong>Scatter plot selection</strong>
             <div class="labeled-form">                
                 <span>Plot:</span>
                 <select ref="plotSelector" v-model="selectedPlotID" @change="changePlot">

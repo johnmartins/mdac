@@ -1,7 +1,7 @@
 <template>
     <SidebarSection 
         title="Filters" 
-        :start-maximized="false"
+        :start-maximized="true"
     >
         <div class="control-group">       
             <div v-if="Object.keys(filters).length > 0">
@@ -10,7 +10,7 @@
                 </div>
             </div>
             <div v-else>
-                <span style="font-size: 0.8em;">No filters have been applied</span>
+                <span>No filters have been applied</span>
             </div>
         </div>
     </SidebarSection>
