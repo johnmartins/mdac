@@ -99,6 +99,7 @@ function readFile () {
     optionsStore.resetColorCoding()
     dataStore.wipeAllData()
     const reader = new FileReader()
+    stateStore.importedFileName = file.name
     reader.readAsText(new Blob([file], {"type": file.type}))	
     reader.onloadend = (res) => {
         parseCSV(res)

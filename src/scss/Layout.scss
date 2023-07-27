@@ -24,7 +24,7 @@
     width: 10px;
     cursor: w-resize;
     height: 100%;
-    background-color: white;
+    background-color: transparent;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -42,14 +42,14 @@
 }
 
 .resize-border-v.left {
-    border-left: 2px solid whitesmoke;
+    border-left: 1px solid black;
     .btn-toggle-menu {
         border-width: 2px 2px 2px 0px;
     }
 }
 
 .resize-border-v.right {
-    border-right: 2px solid whitesmoke;
+    border-right: 1px solid black;
     .btn-toggle-menu {
         border-width: 2px 0px 2px 2px;
     }
