@@ -74,6 +74,7 @@ h1 {
     justify-content: left;
     min-height: $height;
     width: $width;
+    color: black;
 }
 
 .popup-body {
@@ -81,6 +82,7 @@ h1 {
     font-size: 0.8em;
     white-space: pre-line;
     margin-top: 8px;
+    color: black;
 }
 
 .popup-button-array {

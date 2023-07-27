@@ -1,0 +1,60 @@
+@import "Colors.scss";
+
+button {
+    border: 1px solid $color-primary-base;
+    border-radius: 0px;
+    outline: none;
+    background-color: $color-primary;
+
+    text-transform: uppercase;
+    color: $color-light;
+    font-size: 12px;
+    letter-spacing: 1px;
+
+    margin: 4px 0 4px 0;
+    cursor: pointer;
+    padding: 7px 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: color 0.25s ease-in-out, background-color 0.25s ease-in-out;
+
+    &:hover {
+        background-color: $color-primary-base;
+    }
+
+    &.small {
+        padding: 5px 8px;
+        font-size: 10px;
+    }
+
+    // Danger variation
+    &.danger {
+        background-color: $color-danger;
+        border: 1px solid $color-danger;
+
+        &:hover {
+            background-color: $color-danger-base;
+        }
+    }
+
+    &.active {
+        background-color: $color-light;
+        color: $color-primary-base;
+        border-width: 1px;
+    }
+
+    &:disabled {
+        background-color: $color-light-gray;
+        border: 1px solid $color-gray;
+        color: $color-gray;
+        
+        &:hover {
+            background-color: $color-light-gray;
+            cursor: default;
+        }
+    }
+
+}
