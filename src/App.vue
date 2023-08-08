@@ -218,6 +218,7 @@ onMounted( () => {
 		color: grey;
 		font-size: 0.8em;
         pointer-events: none;
+        text-align: center;
 
 		a {
 			color: grey;
