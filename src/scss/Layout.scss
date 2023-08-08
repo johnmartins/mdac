@@ -25,10 +25,10 @@
     justify-content: center;
 
     .btn-toggle-menu {
-        border-style: solid;
-        border-color: whitesmoke;
+
+        border: 1px solid gray;
         margin: 0;
-        padding: 0;
+        padding: 2px !important;
         background: transparent;
         color: black;
         font-family: monospace;

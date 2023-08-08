@@ -5,7 +5,6 @@
     >
         <div v-if="selectedPlot">
             <div class="control-group">
-                <strong>Plot configuration</strong>
                 <div class="labeled-form">                
                     <span>Title:</span>
                     <input ref="yAxisSelector" v-model="selectedPlot.title" type="text" @change="onTitleChange">

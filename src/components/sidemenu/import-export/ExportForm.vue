@@ -13,7 +13,7 @@
                 </select>
             </div>
             <div class="d-grid gap-2 mt-2">
-                <button class="btn btn-sm btn-primary" @click="exportRequest">Download</button>
+                <button @click="exportRequest">Download</button>
             </div>
         </div>
         <div class="control-group">
@@ -24,7 +24,7 @@
                 <input ref="filteredDataCheckbox" v-model="includeFilteredData" type="checkbox">
             </div>
             <div class="d-grid gap-2 mt-2">
-                <button class="btn btn-sm btn-primary" @click="exportDataRequest(includeFilteredData)">Download CSV</button>
+                <button @click="exportDataRequest(includeFilteredData)">Download CSV</button>
             </div>
         </div>
     </SidebarSection>

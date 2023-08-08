@@ -6,14 +6,14 @@ button {
     outline: none;
     background-color: $color-primary;
 
-    text-transform: uppercase;
+    text-transform: uppercase !important;
     color: $color-light;
-    font-size: 12px;
+    font-size: 12px !important;
     letter-spacing: 1px;
 
     margin: 4px 0 4px 0;
     cursor: pointer;
-    padding: 7px 16px;
+    padding: 7px 16px !important;
 
     display: flex;
     align-items: center;
@@ -26,8 +26,8 @@ button {
     }
 
     &.small {
-        padding: 5px 8px;
-        font-size: 10px;
+        padding: 5px 8px !important;
+        font-size: 12px !important;
     }
 
     // Danger variation
@@ -57,4 +57,12 @@ button {
         }
     }
 
+}
+
+.button-group {
+    display: flex;
+    flex-direction: row;
+    button {
+        flex-grow: 1;
+    }
 }

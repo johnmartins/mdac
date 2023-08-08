@@ -54,6 +54,7 @@
                             <!-- title -->
                             <text
                                 class="scatter-axis-title-x" 
+                                :style="{fontSize: `${optionsStore.titleSize}em`}"
                                 :x="scatterStore.xAxisLength/2" 
                                 :y="scatterStore.yAxisLength + plotParameters.xAxisTitlePadding"
                             >

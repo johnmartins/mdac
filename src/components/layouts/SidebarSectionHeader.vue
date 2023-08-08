@@ -1,11 +1,11 @@
 <template>
-    <div class="title-block">
+    <div class="title-block clickable" @click="toggleMaximized">
         <slot />
         <div>
-            <span v-if="props.maximized" class="clickable-icon" @click="emit('on-do-minimize')">
+            <span v-if="props.maximized" class="clickable-icon">
                 <faicon icon="fa-solid fa-chevron-up" />
             </span>
-            <span v-if="!props.maximized" class="clickable-icon" @click="emit('on-do-maximize')">
+            <span v-if="!props.maximized" class="clickable-icon">
                 <faicon icon="fa-solid fa-chevron-down" />
             </span>
         </div>
@@ -20,6 +20,14 @@ const props = defineProps({
         required: true,
     }
 })
+
+function toggleMaximized () {
+    if (props.maximized) {
+        emit('on-do-minimize')
+    } else {
+        emit('on-do-maximize')
+    }
+}
 
 </script>
 <style lang="scss" scoped>

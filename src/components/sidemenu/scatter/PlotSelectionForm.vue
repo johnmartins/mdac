@@ -12,7 +12,7 @@
                 </select>
             </div>
             <div class="d-grid mt-2">
-                <button class="btn d-block btn-sm btn-success" @click="newPlot">Create new plot</button>
+                <button class="success" @click="newPlot">Create new plot</button>
             </div>
         </div>
     </SidebarSection>

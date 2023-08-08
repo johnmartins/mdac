@@ -7,7 +7,7 @@
                     {{ popup.body }}
                 </div>
                 <div class="popup-button-array">
-                    <button class="btn btn-sm btn-primary" @click="onClickOK">OK</button>
+                    <button class="small" @click="onClickOK">OK</button>
                 </div>
             </div>
         </div>  
@@ -87,7 +87,7 @@ h1 {
 
 .popup-button-array {
     display: flex;
-    flex-direction: row;
+    flex-direction: row-reverse;
     justify-content: space-between;
     margin-top: 8px;
 }

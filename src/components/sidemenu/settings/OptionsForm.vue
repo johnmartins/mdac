@@ -81,7 +81,6 @@ function setResolutionManualOverride (override) {
 
 <style lang="scss" scoped>
     .title {
-        font-size: 0.8em;
         font-weight: bold;
     }
 

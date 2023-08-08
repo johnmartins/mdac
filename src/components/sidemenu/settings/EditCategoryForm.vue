@@ -14,10 +14,10 @@
                     <TextInput v-model.number="editedCategory.ticks">Ticks</TextInput>
                 </div>
 
-                <div class="btn-group" style="width: 100%">
-                    <button class="btn btn-success btn-sm" @click="editCategory">Update</button>
-                    <button v-if="selectedCategory.enabled" class="btn btn-danger btn-sm" @click="disableCategory">Disable</button>
-                    <button v-if="!selectedCategory.enabled" class="btn btn-primary btn-sm" @click="enableCategory">Enable</button>
+                <div class="button-group" style="width: 100%">
+                    <button class="small success" @click="editCategory">Update</button>
+                    <button v-if="selectedCategory.enabled" class="small danger" @click="disableCategory">Disable</button>
+                    <button v-if="!selectedCategory.enabled" class="small" @click="enableCategory">Enable</button>
                 </div>
             </div>
         </div>
