@@ -54,6 +54,7 @@
                             <!-- title -->
                             <text
                                 class="scatter-axis-title-x" 
+                                :style="{fontSize: `${optionsStore.titleSize}em`}"
                                 :x="scatterStore.xAxisLength/2" 
                                 :y="scatterStore.yAxisLength + plotParameters.xAxisTitlePadding"
                             >
@@ -193,7 +194,7 @@ eventBus.on('Router.TabChange', (viewName) => {
     }
 })
 eventBus.on('Layout.contentResize', updateContainerSize)
-eventBus.on('ExportForm.exportRequest', handleExportRequest)
+eventBus.on('ExportForm.exportFigureRequest', handleExportRequest)
 
 function onMouseDown (evt) {
     clearSelections()

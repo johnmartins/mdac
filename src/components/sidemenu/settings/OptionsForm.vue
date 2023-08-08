@@ -1,8 +1,9 @@
 <template>
-    <div class="card mt-3">
-        <div class="control-group p-2">
-            <div><strong>Graphical options</strong></div>
-
+    <SidebarSection 
+        title="Plot Options" 
+        :start-maximized="false"
+    >
+        <div class="control-group">
             <div v-if="stateStore.activeView === 'pcp'" class="labeled-form mb-2">
                 <span>Rendering: </span>
                 <select ref="lineFormatSelector" v-model="pcpStore.renderingType">
@@ -48,7 +49,7 @@
                 <input type="number" step="0.05" max="1" min="0" :value="optionsStore.excludedDataOpacity" @change="setFilteredDataOpacity">
             </div>
         </div>
-    </div>
+    </SidebarSection>
 </template>
 
 <script setup>
@@ -56,6 +57,7 @@ import { reactive, ref } from "vue"
 
 // Components
 import RangeInput from '@/components/inputs/RangeInput.vue'
+import SidebarSection from "@/components/layouts/SidebarSection.vue"
 
 // State
 import {useOptionsStore} from "@/store/OptionsStore"
@@ -79,7 +81,6 @@ function setResolutionManualOverride (override) {
 
 <style lang="scss" scoped>
     .title {
-        font-size: 0.8em;
         font-weight: bold;
     }
 

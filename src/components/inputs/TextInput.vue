@@ -1,13 +1,13 @@
 <template>
-    <div class="input-group input-group-sm mb-1">
-        <div class="input-group-prepend">
-            <span id="inputGroup-sizing-sm" class="input-group-text"><slot /></span>
+    <div class="labeled-input-container mb-1">
+        <div>
+            <span class="">
+                <slot />
+            </span>
         </div>
         <input 
             type="text" 
             class="form-control" 
-            aria-label="Small" 
-            aria-describedby="inputGroup-sizing-sm" 
             :value="modelValue"
             @input="$emit('update:modelValue', $event.target.value)"
         >
@@ -21,8 +21,13 @@ defineEmits(['update:modelValue'])
 </script>
 
 <style lang="scss" scoped>
+
+    .labeled-input-container {
+        display: grid;
+        grid-template-columns: 1fr 3fr;
+    }
     .input-group-text {
-        font-size: 0.8rem;
+        font-size: 1em;
         width: 60px;
         padding: 0.1em 0 0.1em 0.4em;
 
@@ -34,10 +39,10 @@ defineEmits(['update:modelValue'])
 
     .form-control  {
         padding: 0.1rem 0 0.1rem 0.4rem;
-        font-size: 0.6rem !important;
+        font-size: 1em !important;
         font-family: monospace;
-        font-weight: bold;
         text-align: right;
+        padding-right: 4px;
     }
 
 </style>

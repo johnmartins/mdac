@@ -2,6 +2,9 @@ import { defineStore } from 'pinia'
 
 export const useStateStore = defineStore('state', {
     state: () => ({
+        // Imported file info
+        importedFileName: null,
+
         // Layout
         activeView: 'pcp',
         showCategorySettingsWindow: false,

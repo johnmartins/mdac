@@ -13,6 +13,10 @@ async function calculateIntersimilarity (fidelityColumnTitle, targetColValue, io
         throw new Error('Unsupported analysis configuration.')
     }
 
+    if (cols.length === 0) {
+        throw new Error(`No columns of type ${ioType} could be found. Ensure that you have tagged data as input/output in the data view.`)
+    }
+
     const normalized = true
     const intersimCol = '$intersim$'
 

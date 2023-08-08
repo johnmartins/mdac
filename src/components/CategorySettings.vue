@@ -37,7 +37,7 @@
                 
                 <div class="button-row mt-2">
                     <button
-                        class="btn btn-sm btn-primary close-button" 
+                        class="small close-button" 
                         @click="showCategorySettingsWindow=false"
                     >
                         Close
@@ -85,6 +85,7 @@ $width: 300px;
     cursor: auto;
     font-size: 0.8em;    
     font-family: monospace;
+    color: black;
 }
 
 .window-header {

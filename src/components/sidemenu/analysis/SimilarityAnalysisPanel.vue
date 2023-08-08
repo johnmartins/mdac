@@ -1,10 +1,9 @@
 <template>
-    <div class="card mt-3">
-        <div class="control-group p-2">
-            <div>
-                <strong>Similarity analysis</strong>
-            </div>
-            
+    <SidebarSection 
+        title="Similarity Analysis" 
+        :start-maximized="false"
+    >
+        <div class="control-group">            
             <div class="labeled-form">
                 <span>Fidelity column: </span>
                 <select v-model="fidelityColumn" class="mb-2">
@@ -27,12 +26,12 @@
                 </select>
             </div>
             <div class="d-grid">
-                <button class="btn btn-sm btn-primary" :disabled="!similarityAnalysisAvailable" @click="requestIntersimCalc">
+                <button class="" :disabled="!similarityAnalysisAvailable" @click="requestIntersimCalc">
                     Calculate inter-similarity
                 </button>
             </div>
         </div>
-    </div>
+    </SidebarSection>
 </template>
 <script setup>
 
@@ -43,6 +42,7 @@ import { useStateStore } from "@/store/StateStore"
 import { storeToRefs } from "pinia"
 import { computed, ref } from "vue"
 import { useDataStore } from "../../../store/DataStore"
+import SidebarSection from "@/components/layouts/SidebarSection"
 
 const analysisWorker = new Worker('analysis.js')
 
