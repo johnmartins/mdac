@@ -4,9 +4,9 @@
 </template>
 
 <script setup>
-import {onMounted, ref, inject, watch} from "vue"
-import { storeToRefs } from "pinia"
-import * as d3 from "d3"
+import { onMounted, ref, inject, watch, nextTick } from "vue";
+import { storeToRefs } from "pinia";
+import * as d3 from "d3";
 
 // Stores
 import {useDataStore} from "../../../store/DataStore"
@@ -78,69 +78,67 @@ function restartRedrawCountdown () {
     }, refreshDelay)
 }
 
-function draw () {
+async function draw () {
     if (PCPStore.renderingType !== 'raster') return
     stateStore.loadingReason = 'Redrawing PCP canvas'
     const t_draw_start = performance.now()
     PCPStore.pathsDataUrl = null
 
-    setTimeout(() => {
-        ctx.clearRect(0, 0, canvasContainer.value.offsetWidth, canvasContainer.value.offsetHeight)
-        ctx.setTransform(resolution.value,0,0,resolution.value,0,0);
+    await nextTick();
 
-        const renderData = (d, color, opacity) => {
-            ctx.beginPath();
-            lineGenerator(d)
-            ctx.lineWidth = 1;
-            ctx.globalAlpha = opacity;
-            ctx.strokeStyle = color
-            ctx.stroke();
-            ctx.closePath();
-        }
+    ctx.clearRect(0, 0, canvasContainer.value.offsetWidth, canvasContainer.value.offsetHeight)
+    ctx.setTransform(resolution.value,0,0,resolution.value,0,0);
 
-        // Render excluded data
-        if (!optionsStore.hideExcluded) {
-            data.value
-                .filter(d => !dataStore.dataPointFilterCheck(d))
-                .forEach(d => renderData(d, '#bfbfbf', optionsStore.excludedDataOpacity))
-        }
+    const renderData = (d, color, opacity) => {
+        ctx.beginPath();
+        lineGenerator(d);
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = opacity;
+        ctx.strokeStyle = color;
+        ctx.stroke();
+    }
 
-        // Render included data
+    // Render excluded data
+    if (!optionsStore.hideExcluded) {
         data.value
-            .filter(dataStore.dataPointFilterCheck)
-            .forEach(d => renderData(d, getLineColor(d), optionsStore.includedDataOpacity)) 
+            .filter(d => !dataStore.dataPointFilterCheck(d))
+            .forEach(d => renderData(d, '#bfbfbf', optionsStore.excludedDataOpacity))
+    }
 
-        stateStore.clearLoading()
+    // Render included data
+    data.value
+        .filter(dataStore.dataPointFilterCheck)
+        .forEach(d => renderData(d, getLineColor(d), optionsStore.includedDataOpacity)) 
 
-        const t_draw_end = performance.now()
-        console.debug(`Draw time: ${(t_draw_end - t_draw_start)/1000} [s]`)
+    stateStore.clearLoading()
 
-        const dUrl = pathCanvas.toDataURL()
-        const t_draw_post_url = performance.now()
-        console.log(`dUrl generated in ${(t_draw_post_url - t_draw_end) / 1000} seconds`)
-        PCPStore.pathsDataUrl = dUrl
+    const t_draw_end = performance.now()
+    console.debug(`Draw time: ${(t_draw_end - t_draw_start)/1000} [s]`)
 
-    }, 50)
+    const dUrl = pathCanvas.toDataURL()
+    const t_draw_post_url = performance.now()
+    console.log(`dUrl generated in ${(t_draw_post_url - t_draw_end) / 1000} seconds`)
+    PCPStore.pathsDataUrl = dUrl
 }
 
-function resizeCanvas () {
+async function resizeCanvas () {
     if (PCPStore.renderingType !== 'raster') return
     if (!canvasContainer.value) return
     PCPStore.pathsDataUrl = null	// Triggers the image in PCP to become hidden
-    setTimeout( () => {
-        const w = canvasContainer.value.offsetWidth
-        const h = canvasContainer.value.offsetHeight
-        pathCanvas.width = w * resolution.value
-        pathCanvas.height = h * resolution.value
-        pathCanvas.style.width = w + 'px'
-        pathCanvas.style.height = h + 'px'
-        restartRedrawCountdown()
-    }, 250)
 
+    await nextTick();
+
+    const w = canvasContainer.value.offsetWidth
+    const h = canvasContainer.value.offsetHeight
+    pathCanvas.width = w * resolution.value
+    pathCanvas.height = h * resolution.value
+    pathCanvas.style.width = w + 'px'
+    pathCanvas.style.height = h + 'px'
+    restartRedrawCountdown()
 }
 
 function lineGenerator(d) {
-    let dataCats = Object.keys(d)
+    let dataCats = Object.keys(d) // TODO: Refactor potential
     let dataArray = Array(dataCats.length).fill(null)
 
     for (let i = 0; i < dataCats.length; i++) {		

@@ -18,7 +18,7 @@ export const useOptionsStore = defineStore('options', {
         useSimilarityColorCoding: true,
 
         // PCP lines
-        includedDataOpacity: 0.8,
+        includedDataOpacity: 1,
         excludedDataOpacity: 0,
         hideExcluded: true,
         curveType: 'line'
