@@ -58,7 +58,7 @@
 
 <script setup>
 
-import { reactive, ref, onMounted, onUpdated } from "vue"
+import { reactive, ref, onMounted, onUpdated, nextTick } from "vue"
 import { storeToRefs } from "pinia"
 
 import {useDataStore} from "@/store/DataStore"
@@ -86,8 +86,8 @@ function moveCategory (category, n) {
 }
 
 
-function sortBy (category) {
-    stateStore.setLoading('Sorting data')
+async function sortBy (category) {
+    await stateStore.setLoading('Sorting data')
 
     if (sortCategoryID.value) {
         if (sortCategoryID.value === category.id) {
@@ -95,22 +95,22 @@ function sortBy (category) {
         }
     }
     
-    setTimeout(() => {
-        sortFunction.value = (a,b) => {
-            let valA = a[category.title]
-            let valB = b[category.title]
-            if (!category.usesCategoricalData) {
-                valA = parseFloat(valA)
-                valB = parseFloat(valB)
-            }
-            if (valA > valB) return sortReversed.value ? -1 : 1
-            if (valA < valB) return sortReversed.value ? 1 : -1
-            return 0
+    await nextTick();
+    
+    sortFunction.value = (a,b) => {
+        let valA = a[category.title]
+        let valB = b[category.title]
+        if (!category.usesCategoricalData) {
+            valA = parseFloat(valA)
+            valB = parseFloat(valB)
         }
-        sortCategoryID.value = category.id
-        stateStore.clearLoading()
-    }, 100)
-
+        if (valA > valB) return sortReversed.value ? -1 : 1
+        if (valA < valB) return sortReversed.value ? 1 : -1
+        return 0
+    }
+    sortCategoryID.value = category.id
+    
+    await stateStore.clearLoading()
 }
 
 function toggleDisableEnable (category) {

@@ -65,6 +65,7 @@ watch(() => dataStore.enabledCategoriesCount, () => {
 function restartRedrawCountdown () {
     if (PCPStore.renderingType !== 'raster') return
     if (stateStore.activeView !== 'pcp') return
+    console.log('Restart draw countdown')
 
     let refreshDelay = 250
 
@@ -79,14 +80,12 @@ function restartRedrawCountdown () {
 }
 
 async function draw () {
-    if (PCPStore.renderingType !== 'raster') return
-    stateStore.loadingReason = 'Redrawing PCP canvas'
-    const t_draw_start = performance.now()
-    PCPStore.pathsDataUrl = null
+    if (PCPStore.renderingType !== 'raster') return;
+    await stateStore.setLoading('Redrawing PCP canvas');
+    const t_draw_start = performance.now();
+    PCPStore.pathsDataUrl = null;
 
-    await nextTick();
-
-    ctx.clearRect(0, 0, canvasContainer.value.offsetWidth, canvasContainer.value.offsetHeight)
+    ctx.clearRect(0, 0, canvasContainer.value.offsetWidth, canvasContainer.value.offsetHeight);
     ctx.setTransform(resolution.value,0,0,resolution.value,0,0);
 
     const renderData = (d, color, opacity) => {
@@ -102,23 +101,23 @@ async function draw () {
     if (!optionsStore.hideExcluded) {
         data.value
             .filter(d => !dataStore.dataPointFilterCheck(d))
-            .forEach(d => renderData(d, '#bfbfbf', optionsStore.excludedDataOpacity))
+            .forEach(d => renderData(d, '#bfbfbf', optionsStore.excludedDataOpacity));
     }
 
     // Render included data
     data.value
         .filter(dataStore.dataPointFilterCheck)
-        .forEach(d => renderData(d, getLineColor(d), optionsStore.includedDataOpacity)) 
+        .forEach(d => renderData(d, getLineColor(d), optionsStore.includedDataOpacity)); 
 
-    stateStore.clearLoading()
+    const t_draw_end = performance.now();
+    console.debug(`Draw time: ${(t_draw_end - t_draw_start)/1000} [s]`);
 
-    const t_draw_end = performance.now()
-    console.debug(`Draw time: ${(t_draw_end - t_draw_start)/1000} [s]`)
+    const dUrl = pathCanvas.toDataURL();
+    const t_draw_post_url = performance.now();
+    console.log(`dUrl generated in ${(t_draw_post_url - t_draw_end) / 1000} seconds`);
+    PCPStore.pathsDataUrl = dUrl;
 
-    const dUrl = pathCanvas.toDataURL()
-    const t_draw_post_url = performance.now()
-    console.log(`dUrl generated in ${(t_draw_post_url - t_draw_end) / 1000} seconds`)
-    PCPStore.pathsDataUrl = dUrl
+    await stateStore.clearLoading();
 }
 
 async function resizeCanvas () {

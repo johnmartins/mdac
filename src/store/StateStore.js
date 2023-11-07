@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { nextTick } from 'vue';
 
 export const useStateStore = defineStore('state', {
     state: () => ({
@@ -18,13 +19,16 @@ export const useStateStore = defineStore('state', {
     getters: {},
     actions: {
         setView(view) {
-            this.activeView = view
+            this.activeView = view;
         },
-        setLoading(reason) {
-            this.loadingReason = reason
+        async setLoading(reason) {
+            this.loadingReason = reason;
+            await nextTick();
+            return new Promise(resolve => setTimeout(resolve, 0));
         },
-        clearLoading() {
-            this.loadingReason = null
+        async clearLoading() {
+            this.loadingReason = null;
+            return new Promise(resolve => setTimeout(resolve, 0));
         }
     },
 })
