@@ -7,7 +7,7 @@
             <strong>Plot export</strong>
             <div class="labeled-form">
                 <span>Format: </span>
-                <select ref="formatSelector">
+                <select ref="formatSelector" @change="onImageFormatChange">
                     <option value="png">Image (PNG)</option>
                     <option value="svg">Vector graphics (SVG)</option>
                 </select>
@@ -31,25 +31,46 @@
 </template>
 
 <script setup>
-import { ref, inject } from "vue"
+import { ref, inject, watch } from "vue";
+import { storeToRefs } from "pinia";
 
-import SidebarSection from "@/components/layouts/SidebarSection.vue"
+import SidebarSection from "@/components/layouts/SidebarSection.vue";
 
-import { useDataStore } from "@/store/DataStore"
+import { useDataStore } from "@/store/DataStore";
+import { usePCPStore } from "@/store/PCPStore";
 
-const dataStore = useDataStore()
+const dataStore = useDataStore();
+const pcpStore = usePCPStore();
+
+const { renderingType } = storeToRefs(pcpStore);
 
 // DOM references
-const filteredDataCheckbox = ref(null)
-const formatSelector = ref(null)
+const filteredDataCheckbox = ref(null);
+const formatSelector = ref(null);
 
 // State
-const includeFilteredData = ref(false)
+const includeFilteredData = ref(false);
 
-const eventBus = inject('eventBus')
+const eventBus = inject('eventBus');
+
+watch(renderingType, () => {
+    if (renderingType.value === 'vector') {
+        formatSelector.value.value = 'svg';
+    } else {
+        formatSelector.value.value = 'png';
+    }
+})
+
+function onImageFormatChange (evt) {
+    if (evt.target.value === 'svg') {
+        pcpStore.renderingType = 'vector';
+    } else {
+        pcpStore.renderingType = 'raster';
+    }
+}
 
 function exportRequest (evt) {
-    eventBus.emit('ExportForm.exportFigureRequest', formatSelector.value.value)
+    eventBus.emit('ExportForm.exportFigureRequest', formatSelector.value.value);
 }
 
 function exportDataRequest (includeFiltered) {

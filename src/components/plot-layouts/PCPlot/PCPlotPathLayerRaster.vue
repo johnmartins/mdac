@@ -14,6 +14,10 @@ import {usePCPStore} from "../../../store/PCPStore"
 import {useOptionsStore} from "../../../store/OptionsStore"
 import {useStateStore} from "../../../store/StateStore"
 
+defineExpose({
+    generateDataUrl
+})
+
 // Store references
 const dataStore = useDataStore()
 const PCPStore = usePCPStore()
@@ -63,10 +67,17 @@ watch(() => dataStore.enabledCategoriesCount, () => {
     restartRedrawCountdown()
 })
 
+async function generateDataUrl () {
+    await stateStore.setLoading('Generating dURL');
+    const dUrl = pathCanvas.toDataURL();
+    PCPStore.pathsDataUrl = dUrl;
+
+    await stateStore.clearLoading();
+}
+
 function restartRedrawCountdown () {
     if (PCPStore.renderingType !== 'raster') return
     if (stateStore.activeView !== 'pcp') return
-    console.log('Restart draw countdown')
 
     let refreshDelay = 250
 
@@ -111,13 +122,6 @@ async function draw () {
 
     await stateStore.clearLoading();
     return 
-
-    const dUrl = pathCanvas.toDataURL();
-    const t_draw_post_url = performance.now();
-    console.log(`dUrl generated in ${(t_draw_post_url - t_draw_end) / 1000} seconds`);
-    PCPStore.pathsDataUrl = dUrl;
-
-    await stateStore.clearLoading();
 }
 
 function renderLine (d, color, opacity) {
