@@ -89,15 +89,6 @@ async function draw () {
     ctx.clearRect(0, 0, canvasContainer.value.offsetWidth, canvasContainer.value.offsetHeight);
     ctx.setTransform(resolution.value,0,0,resolution.value,0,0);
 
-    const renderData = async (d, color, opacity) => {
-        ctx.beginPath();
-        lineGenerator(d);
-        ctx.lineWidth = 1;
-        ctx.globalAlpha = opacity;
-        ctx.strokeStyle = color;
-        ctx.stroke();        
-    }
-
     let includedDataArray = [];
     let excludedDataArray = [];
 
@@ -110,18 +101,6 @@ async function draw () {
         } else {
             excludedDataArray.push(d);
         }   
-    }
-
-    const batchRender = async (dataArray, opacity, overrideColor = null) => {
-        let dataArrayLength = dataArray.length;
-        let chunkSize = dataArrayLength / 50;
-        for (let i = 0; i < dataArrayLength; i += chunkSize) {
-            let chunk = dataArray.slice(i, i + chunkSize);
-            await Promise.all(chunk.map(d => renderData(d, overrideColor ? overrideColor : getLineColor(d), opacity)));
-
-            // Pause until next chunk 
-            await new Promise(resolve => setTimeout(resolve, 0));
-        }
     }
 
     if (!optionsStore.hideExcluded) await batchRender(excludedDataArray, optionsStore.excludedDataOpacity, '#bfbfbf');
@@ -139,6 +118,32 @@ async function draw () {
     PCPStore.pathsDataUrl = dUrl;
 
     await stateStore.clearLoading();
+}
+
+function renderLine (d, color, opacity) {
+    ctx.beginPath();
+    lineGenerator(d);
+    ctx.lineWidth = 1;
+    ctx.globalAlpha = opacity;
+    ctx.strokeStyle = color;
+    ctx.stroke();        
+}
+
+async function batchRender (dataArray, opacity, overrideColor = null) {
+    let dataArrayLength = dataArray.length;
+    let chunkSize = dataArrayLength / getChunkCount(dataArrayLength);
+    for (let i = 0; i < dataArrayLength; i += chunkSize) {
+        let chunk = dataArray.slice(i, i + chunkSize);
+        await Promise.all(chunk.map(d => renderLine(d, overrideColor ? overrideColor : getLineColor(d), opacity)));
+
+        // Pause until next chunk 
+        await new Promise(resolve => setTimeout(resolve, 0));
+    }
+}
+
+function getChunkCount (dataArrayLength) {
+    let count = parseInt(Math.max(10,Math.min(50, dataArrayLength/250)));
+    return count;
 }
 
 async function resizeCanvas () {
