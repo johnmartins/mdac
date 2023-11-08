@@ -103,7 +103,7 @@ async function readFile () {
     reader.readAsText(new Blob([file], {"type": file.type}))	
     reader.onloadend = async (res) => {
         parseCSV(res)
-        stateStore.setLoading('Awaiting rendering hook..')
+        await stateStore.clearLoading()
     } 
 }
 
