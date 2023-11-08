@@ -31,8 +31,10 @@ import {truncateDecimals} from "@/utils/data-utils"
 import {useDataStore} from "../../../store/DataStore"
 import {usePCPStore} from "../../../store/PCPStore"
 import {useOptionsStore} from "../../../store/OptionsStore"
+import { useStateStore } from "@/store/StateStore"
 
 // Store references
+const stateStore = useStateStore();
 const dataStore = useDataStore()
 const PCPStore = usePCPStore()
 const optionsStore = useOptionsStore()
@@ -42,8 +44,8 @@ const {horizontalOffset, axisLength, plotYBounds} = storeToRefs(PCPStore)
 const {data} = storeToRefs(dataStore)
 
 function lineGenerator(d) {
-    let dataCats = Object.keys(d)
-    let dataArray = Array(dataCats.length).fill(null)
+    let dataCats = Object.keys(d);
+    let dataArray = Array(dataCats.length).fill(null);
 
     for (let i = 0; i < dataCats.length; i++) {		
         let c = dataStore.getCategoryWithName(dataCats[i])

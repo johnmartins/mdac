@@ -3,7 +3,7 @@
         <div ref="pcpPlot" style="height: 100%; position: relative;" class="svg-container">
             <!-- Raster rendering layer -->
             <div v-if="PCPStore.renderingType === 'raster'" style="width: 100%; height: 100%;">
-                <PCPlotPathLayerRaster />
+                <PCPlotPathLayerRaster ref="rasterLayer" />
             </div>
             <svg 
                 ref="plotCanvas"  
@@ -26,7 +26,9 @@
                     <!-- Vector rendering layer -->
                     <PCPlotPathLayerVector />
 
+                    <!-- Raster export image -->
                     <image v-if="PCPStore.renderingType === 'raster' && pathsDataUrl" :href="pathsDataUrl" width="100%" height="100%" :y="getPlotYBounds()[0]" />
+                    
 
                     <!-- Axis group. Filter for enabled, sort by position, position using index. -->
                     <g 
@@ -93,7 +95,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, onUpdated, inject, computed, watch} from "vue"
+import { reactive, ref, onMounted, onUpdated, inject, computed, watch, nextTick} from "vue"
 import { storeToRefs } from "pinia"
 
 import { saveAs } from "file-saver"
@@ -139,6 +141,7 @@ const dataExcluded = ref([])
 // Layout references
 const plotCanvas = ref(null)
 const pcpPlot = ref(null)
+const rasterLayer = ref(null)
 
 const plotParameters = reactive({
     padding: 100,
@@ -336,23 +339,38 @@ function getSelectedCategoryTitle () {
     return selectedCategory.value ? selectedCategory.value.title : null
 }
 
-function handleExportRequest (format) {
-    if (activeView.value !== 'pcp') return
+async function handleExportRequest (format) {
+    if (activeView.value !== 'pcp') return;
 
     if (format === 'png') {
-        exportPNG()
+
+        if (PCPStore.renderingType !== 'raster') {
+            const errorPopup = new Popup('error', 'Invalid export configuration', 
+                'To export to PNG, first change render mode to "Rasterized" under the Plot Options section in the menu.' +
+            '\n\nAlternatively, you can export to SVG.')
+            layoutStore.queuePopup(errorPopup)
+            return
+        }
+
+        try {
+            await rasterLayer.value.generateDataUrl();
+            await nextTick();
+            await exportPNG();
+        } finally {
+            PCPStore.pathsDataUrl = null;
+        }
     } 
     else if (format === 'svg') {
-        exportSVG()
+        exportSVG();
     }
     else {
-        throw new Error('Unknown format in export request')
+        throw new Error('Unknown format in export request');
     }
 }
 
-function exportPNG () {
+async function exportPNG () {
     const csvElement = plotCanvas.value
-    saveSvgAsPng(csvElement, 'PCPlot.png', {encoderOptions: 1, backgroundColor: 'white', scale: 2})
+    await saveSvgAsPng(csvElement, 'PCPlot.png', {encoderOptions: 1, backgroundColor: 'white', scale: 2})
 }
 
 function exportSVG () {

@@ -1,19 +1,19 @@
 <template>
     <div v-if="loadingReason" class="modal-mask loading modal-container">
         <div class="message-container anim-pulse">
-            <span>{{ loadingReason }}</span><br>
-            <span class="icon"><faicon icon="fa-solid fa-spinner" class="anim-rotate-step-8" /></span>
+            <span class="icon me-2"><faicon icon="fa-solid fa-spinner" class="anim-rotate-step-8" /></span>
+            <span>{{ loadingReason }}</span>
         </div>
     </div>
 </template>
 
 <script setup>
-import { storeToRefs } from "pinia"
+import { storeToRefs } from "pinia";
 
-import {useStateStore} from "@/store/StateStore"
+import {useStateStore} from "@/store/StateStore";
 
-const stateStore = useStateStore()
-const {loadingReason} = storeToRefs(stateStore)
+const stateStore = useStateStore();
+const { loadingReason } = storeToRefs(stateStore);
 
 </script>
 
@@ -31,6 +31,12 @@ const {loadingReason} = storeToRefs(stateStore)
     }
 
     .message-container {
-        color: black;
+        color: white;
+        white-space: nowrap;
+        height: 40px;
+        display: flex;
+        // Align in middle vertically
+        justify-content: center; /*x-axis*/
+        align-items: center; /*y-axis*/
     }
 </style>

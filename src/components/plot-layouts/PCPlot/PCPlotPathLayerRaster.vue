@@ -4,15 +4,19 @@
 </template>
 
 <script setup>
-import {onMounted, ref, inject, watch} from "vue"
-import { storeToRefs } from "pinia"
-import * as d3 from "d3"
+import { onMounted, ref, inject, watch, nextTick } from "vue";
+import { storeToRefs } from "pinia";
+import * as d3 from "d3";
 
 // Stores
 import {useDataStore} from "../../../store/DataStore"
 import {usePCPStore} from "../../../store/PCPStore"
 import {useOptionsStore} from "../../../store/OptionsStore"
 import {useStateStore} from "../../../store/StateStore"
+
+defineExpose({
+    generateDataUrl
+})
 
 // Store references
 const dataStore = useDataStore()
@@ -37,11 +41,12 @@ eventBus.on('Router.TabChange', (viewName) => {
 })
 
 // Canvas draw variables
-let pathCanvas = document.createElement('canvas')
+let pathCanvas = document.createElement('canvas')   // Is not appended to DOM
 let ctx = pathCanvas.getContext('2d')
 let redrawTimerID = null
 
 onMounted(() => {
+    canvasContainer.value.appendChild(pathCanvas);
     resizeCanvas()
 })
 
@@ -62,6 +67,14 @@ watch(() => dataStore.enabledCategoriesCount, () => {
     restartRedrawCountdown()
 })
 
+async function generateDataUrl () {
+    await stateStore.setLoading('Generating dURL');
+    const dUrl = pathCanvas.toDataURL();
+    PCPStore.pathsDataUrl = dUrl;
+
+    await stateStore.clearLoading();
+}
+
 function restartRedrawCountdown () {
     if (PCPStore.renderingType !== 'raster') return
     if (stateStore.activeView !== 'pcp') return
@@ -78,69 +91,83 @@ function restartRedrawCountdown () {
     }, refreshDelay)
 }
 
-function draw () {
-    if (PCPStore.renderingType !== 'raster') return
-    stateStore.loadingReason = 'Redrawing PCP canvas'
-    const t_draw_start = performance.now()
-    PCPStore.pathsDataUrl = null
+async function draw () {
+    if (PCPStore.renderingType !== 'raster') return;
+    await stateStore.setLoading('Redrawing PCP canvas');
+    const t_draw_start = performance.now();
+    PCPStore.pathsDataUrl = null;
 
-    setTimeout(() => {
-        ctx.clearRect(0, 0, canvasContainer.value.offsetWidth, canvasContainer.value.offsetHeight)
-        ctx.setTransform(resolution.value,0,0,resolution.value,0,0);
+    ctx.clearRect(0, 0, canvasContainer.value.offsetWidth, canvasContainer.value.offsetHeight);
+    ctx.setTransform(resolution.value,0,0,resolution.value,0,0);
 
-        const renderData = (d, color, opacity) => {
-            ctx.beginPath();
-            lineGenerator(d)
-            ctx.lineWidth = 1;
-            ctx.globalAlpha = opacity;
-            ctx.strokeStyle = color
-            ctx.stroke();
-            ctx.closePath();
-        }
+    let includedDataArray = [];
+    let excludedDataArray = [];
 
-        // Render excluded data
-        if (!optionsStore.hideExcluded) {
-            data.value
-                .filter(d => !dataStore.dataPointFilterCheck(d))
-                .forEach(d => renderData(d, '#bfbfbf', optionsStore.excludedDataOpacity))
-        }
+    for (let i = 0; i < data.value.length; i++) {
+        let d = data.value[i];
 
-        // Render included data
-        data.value
-            .filter(dataStore.dataPointFilterCheck)
-            .forEach(d => renderData(d, getLineColor(d), optionsStore.includedDataOpacity)) 
+        // Check if included
+        if (dataStore.dataPointFilterCheck(d)) {
+            includedDataArray.push(d);
+        } else {
+            excludedDataArray.push(d);
+        }   
+    }
 
-        stateStore.clearLoading()
+    if (!optionsStore.hideExcluded) await batchRender(excludedDataArray, optionsStore.excludedDataOpacity, '#bfbfbf');
+    await batchRender(includedDataArray, optionsStore.includedDataOpacity);
 
-        const t_draw_end = performance.now()
-        console.debug(`Draw time: ${(t_draw_end - t_draw_start)/1000} [s]`)
+    const t_draw_end = performance.now();
+    console.debug(`Draw time: ${(t_draw_end - t_draw_start)/1000} [s]`);
 
-        const dUrl = pathCanvas.toDataURL()
-        const t_draw_post_url = performance.now()
-        console.log(`dUrl generated in ${(t_draw_post_url - t_draw_end) / 1000} seconds`)
-        PCPStore.pathsDataUrl = dUrl
-
-    }, 50)
+    await stateStore.clearLoading();
+    return 
 }
 
-function resizeCanvas () {
+function renderLine (d, color, opacity) {
+    ctx.beginPath();
+    lineGenerator(d);
+    ctx.lineWidth = 1;
+    ctx.globalAlpha = opacity;
+    ctx.strokeStyle = color;
+    ctx.stroke();        
+}
+
+async function batchRender (dataArray, opacity, overrideColor = null) {
+    let dataArrayLength = dataArray.length;
+    let chunkSize = dataArrayLength / getChunkCount(dataArrayLength);
+    for (let i = 0; i < dataArrayLength; i += chunkSize) {
+        let chunk = dataArray.slice(i, i + chunkSize);
+        await Promise.all(chunk.map(d => renderLine(d, overrideColor ? overrideColor : getLineColor(d), opacity)));
+
+        // Pause until next chunk 
+        await new Promise(resolve => setTimeout(resolve, 0));
+    }
+}
+
+function getChunkCount (dataArrayLength) {
+    let count = parseInt(Math.max(10,Math.min(50, dataArrayLength/250)));
+    return count;
+}
+
+async function resizeCanvas () {
     if (PCPStore.renderingType !== 'raster') return
     if (!canvasContainer.value) return
     PCPStore.pathsDataUrl = null	// Triggers the image in PCP to become hidden
-    setTimeout( () => {
-        const w = canvasContainer.value.offsetWidth
-        const h = canvasContainer.value.offsetHeight
-        pathCanvas.width = w * resolution.value
-        pathCanvas.height = h * resolution.value
-        pathCanvas.style.width = w + 'px'
-        pathCanvas.style.height = h + 'px'
-        restartRedrawCountdown()
-    }, 250)
 
+    await nextTick();
+
+    const w = canvasContainer.value.offsetWidth
+    const h = canvasContainer.value.offsetHeight
+    pathCanvas.width = w * resolution.value
+    pathCanvas.height = h * resolution.value
+    pathCanvas.style.width = w + 'px'
+    pathCanvas.style.height = h + 'px'
+    restartRedrawCountdown()
 }
 
 function lineGenerator(d) {
-    let dataCats = Object.keys(d)
+    let dataCats = Object.keys(d) // TODO: Refactor potential
     let dataArray = Array(dataCats.length).fill(null)
 
     for (let i = 0; i < dataCats.length; i++) {		
