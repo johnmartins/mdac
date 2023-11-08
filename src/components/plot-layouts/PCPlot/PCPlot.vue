@@ -26,7 +26,9 @@
                     <!-- Vector rendering layer -->
                     <PCPlotPathLayerVector />
 
+                    <!--
                     <image v-if="PCPStore.renderingType === 'raster' && pathsDataUrl" :href="pathsDataUrl" width="100%" height="100%" :y="getPlotYBounds()[0]" />
+                    -->
 
                     <!-- Axis group. Filter for enabled, sort by position, position using index. -->
                     <g 

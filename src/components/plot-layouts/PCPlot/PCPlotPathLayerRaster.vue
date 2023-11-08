@@ -37,11 +37,12 @@ eventBus.on('Router.TabChange', (viewName) => {
 })
 
 // Canvas draw variables
-let pathCanvas = document.createElement('canvas')
+let pathCanvas = document.createElement('canvas')   // Is not appended to DOM
 let ctx = pathCanvas.getContext('2d')
 let redrawTimerID = null
 
 onMounted(() => {
+    canvasContainer.value.appendChild(pathCanvas);
     resizeCanvas()
 })
 
@@ -88,29 +89,49 @@ async function draw () {
     ctx.clearRect(0, 0, canvasContainer.value.offsetWidth, canvasContainer.value.offsetHeight);
     ctx.setTransform(resolution.value,0,0,resolution.value,0,0);
 
-    const renderData = (d, color, opacity) => {
+    const renderData = async (d, color, opacity) => {
         ctx.beginPath();
         lineGenerator(d);
         ctx.lineWidth = 1;
         ctx.globalAlpha = opacity;
         ctx.strokeStyle = color;
-        ctx.stroke();
+        ctx.stroke();        
     }
 
-    // Render excluded data
-    if (!optionsStore.hideExcluded) {
-        data.value
-            .filter(d => !dataStore.dataPointFilterCheck(d))
-            .forEach(d => renderData(d, '#bfbfbf', optionsStore.excludedDataOpacity));
+    let includedDataArray = [];
+    let excludedDataArray = [];
+
+    for (let i = 0; i < data.value.length; i++) {
+        let d = data.value[i];
+
+        // Check if included
+        if (dataStore.dataPointFilterCheck(d)) {
+            includedDataArray.push(d);
+        } else {
+            excludedDataArray.push(d);
+        }   
     }
 
-    // Render included data
-    data.value
-        .filter(dataStore.dataPointFilterCheck)
-        .forEach(d => renderData(d, getLineColor(d), optionsStore.includedDataOpacity)); 
+    const batchRender = async (dataArray, opacity, overrideColor = null) => {
+        let dataArrayLength = dataArray.length;
+        let chunkSize = dataArrayLength / 50;
+        for (let i = 0; i < dataArrayLength; i += chunkSize) {
+            let chunk = dataArray.slice(i, i + chunkSize);
+            await Promise.all(chunk.map(d => renderData(d, overrideColor ? overrideColor : getLineColor(d), opacity)));
+
+            // Pause until next chunk 
+            await new Promise(resolve => setTimeout(resolve, 0));
+        }
+    }
+
+    if (!optionsStore.hideExcluded) await batchRender(excludedDataArray, optionsStore.excludedDataOpacity, '#bfbfbf');
+    await batchRender(includedDataArray, optionsStore.includedDataOpacity);
 
     const t_draw_end = performance.now();
     console.debug(`Draw time: ${(t_draw_end - t_draw_start)/1000} [s]`);
+
+    await stateStore.clearLoading();
+    return 
 
     const dUrl = pathCanvas.toDataURL();
     const t_draw_post_url = performance.now();
