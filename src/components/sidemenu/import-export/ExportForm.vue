@@ -20,7 +20,7 @@
             <strong>Data export</strong>
             <div style="display: flex; justify-content: space-between; flex-direction: row;">
                 <!-- Checkbox filtered data -->
-                <span for="">Include filtered data</span>
+                <span>Include filtered data</span>
                 <input ref="filteredDataCheckbox" v-model="includeFilteredData" type="checkbox">
             </div>
             <div class="d-grid gap-2 mt-2">

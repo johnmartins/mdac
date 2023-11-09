@@ -21,7 +21,10 @@ export const useOptionsStore = defineStore('options', {
         includedDataOpacity: 1,
         excludedDataOpacity: 0,
         hideExcluded: true,
-        curveType: 'line'
+        curveType: 'line',
+
+        // Misc
+        showFilters: true,
 
     }),
     getters: {},

@@ -33,6 +33,13 @@
                 </select>
             </div>
 
+            <div class="control-group">
+                <div style="display: flex; justify-content: space-between; flex-direction: row;">
+                    <label class="form-check-label">Show filters in plot</label>
+                    <input v-model="optionsStore.showFilters" type="checkbox">
+                </div>
+            </div>
+
             <span class="title">Font size</span>
             <div class="labeled-form size-and-opacity-forms">
                 <span>Title size:</span>

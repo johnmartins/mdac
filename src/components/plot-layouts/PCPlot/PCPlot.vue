@@ -51,8 +51,10 @@
                         />
 
                         <!-- Axis Filters -->
-                        <g v-for="(f, index) in filters[c.title]" :key="index">
-                            <PCPlotFilter :filter="f" :category="c" @interaction="onFilterInteraction" />
+                        <g v-if="optionsStore.showFilters">
+                            <g v-for="(f, index) in filters[c.title]" :key="index">
+                                <PCPlotFilter :filter="f" :category="c" @interaction="onFilterInteraction" />
+                            </g>
                         </g>
 						
                         <!-- Proto axis filters -->
