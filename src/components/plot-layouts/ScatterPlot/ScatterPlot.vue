@@ -32,7 +32,6 @@
                         
                         <!-- filter group -->
                         <g>
-
                             <rect
                                 v-if="filterVariables.mousedown"
                                 class="filter-box-proto"
@@ -41,7 +40,6 @@
                                 :width="protoFilterRectAttrs.width"
                                 :height="protoFilterRectAttrs.height"
                             />
-
                         </g>
 
                         <!-- x-axis group -->

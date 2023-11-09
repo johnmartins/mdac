@@ -14,15 +14,17 @@
                     <option v-for="c in categories" :key="c.id" :value="c"> {{ c.displayTitle }}</option>
                 </select>
             </div>
-            <div class="form-check" title="If enabled, data points will be color coded based on input similarity (euclidean proximity).">
-                <input
-                    v-model="useSimilarityColorCoding" class="form-check-input" 
-                    type="checkbox" 
-                    @change="onUseSimilarityColorCodingChange"
-                >
-                <label class="form-check-label m-0" for="flexCheckDefault">
-                    Use similarity color coding
-                </label>
+            <div class="control-group" title="If enabled, data points will be color coded based on input similarity (euclidean proximity).">
+                <div style="display: flex; justify-content: space-between; flex-direction: row;">
+                    <label class="form-check-label m-0">
+                        Use similarity color coding
+                    </label>
+                    <input
+                        v-model="useSimilarityColorCoding"
+                        type="checkbox" 
+                        @change="onUseSimilarityColorCodingChange"
+                    >
+                </div>
             </div>
         </div>
     </SidebarSection>
