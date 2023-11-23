@@ -121,7 +121,7 @@ function exportDataRequest (includeFiltered) {
     const blob = new Blob([csvStr], { type: 'text/csv;charset=utf-8;' })
     const a = document.createElement("a")
     a.href = URL.createObjectURL(blob);
-    a.download = 'mdac-data.json';
+    a.download = 'mdac-data.csv';
     a.click();
 }
 
