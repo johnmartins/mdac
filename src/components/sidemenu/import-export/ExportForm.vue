@@ -31,7 +31,7 @@
             <strong>Filter export</strong>
             <div style="display: flex; justify-content: space-between; flex-direction: row;">
                 <!-- Checkbox filtered data -->
-                <span>Convert near-limit to inf</span>
+                <span>Interpret out-of-bounds limits as inf</span>
                 <input ref="filteredDataCheckbox" v-model="nearLimitAsInf" type="checkbox">
             </div>
             <div class="d-grid gap-2 mt-2">
@@ -167,8 +167,6 @@ function nearLimitConversion(minmax, filter) {
 }
 
 function exportFilterRequest (nearLimitAsInf) {
-    console.log("Exporting filters");
-
     let headerRow = ['category','min','max','included'];
     let csvRowArray = [headerRow.join(';')];
 
@@ -180,7 +178,6 @@ function exportFilterRequest (nearLimitAsInf) {
         }
 
         filterArray.forEach(filter => {
-            console.log(filter);
 
             let filterData = [`"${category.title}"`, '"N/A"', '"N/A"', '"N/A"'];
 
@@ -202,8 +199,6 @@ function exportFilterRequest (nearLimitAsInf) {
         });
 
         const csvStr = csvRowArray.join("\n");
-
-        console.log(csvStr);
 
         // Download csvStr as csv-file
         const blob = new Blob([csvStr], { type: 'text/csv;charset=utf-8;' });
