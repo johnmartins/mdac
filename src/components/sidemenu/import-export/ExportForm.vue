@@ -13,7 +13,7 @@
                 </select>
             </div>
             <div class="d-grid gap-2 mt-2">
-                <button @click="exportRequest">Download</button>
+                <button @click="exportRequest">Download Image</button>
             </div>
         </div>
         <div class="control-group">
