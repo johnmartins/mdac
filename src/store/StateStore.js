@@ -15,9 +15,16 @@ export const useStateStore = defineStore('state', {
 
         // Misc
         loadingReason: null,        // If not null, then something is loading, preventing the user from interacting with the interface.
+
+        // Queued re-renders
+        reRenderMvGrid: true
     }),
     getters: {},
     actions: {
+        queueReRenders () {
+            console.log("QUEUE RERENDER")
+            this.reRenderMvGrid = true
+        },
         setView(view) {
             this.activeView = view;
         },

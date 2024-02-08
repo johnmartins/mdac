@@ -138,7 +138,6 @@ import CategoricFilter from "@/models/filters/CategoricFilter"
 // Components
 import ScatterPlotPointLayer from "./ScatterPlotPointLayer.vue"
 import RangeIndicator from "@/components/plot-features/RangeIndicator"
-import ScatterPlotPointLayerRaster from "./ScatterPlotPointLayerRaster.vue"
 
 const dataStore = useDataStore()
 const scatterStore = useScatterStore()
@@ -147,9 +146,6 @@ const optionsStore = useOptionsStore()
 
 const {selectedPlot} = storeToRefs(scatterStore)
 const {activeView} = storeToRefs(stateStore)
-
-// DOM
-const rasterLayer = ref(null);
 
 // Plot references
 const plotCanvas = ref(null)

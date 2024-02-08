@@ -15,6 +15,7 @@
                 </span>
 
                 <span
+                    v-if="categories.length > 0"
                     class="link" 
                     :class="{active: activeView === 'scatter'}" 
                     @click="setView('scatter')"
@@ -22,13 +23,15 @@
                     Scatter
                 </span>
                 <span
+                    v-if="categories.length > 0"
                     class="link"
                     :class="{active: activeView === 'mvgrid'}"
                     @click="setView('mvgrid')"
                 >
-                    MV Grid
+                    Scatter-Grid
                 </span>
                 <span
+                    v-if="categories.length > 0"
                     class="link" 
                     :class="{active: activeView === 'data'}" 
                     @click="setView('data')"
@@ -70,7 +73,7 @@
             </div>
             <div ref="mvGridContainer" class="fill-content" style="display: none">
                 <SidebarLayout>
-                    <template #sidebar><ScatterSideMenu /></template>
+                    <template #sidebar><MVGridSideMenu /></template>
                     <MVGridLayout />
                 </SidebarLayout>
             </div>
@@ -88,33 +91,34 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, onUpdated, inject, onErrorCaptured } from "vue"
+import { reactive, ref, onMounted, onUpdated, inject, onErrorCaptured } from "vue";
 
 // Layouts
-import SidebarLayout from '@/components/layouts/SidebarLayout'
-import DoubleSidebarLayout from '@/components/layouts/DoubleSidebarLayout'
-import BoxLayout from '@/components/layouts/BoxLayout'
-import PopupBox from '@/components/layouts/PopupBox'
+import SidebarLayout from '@/components/layouts/SidebarLayout';
+import DoubleSidebarLayout from '@/components/layouts/DoubleSidebarLayout';
+import BoxLayout from '@/components/layouts/BoxLayout';
+import PopupBox from '@/components/layouts/PopupBox';
 
-import PCPlot from '@/components/plot-layouts/PCPlot/PCPlot.vue'
-import PCPSideMenu from '@/components/plot-layouts/PCPlot/PCPSideMenu'
-import DataList from '@/components/DataList'
-import ScatterPlot from '@/components/plot-layouts/ScatterPlot/ScatterPlot'
-import ScatterSideMenu from '@/components/plot-layouts/ScatterPlot/ScatterSideMenu'
-import ScatterSideMenuRight from '@/components/plot-layouts/ScatterPlot/ScatterSideMenuRight'
-import MVGridLayout from "./components/plot-layouts/MVGrid/MVGridLayout"
-import CategorySettings from '@/components/CategorySettings'
-import LoadingModal from '@/components/LoadingModal'
+import PCPlot from '@/components/plot-layouts/PCPlot/PCPlot.vue';
+import PCPSideMenu from '@/components/plot-layouts/PCPlot/PCPSideMenu';
+import DataList from '@/components/DataList';
+import ScatterPlot from '@/components/plot-layouts/ScatterPlot/ScatterPlot';
+import ScatterSideMenu from '@/components/plot-layouts/ScatterPlot/ScatterSideMenu';
+import ScatterSideMenuRight from '@/components/plot-layouts/ScatterPlot/ScatterSideMenuRight';
+import MVGridLayout from "./components/plot-layouts/MVGrid/MVGridLayout";
+import CategorySettings from '@/components/CategorySettings';
+import LoadingModal from '@/components/LoadingModal';
+import MVGridSideMenu from '@/components/plot-layouts/MVGrid/MVGridSideMenu';
 
-import { storeToRefs } from "pinia"
-import {useLayoutStore} from "@/store/LayoutStore"
-import {useStateStore} from "@/store/StateStore"
-import {useDataStore} from "@/store/DataStore"
-import Popup from "@/models/layout/Popup"
+import { storeToRefs } from "pinia";
+import {useLayoutStore} from "@/store/LayoutStore";
+import {useStateStore} from "@/store/StateStore";
+import {useDataStore} from "@/store/DataStore";
+import Popup from "@/models/layout/Popup";
 
-const stateStore = useStateStore()
-const layoutStore = useLayoutStore()
-const dataStore = useDataStore()
+const stateStore = useStateStore();
+const layoutStore = useLayoutStore();
+const dataStore = useDataStore();
 
 const {activeView, showCategorySettingsWindow} = storeToRefs(stateStore)
 const {popups} = storeToRefs(layoutStore)

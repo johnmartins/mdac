@@ -1,5 +1,6 @@
-import { defineStore } from 'pinia'
-import Category from "@/models/plots/Category"
+import { defineStore } from 'pinia';
+import Category from "@/models/plots/Category";
+import { useStateStore } from './StateStore';
 
 export const useDataStore = defineStore('data', {
     state: () => ({
@@ -72,16 +73,23 @@ export const useDataStore = defineStore('data', {
             this.data = data
         },
         addFilter (f) {
+            const stateStore = useStateStore();
+
             if (!this.filters[f.columnID]) {
-                this.filters[f.columnID] = []
+                this.filters[f.columnID] = [];
             }
-            this.filters[f.columnID].push(f)
-            this.filterIDMap.set(f.id, f)
+            this.filters[f.columnID].push(f);
+            this.filterIDMap.set(f.id, f);
+
+            // Queue rerenders
+            stateStore.reRenderMvGrid = true;
         },
         getFilterByID (id) {
             return this.filterIDMap.get(id)
         },
         deleteFilter (filterToDelete) {
+            const stateStore = useStateStore();
+
             let deleteIndex = -1
             for (let i = 0; i < this.filters[filterToDelete.columnID].length; i++) {
                 const f = this.filters[filterToDelete.columnID][i]
@@ -101,8 +109,13 @@ export const useDataStore = defineStore('data', {
                 delete this.filters[filterToDelete.columnID]
             }
             this.filterIDMap.delete(filterToDelete.id)
+
+            // Queue rerenders
+            stateStore.reRenderMvGrid = true;
         },
         editFilter (oldFilter, newFilter) {
+            const stateStore = useStateStore();
+
             let changeIndex = -1
             for (let i = 0; i < this.filters[oldFilter.columnID].length; i++) {
                 const f = this.filters[oldFilter.columnID][i]
@@ -118,6 +131,9 @@ export const useDataStore = defineStore('data', {
                 f.thresholdA = newFilter.thresholdA
                 f.thresholdB = newFilter.thresholdB
             }
+
+            // Queue rerenders
+            stateStore.reRenderMvGrid = true;
         },
         clearFilters () {
             for (let categoryName in this.filters) {

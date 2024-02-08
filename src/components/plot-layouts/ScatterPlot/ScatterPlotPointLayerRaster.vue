@@ -23,6 +23,10 @@ const props = defineProps({
     cx: Object,
     cy: Object,
     dataArray: Array,
+    renderCondition: {
+        type: Function,
+        default: () => true
+    }
 });
 
 // Stores
@@ -32,7 +36,8 @@ const optionsStore = useOptionsStore();
 const scatterStore = useScatterStore();
 
 // Store refs
-const {data} = storeToRefs(dataStore);
+const { data } = storeToRefs(dataStore);
+const { activeView } = storeToRefs(stateStore);
 
 // DOM
 const canvasContainer = ref(null);
@@ -41,22 +46,10 @@ const canvasContainer = ref(null);
 let scatterCanvas = document.createElement('canvas');
 let ctx = scatterCanvas.getContext('2d');
 let redrawTimerID = null;
-let resolution = ref(0.5);
+let resolution = ref(1);
 
 const eventBus = inject('eventBus');
 eventBus.on('Layout.contentResize', resizeCanvas);
-
-// Watchers 
-watch([() => props.dataArray.length, () => {
-    if (!props.cx) return null
-    return props.cx.title
-}, () => {
-    if (!props.cy) return null
-    return props.cy.title
-}], () => {
-    restartRedrawCountdown();
-});
-
 
 onMounted(() => {
     canvasContainer.value.appendChild(scatterCanvas);
@@ -88,20 +81,22 @@ async function draw () {
         return;
     }
 
+    eventBus.emit('ScatterPlotPointLayerRaster.renderStart');
+
+    await nextTick();
+
     await batchRender(props.dataArray);
 }
 
 async function batchRender (dataArray) {
     let dataArrayLength = dataArray.length;
-    let chunkSize = dataArrayLength / getChunkCount(dataArrayLength);
 
-    for (let i = 0; i < dataArrayLength; i+= chunkSize) {
-        let chunk = dataArray.slice(i, i + chunkSize);
-        await Promise.all(chunk.map(d => renderDataPoint(d)));
-
-        // Pause until next chunk
-        await new Promise(resolve => setTimeout(resolve, 0));
+    for (let i = 0; i < dataArrayLength; i++) {
+        let d = dataArray[i];
+        await renderDataPoint(d);
     }
+
+    eventBus.emit('ScatterPlotPointLayerRaster.renderComplete');
 }
 
 async function renderDataPoint (d) {
@@ -125,17 +120,27 @@ async function renderDataPoint (d) {
     // Render as circle in canvas
     ctx.beginPath();
     ctx.arc(xPlot, yPlot, 1, 0, 2 * Math.PI);
-    ctx.fillStyle = "red";
+    ctx.fillStyle = getFill(d, true);
     ctx.fill();
 }
 
-function getChunkCount (dataArrayLength) {
-    let count = parseInt(Math.max(10,Math.min(25, dataArrayLength/500)));
-    return count;
+function getFill (d, included) {
+    const ID = d[dataStore.idCol]
+    if (ID === scatterStore.selectedDataID) return 'white'
+
+    if (!included) {
+        return '#bfbfbf'
+    } 
+
+    return optionsStore.getSampleColor(d)
 }
 
 function restartRedrawCountdown () {
     let refreshDelay = 250;
+
+    if (props.renderCondition() === false) {
+        return;
+    } 
 
     if (redrawTimerID) {
         clearTimeout(redrawTimerID);
