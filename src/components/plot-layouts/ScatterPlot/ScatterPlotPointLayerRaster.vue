@@ -1,7 +1,7 @@
 <template>
     <div 
         ref="canvasContainer"
-        style="width: 100%; height: 100%; border: 1px solid red;"
+        style="width: 100%; height: 100%;"
     />
 </template>
 
@@ -11,7 +11,13 @@ import { useOptionsStore } from '@/store/OptionsStore';
 import { useScatterStore } from '@/store/ScatterStore';
 import { useStateStore } from '@/store/StateStore';
 import { storeToRefs } from 'pinia';
-import { nextTick, onMounted, ref } from 'vue';
+import { nextTick, onMounted, ref, inject, watch } from 'vue';
+
+defineExpose({
+    generateDataUrl,
+    restartRedrawCountdown,
+    resizeCanvas
+});
 
 const props = defineProps({
     cx: Object,
@@ -35,17 +41,26 @@ const canvasContainer = ref(null);
 let scatterCanvas = document.createElement('canvas');
 let ctx = scatterCanvas.getContext('2d');
 let redrawTimerID = null;
-let resolution = ref(1);
+let resolution = ref(0.5);
 
-defineExpose({
-    generateDataUrl
+const eventBus = inject('eventBus');
+eventBus.on('Layout.contentResize', resizeCanvas);
+
+// Watchers 
+watch([() => props.dataArray.length, () => {
+    if (!props.cx) return null
+    return props.cx.title
+}, () => {
+    if (!props.cy) return null
+    return props.cy.title
+}], () => {
+    restartRedrawCountdown();
 });
 
+
 onMounted(() => {
-    console.log("onMounted canvas container: "+canvasContainer.value)
     canvasContainer.value.appendChild(scatterCanvas);
     resizeCanvas();
-
     restartRedrawCountdown();
 });
 
@@ -79,12 +94,9 @@ async function draw () {
 async function batchRender (dataArray) {
     let dataArrayLength = dataArray.length;
     let chunkSize = dataArrayLength / getChunkCount(dataArrayLength);
-    console.log("Chunk size: " + chunkSize + " Data array length: " + dataArrayLength)
 
     for (let i = 0; i < dataArrayLength; i+= chunkSize) {
-        console.log('Rendering chunk: ' + i);
         let chunk = dataArray.slice(i, i + chunkSize);
-        console.log(chunk)
         await Promise.all(chunk.map(d => renderDataPoint(d)));
 
         // Pause until next chunk
@@ -96,29 +108,29 @@ async function renderDataPoint (d) {
     // Get datapoint true position
     let x = props.cx.scaleLinear(d[props.cx.title]);
     let y = props.cy.scaleLinear(d[props.cy.title]);
-    
-    let xPlot = canvasContainer.value.offsetWidth - x * (canvasContainer.value.offsetWidth - 0);
-    let yPlot = y * (canvasContainer.value.offsetHeight - 0);
 
-    if (!x && !y) {
+    let xPlot = canvasContainer.value.offsetWidth - x * (canvasContainer.value.offsetWidth);
+    let yPlot = y * (canvasContainer.value.offsetHeight);
+
+    if (x === null && y === null) {
         throw new Error('Data point has no x and no y value');
     }
 
     if (!x) {
         x = 0;
     } else if (!y) {
-        y = scatterStore.yAxisLength;
+        y = canvasContainer.value.offsetHeight;
     }
 
     // Render as circle in canvas
     ctx.beginPath();
-    ctx.arc(xPlot, yPlot, 5, 0, 2 * Math.PI);
+    ctx.arc(xPlot, yPlot, 1, 0, 2 * Math.PI);
     ctx.fillStyle = "red";
     ctx.fill();
 }
 
 function getChunkCount (dataArrayLength) {
-    let count = parseInt(Math.max(10,Math.min(50, dataArrayLength/250)));
+    let count = parseInt(Math.max(10,Math.min(25, dataArrayLength/500)));
     return count;
 }
 

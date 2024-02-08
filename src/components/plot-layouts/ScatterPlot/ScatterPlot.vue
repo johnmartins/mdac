@@ -1,15 +1,6 @@
 <template>
     <div class="component-container">
         <div class="svg-container" style="position: relative;">
-            <div v-if="activeView === 'scatter'" style="width: 100%; height: 100%;">
-                <ScatterPlotPointLayerRaster 
-                    ref="rasterLayer" 
-                    :cx="cx" 
-                    :cy="cy"
-                    :dataArray="dataStore.data"
-                />
-                <!-- selectedPlot.value.xAxisCategoryName for cx-->
-            </div>
             <svg
                 ref="plotCanvas" 
                 height="100%" 

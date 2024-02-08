@@ -22,6 +22,13 @@
                     Scatter
                 </span>
                 <span
+                    class="link"
+                    :class="{active: activeView === 'mvgrid'}"
+                    @click="setView('mvgrid')"
+                >
+                    MV Grid
+                </span>
+                <span
                     class="link" 
                     :class="{active: activeView === 'data'}" 
                     @click="setView('data')"
@@ -61,6 +68,12 @@
                     <template #sidebarB><ScatterSideMenuRight /></template>
                 </DoubleSidebarLayout>
             </div>
+            <div ref="mvGridContainer" class="fill-content" style="display: none">
+                <SidebarLayout>
+                    <template #sidebar><ScatterSideMenu /></template>
+                    <MVGridLayout />
+                </SidebarLayout>
+            </div>
         </div>
 
         <div class="author-banner">&copy; Julian Martinsson Bonde, <a href="https://github.com/johnmartins">https://github.com/johnmartins</a></div>
@@ -89,6 +102,7 @@ import DataList from '@/components/DataList'
 import ScatterPlot from '@/components/plot-layouts/ScatterPlot/ScatterPlot'
 import ScatterSideMenu from '@/components/plot-layouts/ScatterPlot/ScatterSideMenu'
 import ScatterSideMenuRight from '@/components/plot-layouts/ScatterPlot/ScatterSideMenuRight'
+import MVGridLayout from "./components/plot-layouts/MVGrid/MVGridLayout"
 import CategorySettings from '@/components/CategorySettings'
 import LoadingModal from '@/components/LoadingModal'
 
@@ -106,11 +120,12 @@ const {activeView, showCategorySettingsWindow} = storeToRefs(stateStore)
 const {popups} = storeToRefs(layoutStore)
 const {categories} = storeToRefs(dataStore)
 
-const pcpContainer = ref(null)
-const scatterContainer = ref(null)
-const dataContainer = ref(null)
-const plot = ref(null)
-const appVersion = ref(process.env.VUE_APP_VERSION)
+const pcpContainer = ref(null);
+const scatterContainer = ref(null);
+const dataContainer = ref(null);
+const mvGridContainer = ref(null);
+const plot = ref(null);
+const appVersion = ref(process.env.VUE_APP_VERSION);
 
 const eventBus = inject('eventBus')
 
@@ -120,22 +135,25 @@ eventBus.on('main.error', (err) => {
 })
 
 function setView (viewName) {
-    pcpContainer.value.style.display="none"
-    scatterContainer.value.style.display="none"
-    dataContainer.value.style.display="none"
+    pcpContainer.value.style.display="none";
+    scatterContainer.value.style.display="none";
+    dataContainer.value.style.display="none";
+    mvGridContainer.value.style.display="none";
     switch(viewName) {
     case "pcp":
-        pcpContainer.value.style.display="block"
+        pcpContainer.value.style.display="block";
         break
     case "scatter":
-        scatterContainer.value.style.display="block"
-        break
+        scatterContainer.value.style.display="block";
+        break;
     case "data":
-        dataContainer.value.style.display="block"
-        break
+        dataContainer.value.style.display="block";
+        break;
+    case "mvgrid":
+        mvGridContainer.value.style.display="block";
+        break;
     default:
-        throw new Error('No such view')
-        return
+        throw new Error('No such view');
     }
     stateStore.setView(viewName)
     eventBus.emit('Router.TabChange', viewName)
