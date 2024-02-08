@@ -1,13 +1,22 @@
 <template>
     <div class="component-container">
-        <div class="svg-container">
+        <div class="svg-container" style="position: relative;">
+            <div v-if="activeView === 'scatter'" style="width: 100%; height: 100%;">
+                <ScatterPlotPointLayerRaster 
+                    ref="rasterLayer" 
+                    :cx="cx" 
+                    :cy="cy"
+                    :dataArray="dataStore.data"
+                />
+                <!-- selectedPlot.value.xAxisCategoryName for cx-->
+            </div>
             <svg
                 ref="plotCanvas" 
                 height="100%" 
                 width="100%"
                 tabindex="0"
                 class="scatter-plot svg-content-responsive"
-                style="font-family: monospace;"
+                style="font-family: monospace; position: absolute; left: 0; top: 0;"
                 @mousedown.prevent.self="onMouseDown"
                 @mouseup.prevent="dragFilterEnd"
                 @mousemove="dragFilter"
@@ -138,6 +147,7 @@ import CategoricFilter from "@/models/filters/CategoricFilter"
 // Components
 import ScatterPlotPointLayer from "./ScatterPlotPointLayer.vue"
 import RangeIndicator from "@/components/plot-features/RangeIndicator"
+import ScatterPlotPointLayerRaster from "./ScatterPlotPointLayerRaster.vue"
 
 const dataStore = useDataStore()
 const scatterStore = useScatterStore()
@@ -146,6 +156,9 @@ const optionsStore = useOptionsStore()
 
 const {selectedPlot} = storeToRefs(scatterStore)
 const {activeView} = storeToRefs(stateStore)
+
+// DOM
+const rasterLayer = ref(null);
 
 // Plot references
 const plotCanvas = ref(null)
