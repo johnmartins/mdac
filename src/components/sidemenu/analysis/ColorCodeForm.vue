@@ -1,7 +1,7 @@
 <template>
     <SidebarSection 
         title="Color Coding" 
-        :start-maximized="false"
+        :start-maximized="props.startMaximized"
     >
         <div class="control-group">
             <div class="labeled-form">                
@@ -42,6 +42,13 @@ const dataStore = useDataStore()
 
 const {selectedColorCodeCategory, useSimilarityColorCoding} = storeToRefs(optionsStore)
 const {categories} = storeToRefs(dataStore)
+
+const props = defineProps({
+    startMaximized: {
+        type: Boolean,
+        default: false
+    }
+})
 
 function onColorCategoryChange (evt) {
     optionsStore.resetColorCodeOverride()

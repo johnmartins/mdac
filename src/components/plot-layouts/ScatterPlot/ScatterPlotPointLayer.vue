@@ -30,19 +30,21 @@
 </template>
 
 <script setup>
-import * as d3 from "d3"
-import { storeToRefs } from "pinia"
+import * as d3 from "d3";
+import { storeToRefs } from "pinia";
 
-import {truncateDecimals} from "@/utils/data-utils"
-import {euclideanDistance} from "@/sadse/similarity"
+import {truncateDecimals} from "@/utils/data-utils";
+import {euclideanDistance} from "@/sadse/similarity";
 
-import {useDataStore} from "@/store/DataStore"
-import {useScatterStore} from "@/store/ScatterStore"
-import {useOptionsStore} from "@/store/OptionsStore"
+import {useDataStore} from "@/store/DataStore";
+import {useScatterStore} from "@/store/ScatterStore";
+import {useOptionsStore} from "@/store/OptionsStore";
+import { useStateStore } from "@/store/StateStore";
 
-const dataStore = useDataStore()
-const scatterStore = useScatterStore()
-const optionsStore = useOptionsStore()
+const dataStore = useDataStore();
+const stateStore = useStateStore();
+const scatterStore = useScatterStore();
+const optionsStore = useOptionsStore();
 
 const {data} = storeToRefs(dataStore)
 const {selectedPlot, selectedDataPoint} = storeToRefs(scatterStore)
@@ -76,6 +78,8 @@ function setupSimilarityColorScale () {
     overrideColorCodeFunction.value = d3.scaleSequential()
         .domain([minDistance, maxDistance])
         .interpolator(d3.interpolateRgbBasis(["blue", "green", "yellow", "red"]))
+
+    stateStore.queueReRenders();
 
 }
 

@@ -15,6 +15,7 @@
                 </span>
 
                 <span
+                    v-if="categories.length > 0"
                     class="link" 
                     :class="{active: activeView === 'scatter'}" 
                     @click="setView('scatter')"
@@ -22,6 +23,15 @@
                     Scatter
                 </span>
                 <span
+                    v-if="categories.length > 0"
+                    class="link"
+                    :class="{active: activeView === 'mvgrid'}"
+                    @click="setView('mvgrid')"
+                >
+                    Scatter-Grid
+                </span>
+                <span
+                    v-if="categories.length > 0"
                     class="link" 
                     :class="{active: activeView === 'data'}" 
                     @click="setView('data')"
@@ -61,6 +71,12 @@
                     <template #sidebarB><ScatterSideMenuRight /></template>
                 </DoubleSidebarLayout>
             </div>
+            <div ref="mvGridContainer" class="fill-content" style="display: none">
+                <SidebarLayout>
+                    <template #sidebar><MVGridSideMenu /></template>
+                    <MVGridLayout />
+                </SidebarLayout>
+            </div>
         </div>
 
         <div class="author-banner">&copy; Julian Martinsson Bonde, <a href="https://github.com/johnmartins">https://github.com/johnmartins</a></div>
@@ -75,42 +91,45 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, onUpdated, inject, onErrorCaptured } from "vue"
+import { reactive, ref, onMounted, onUpdated, inject, onErrorCaptured } from "vue";
 
 // Layouts
-import SidebarLayout from '@/components/layouts/SidebarLayout'
-import DoubleSidebarLayout from '@/components/layouts/DoubleSidebarLayout'
-import BoxLayout from '@/components/layouts/BoxLayout'
-import PopupBox from '@/components/layouts/PopupBox'
+import SidebarLayout from '@/components/layouts/SidebarLayout';
+import DoubleSidebarLayout from '@/components/layouts/DoubleSidebarLayout';
+import BoxLayout from '@/components/layouts/BoxLayout';
+import PopupBox from '@/components/layouts/PopupBox';
 
-import PCPlot from '@/components/plot-layouts/PCPlot/PCPlot.vue'
-import PCPSideMenu from '@/components/plot-layouts/PCPlot/PCPSideMenu'
-import DataList from '@/components/DataList'
-import ScatterPlot from '@/components/plot-layouts/ScatterPlot/ScatterPlot'
-import ScatterSideMenu from '@/components/plot-layouts/ScatterPlot/ScatterSideMenu'
-import ScatterSideMenuRight from '@/components/plot-layouts/ScatterPlot/ScatterSideMenuRight'
-import CategorySettings from '@/components/CategorySettings'
-import LoadingModal from '@/components/LoadingModal'
+import PCPlot from '@/components/plot-layouts/PCPlot/PCPlot.vue';
+import PCPSideMenu from '@/components/plot-layouts/PCPlot/PCPSideMenu';
+import DataList from '@/components/DataList';
+import ScatterPlot from '@/components/plot-layouts/ScatterPlot/ScatterPlot';
+import ScatterSideMenu from '@/components/plot-layouts/ScatterPlot/ScatterSideMenu';
+import ScatterSideMenuRight from '@/components/plot-layouts/ScatterPlot/ScatterSideMenuRight';
+import MVGridLayout from "./components/plot-layouts/MVGrid/MVGridLayout";
+import CategorySettings from '@/components/CategorySettings';
+import LoadingModal from '@/components/LoadingModal';
+import MVGridSideMenu from '@/components/plot-layouts/MVGrid/MVGridSideMenu';
 
-import { storeToRefs } from "pinia"
-import {useLayoutStore} from "@/store/LayoutStore"
-import {useStateStore} from "@/store/StateStore"
-import {useDataStore} from "@/store/DataStore"
-import Popup from "@/models/layout/Popup"
+import { storeToRefs } from "pinia";
+import {useLayoutStore} from "@/store/LayoutStore";
+import {useStateStore} from "@/store/StateStore";
+import {useDataStore} from "@/store/DataStore";
+import Popup from "@/models/layout/Popup";
 
-const stateStore = useStateStore()
-const layoutStore = useLayoutStore()
-const dataStore = useDataStore()
+const stateStore = useStateStore();
+const layoutStore = useLayoutStore();
+const dataStore = useDataStore();
 
 const {activeView, showCategorySettingsWindow} = storeToRefs(stateStore)
 const {popups} = storeToRefs(layoutStore)
 const {categories} = storeToRefs(dataStore)
 
-const pcpContainer = ref(null)
-const scatterContainer = ref(null)
-const dataContainer = ref(null)
-const plot = ref(null)
-const appVersion = ref(process.env.VUE_APP_VERSION)
+const pcpContainer = ref(null);
+const scatterContainer = ref(null);
+const dataContainer = ref(null);
+const mvGridContainer = ref(null);
+const plot = ref(null);
+const appVersion = ref(process.env.VUE_APP_VERSION);
 
 const eventBus = inject('eventBus')
 
@@ -120,22 +139,25 @@ eventBus.on('main.error', (err) => {
 })
 
 function setView (viewName) {
-    pcpContainer.value.style.display="none"
-    scatterContainer.value.style.display="none"
-    dataContainer.value.style.display="none"
+    pcpContainer.value.style.display="none";
+    scatterContainer.value.style.display="none";
+    dataContainer.value.style.display="none";
+    mvGridContainer.value.style.display="none";
     switch(viewName) {
     case "pcp":
-        pcpContainer.value.style.display="block"
+        pcpContainer.value.style.display="block";
         break
     case "scatter":
-        scatterContainer.value.style.display="block"
-        break
+        scatterContainer.value.style.display="block";
+        break;
     case "data":
-        dataContainer.value.style.display="block"
-        break
+        dataContainer.value.style.display="block";
+        break;
+    case "mvgrid":
+        mvGridContainer.value.style.display="block";
+        break;
     default:
-        throw new Error('No such view')
-        return
+        throw new Error('No such view');
     }
     stateStore.setView(viewName)
     eventBus.emit('Router.TabChange', viewName)

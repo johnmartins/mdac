@@ -1,5 +1,4 @@
 <template>
-    <!-- This component does not provide any visual elements in the DOM. It only provides the PCP CSV element with an image of the paths/lines -->
     <div ref="canvasContainer" style="width: 100%; height: 100%;" :style="{paddingTop: `${plotYBounds[0]}px`, paddingLeft: `${plotXBounds[0]}px`}" />
 </template>
 
@@ -41,9 +40,9 @@ eventBus.on('Router.TabChange', (viewName) => {
 })
 
 // Canvas draw variables
-let pathCanvas = document.createElement('canvas')   // Is not appended to DOM
-let ctx = pathCanvas.getContext('2d')
-let redrawTimerID = null
+let pathCanvas = document.createElement('canvas');
+let ctx = pathCanvas.getContext('2d');
+let redrawTimerID = null;
 
 onMounted(() => {
     canvasContainer.value.appendChild(pathCanvas);

@@ -1,13 +1,13 @@
 <template>
     <div class="component-container">
-        <div class="svg-container">
+        <div class="svg-container" style="position: relative;">
             <svg
                 ref="plotCanvas" 
                 height="100%" 
                 width="100%"
                 tabindex="0"
                 class="scatter-plot svg-content-responsive"
-                style="font-family: monospace;"
+                style="font-family: monospace; position: absolute; left: 0; top: 0;"
                 @mousedown.prevent.self="onMouseDown"
                 @mouseup.prevent="dragFilterEnd"
                 @mousemove="dragFilter"

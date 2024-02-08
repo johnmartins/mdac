@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import * as d3 from "d3"
+import { useStateStore } from './StateStore';
 
 export const useOptionsStore = defineStore('options', {
     state: () => ({
@@ -29,7 +30,6 @@ export const useOptionsStore = defineStore('options', {
     }),
     getters: {},
     actions: {
-
         setExcludedDataOpacity (opacity) {
             if (opacity < 0.001) {
                 this.hideExcluded = true
@@ -69,12 +69,16 @@ export const useOptionsStore = defineStore('options', {
             this.colorCodeLowerBound = this.selectedColorCodeCategory.lb
             this.colorCodeUpperBound = this.selectedColorCodeCategory.ub
 
+            useStateStore().queueReRenders();
+
         },
         resetColorCoding () {
             this.resetColorCodeOverride()
             this.selectedColorCodeCategory = null,
             this.colorCodeLowerBound = null
             this.colorCodeUpperBound = null
+
+            useStateStore().queueReRenders();
 
         },
         getActiveColorCodeColumnTitle () {
