@@ -46,7 +46,7 @@ const canvasContainer = ref(null);
 let scatterCanvas = document.createElement('canvas');
 let ctx = scatterCanvas.getContext('2d');
 let redrawTimerID = null;
-let resolution = ref(1);
+let resolution = ref(0.8);
 
 const eventBus = inject('eventBus');
 eventBus.on('Layout.contentResize', resizeCanvas);
@@ -153,6 +153,10 @@ function restartRedrawCountdown () {
 }
 
 async function resizeCanvas () {
+    if (!canvasContainer.value) {
+        return;
+    }
+
     const w = canvasContainer.value.offsetWidth;
     const h = canvasContainer.value.offsetHeight;
     scatterCanvas.width = w * resolution.value;

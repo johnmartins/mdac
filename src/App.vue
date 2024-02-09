@@ -136,6 +136,10 @@ const eventBus = inject('eventBus')
 eventBus.on('main.error', (err) => {
     const errorPopup = new Popup('error', 'Error', err.message)
     layoutStore.queuePopup(errorPopup)
+});
+
+eventBus.on('Router.RequestTabChange', (viewName) => {
+    setView(viewName);
 })
 
 function setView (viewName) {
