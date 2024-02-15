@@ -80,11 +80,14 @@ const excludedData = ref([]);
 const eventBus = inject('eventBus');
 eventBus.on('SourceForm.readData', () => {
     reRenderMvGrid.value = true;
-})
+});
+
+eventBus.on('Layout.contentResize', () => {
+    reRenderMvGrid.value = true;
+});
 
 watch(activeView, async () => {
     if (activeView.value === 'mvgrid' && reRenderMvGrid.value === true) {
-        console.log("Force render.")
         await nextTick();
         forceRenderGrid();
     }
@@ -121,7 +124,6 @@ function parseData () {
 }
 
 async function forceRenderGrid () {
-    console.log("force render grid")
     if (reRenderMvGrid.value === true) {
         reRenderMvGrid.value = false;
     }
@@ -144,8 +146,6 @@ function getCatIdentifier (index) {
 }
 
 async function makePlot (cx, cy) {
-    console.log("Make plot", cx, cy);
-
     const newPlot = new ScatterPlotConfig();
     scatterStore.addPlot(newPlot);
 
