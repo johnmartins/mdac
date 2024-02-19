@@ -1,5 +1,5 @@
 <template>
-    <g v-if="column" class="range-indicator">
+    <g v-if="column && showColorCodeLegend" class="range-indicator">
         <text 
             :style="{fontSize: `${optionsStore.titleSize}em`}"
             class="title"
@@ -21,7 +21,7 @@
                 :fill="color" 
                 :y="barHeight*resolution - (index+1) * barHeight" 
                 :width="barWidth" 
-                :height="barHeight"
+                :height="barHeight"    
             />
 
             <text 
@@ -37,36 +37,36 @@
 </template>
 
 <script setup>
-import {computed} from "vue"
-import { storeToRefs } from "pinia"
+import { computed } from "vue";
+import { storeToRefs } from "pinia";
 
-import {linspace} from "@/utils/data-utils"
-import {useOptionsStore} from "../../store/OptionsStore"
-import {useDataStore} from "../../store/DataStore"
+import { linspace } from "@/utils/data-utils";
+import { useOptionsStore } from "../../store/OptionsStore";
 
-const optionsStore = useOptionsStore()
-const {colorCodeUpperBound, colorCodeLowerBound} = storeToRefs(optionsStore)
-const dataStore = useDataStore()
-const {data} = storeToRefs(dataStore)
+const optionsStore = useOptionsStore();
+const {colorCodeUpperBound, colorCodeLowerBound, showColorCodeLegend} = storeToRefs(optionsStore);
 
-const resolution = 30
-const barWidth = 20
-const barHeight = 4
-const tickMargin = 8
+const resolution = 30;
+const barWidth = 20;
+const barHeight = 4;
+const tickMargin = 8;
 
 const column = computed(() => {
-    return optionsStore.getActiveColorCodeColumn()
+    // Ignore if data is categorical
+    const c = optionsStore.getActiveColorCodeColumn();
+    if (c && c.usesCategoricalData) return null;
+    return optionsStore.getActiveColorCodeColumn();
 })
 
 const spectrumArray = computed(() => {
-    if (!column.value) return []
+    if (!column.value) return [];
     
-    let linearScale = linspace(colorCodeLowerBound.value, colorCodeUpperBound.value, resolution)
-    let colorScale = []
+    let linearScale = linspace(colorCodeLowerBound.value, colorCodeUpperBound.value, resolution);
+    let colorScale = [];
     for (let value of linearScale) {
-        colorScale.push(optionsStore.getSampleColorWithValue(value))
+        colorScale.push(optionsStore.getSampleColorWithValue(value));
     }
-    return colorScale
+    return colorScale;
 })
 
 

@@ -22,7 +22,6 @@ export const useStateStore = defineStore('state', {
     getters: {},
     actions: {
         queueReRenders () {
-            console.log("QUEUE RERENDER")
             this.reRenderMvGrid = true
         },
         setView(view) {

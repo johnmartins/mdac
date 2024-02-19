@@ -17,6 +17,7 @@ export const useOptionsStore = defineStore('options', {
         colorCodeUpperBound: null,
         colorCodeLowerBound: null,
         useSimilarityColorCoding: true,
+        showColorCodeLegend: true,
 
         // PCP lines
         includedDataOpacity: 1,
