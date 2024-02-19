@@ -1,6 +1,9 @@
 <template>
     <div class="component-container" v-show="activeView==='mvgrid'">
-        <div class="mv-grid-container">
+        <div 
+            class="mv-grid-container"
+            @mouseleave="setHoverCategories(null, null)"
+        >
             <div class="grid-row">
                 <div class="grid-element grid-title-element"></div>
                 <div 
@@ -9,6 +12,7 @@
                     v-for="cxTitleCat, xIndex in categories.filter(cat => cat.enabled)" 
                     :key="cxTitleCat.title" 
                     :title="cxTitleCat.title" 
+                    :class="{'hovered-x': hoverCategories.x === cxTitleCat.title, 'hovered-y': hoverCategories.y === cxTitleCat.title}"
                 >
                     {{ getCatIdentifier(xIndex) }}
                 </div>
@@ -22,6 +26,7 @@
                     class="grid-element grid-title-element" 
                     style="display: flex; align-items: center;" 
                     :title="cy.title"
+                    :class="{'hovered-x': hoverCategories.x === cy.title, 'hovered-y': hoverCategories.y === cy.title}"
                 >
                     {{ `${getCatIdentifier(yIndex)}: ${cy.title}` }}
                 </div>
@@ -29,7 +34,8 @@
                 <div class="grid-element" 
                     v-for="cx in categories.filter(cat => cat.enabled)" 
                     :key="cx.title" 
-                    :title="`X: ${cx.title}, Y: ${cy.title}`" 
+                    :title="`X: ${cx.title}&#10;Y: ${cy.title}`" 
+                    @mouseenter="setHoverCategories(cx.title, cy.title)"
                 >
                     <ScatterPlotPointLayerRaster 
                         :cx="cx" 
@@ -47,7 +53,7 @@
 
 <script setup>
 
-import { nextTick, ref, watch, inject } from 'vue';
+import { nextTick, ref, watch, inject, reactive } from 'vue';
 import { useDataStore } from '@/store/DataStore';
 import { useStateStore } from '@/store/StateStore';
 import { useOptionsStore } from '@/store/OptionsStore';
@@ -75,6 +81,7 @@ const rasterElementArray = ref(null);
 // State
 const includedData = ref([]);
 const excludedData = ref([]);
+const hoverCategories = reactive({ x: null, y: null });
 
 // Events
 const eventBus = inject('eventBus');
@@ -98,6 +105,11 @@ watch(reRenderMvGrid, () => {
         forceRenderGrid();
     }
 });
+
+function setHoverCategories (xTitle, yTitle) {
+    hoverCategories.x = xTitle; 
+    hoverCategories.y = yTitle; 
+}
 
 function checkViewActive () {
     if (activeView.value === 'mvgrid') {
@@ -200,6 +212,16 @@ async function makePlot (cx, cy) {
 
         &:hover {
             filter: invert(100%);
+        }
+
+        &.hovered-x {
+            background-color: transparentize($color-info, $amount: 0.2);
+            color: white;
+        }
+
+        &.hovered-y {
+            background-color: transparentize($color-danger, $amount: 0.2);;
+            color: white;
         }
     }
 }
