@@ -80,8 +80,6 @@
                                     :category="c" 
                                     :canvas="plotCanvas"
                                     @onInteraction="onFilterInteraction" 
-                                    @onMouseEnter="plotVariables.mouseOverFilter = f"
-                                    @onMouseLeave="plotVariables.mouseOverFilter === f ? plotVariables.mouseOverFilter = null : plotVariables.mouseOverFilter"
                                 />
                             </g>
                         </g>
@@ -96,8 +94,6 @@
                                 />
                             </g>
                         </g>
-
-
                     </g>
 
                     <g class="scatter-plugin-container" :transform="`translate(${getPlotXBounds()[1] + 20} ${getPlotYBounds()[0]})`">
@@ -165,7 +161,6 @@ const plotParameters = reactive({
     filterMinDragTime: 125, // ms
 })
 const plotVariables = reactive({
-    mouseOverFilter: false,
     mousedown: false,
     interactionType: null,
     currentFilterStartTime: 0,
