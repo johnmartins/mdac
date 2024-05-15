@@ -279,20 +279,25 @@ function onMouseMove (evt) {
     if (!plotVariables.mousedown) return;
 
     if (plotVariables.interactionType === 'block') {
-        return dragFilterBlock(evt)
+        return grabFilterBlock(evt)
     }
 
     dragFilterBox(evt)
 }
 
-function dragFilterBlock (evt) {
+function grabFilterBlock (evt) {
+    let taAdjusted, tbAdjusted;
 
-    let ta = plotVariables.filterToRemove.thresholdA
-    let tb = plotVariables.filterToRemove.thresholdB
-
-    let taAdjusted = plotVariables.currentFilterCategory.scaleLinear(ta)*axisLength.value + plotParameters.padding;
-    let tbAdjusted = plotVariables.currentFilterCategory.scaleLinear(tb)*axisLength.value + plotParameters.padding;
- 
+    if (!plotVariables.currentFilterCategory.usesCategoricalData) {
+        let ta = plotVariables.filterToRemove.thresholdA
+        let tb = plotVariables.filterToRemove.thresholdB
+        taAdjusted = plotVariables.currentFilterCategory.scaleLinear(ta)*axisLength.value + plotParameters.padding;
+        tbAdjusted = plotVariables.currentFilterCategory.scaleLinear(tb)*axisLength.value + plotParameters.padding;
+    } else {
+        taAdjusted = plotVariables.filterToRemove.upperBoundRatio * axisLength.value + plotParameters.padding;
+        tbAdjusted = plotVariables.filterToRemove.lowerBoundRatio * axisLength.value + plotParameters.padding;
+    }
+     
     const loc = getTrueEventCoordinates(evt, plotCanvas.value);
     plotVariables.currentFilterStartValue = loc.y + (taAdjusted - plotVariables.blockOriginCoordinates);
     plotVariables.currentFilterEndValue =  loc.y + (tbAdjusted - plotVariables.blockOriginCoordinates);
