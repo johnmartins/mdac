@@ -4,6 +4,7 @@
             class="filter-box"
             :y="y" 
             :height="height"
+            @mousedown.prevent="moveFilterBlock"
         />
 
         <rect 
@@ -48,9 +49,9 @@ const capHeight = ref(6)
 
 const y = computed(() => {
     if (props.filter.type === 'single-range') {
-        return truncateDecimals(props.category.scaleLinear(props.filter.thresholdB)*axisLength.value, 1)
+        return props.category.scaleLinear(props.filter.thresholdB)*axisLength.value
     } else if (props.filter.type === 'categoric') {
-        return truncateDecimals(props.filter.lowerBoundRatio*axisLength.value, 1)
+        return props.filter.lowerBoundRatio*axisLength.value
     } else {
         throw new Error('Encountered unknown filter type')
     }
@@ -58,13 +59,17 @@ const y = computed(() => {
 
 const height = computed( () => {
     if (props.filter.type === 'single-range') {
-        return truncateDecimals((props.category.scaleLinear(props.filter.thresholdA)-props.category.scaleLinear(props.filter.thresholdB))*axisLength.value, 1)
+        return (props.category.scaleLinear(props.filter.thresholdA)-props.category.scaleLinear(props.filter.thresholdB))*axisLength.value
     } else if (props.filter.type === 'categoric') {
-        return truncateDecimals((props.filter.upperBoundRatio - props.filter.lowerBoundRatio)*axisLength.value, 1)
+        return (props.filter.upperBoundRatio - props.filter.lowerBoundRatio)*axisLength.value
     } else {
         throw new Error('Encountered unknown filter type')
     }
 })
+
+function moveFilterBlock () {
+    console.log("hmm..")
+}
 
 function moveFilterTop () {
     emit('interaction', {
@@ -89,6 +94,7 @@ function moveFilterBot () {
         x: -8px;
         width: 16px; 
         z-index: 99;
+        cursor: grab;
     }
     .filter-pull-box {
         x: -10px;
