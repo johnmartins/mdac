@@ -4,7 +4,9 @@
             class="filter-box"
             :y="y" 
             :height="height"
-            @mousedown.prevent="moveFilterBlock"
+            @mousedown.stop.prevent="moveFilterBlock($event)"
+            @mouseenter="emit('onMouseEnter', props.filter)"
+            @mouseleave="emit('onMouseLeave', props.filter)"
         />
 
         <rect 
@@ -12,6 +14,7 @@
             :y="y - capHeight"
             :height="capHeight"
             @mousedown.prevent="moveFilterTop"
+
         />
 
         <rect 
@@ -38,11 +41,12 @@ const PCPStore = usePCPStore()
 const dataStore = useDataStore()
 
 const {axisLength} = storeToRefs(PCPStore)
-const emit = defineEmits(['interaction'])
+const emit = defineEmits(['onInteraction', 'onMouseEnter', 'onMouseLeave'])
 
 const props = defineProps({
     category: Object,
-    filter: Object
+    filter: Object,
+    canvas: Object,
 })
 
 const capHeight = ref(6)
@@ -67,12 +71,18 @@ const height = computed( () => {
     }
 })
 
-function moveFilterBlock () {
-    console.log("hmm..")
+function moveFilterBlock (evt) {
+    emit('onInteraction', {
+        type: 'block',
+        filter: props.filter, 
+        category: props.category,
+        start: getTrueEventCoordinates(evt, props.canvas).y
+    });
 }
 
 function moveFilterTop () {
-    emit('interaction', {
+    emit('onInteraction', {
+        type: 'edge',
         filter: props.filter, 
         category: props.category,
         start: y.value + height.value
@@ -80,7 +90,8 @@ function moveFilterTop () {
 }
 
 function moveFilterBot () {
-    emit('interaction', {
+    emit('onInteraction', {
+        type: 'edge',
         filter: props.filter, 
         category: props.category,
         start: y.value

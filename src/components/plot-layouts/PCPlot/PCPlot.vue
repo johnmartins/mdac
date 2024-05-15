@@ -49,24 +49,6 @@
                             @click="onClickAxis(c)"
                             @mousedown.prevent="dragFilterStart($event, c)"
                         />
-
-                        <!-- Axis Filters -->
-                        <g v-if="optionsStore.showFilters">
-                            <g v-for="(f, index) in filters[c.title]" :key="index">
-                                <PCPlotFilter :filter="f" :category="c" @interaction="onFilterInteraction" />
-                            </g>
-                        </g>
-						
-                        <!-- Proto axis filters -->
-                        <g v-if="plotVariables.currentFilterCategory && plotVariables.currentFilterDeltaTime > plotParameters.filterMinDragTime">
-                            <g v-if="plotVariables.currentFilterCategory.title === c.title">
-                                <rect 
-                                    class="filter-box-proto"
-                                    :y="truncateDecimals(Math.min(plotVariables.currentFilterStartValue, plotVariables.currentFilterEndValue) - plotParameters.padding, 1)"
-                                    :height="truncateDecimals(Math.abs(plotVariables.currentFilterEndValue - plotVariables.currentFilterStartValue), 1)"
-                                />
-                            </g>
-                        </g>
 						
                         <!-- Axis label -->
                         <text 
@@ -85,6 +67,33 @@
                             <line x1="0" :y1="c.scaleLinear(tick)*getAxisLength()" x2="-5" :y2="c.scaleLinear(tick)*getAxisLength()" />	
                             <!-- Top tick -->
                         </g>
+
+                        <!-- Axis Filters -->
+                        <g v-if="optionsStore.showFilters">
+                            <g v-for="(f, index) in filters[c.title]" :key="index">
+                                <PCPlotFilter 
+                                    :filter="f" 
+                                    :category="c" 
+                                    :canvas="plotCanvas"
+                                    @onInteraction="onFilterInteraction" 
+                                    @onMouseEnter="plotVariables.mouseOverFilter = f"
+                                    @onMouseLeave="plotVariables.mouseOverFilter === f ? plotVariables.mouseOverFilter = null : plotVariables.mouseOverFilter"
+                                />
+                            </g>
+                        </g>
+						
+                        <!-- Proto axis filters -->
+                        <g v-if="plotVariables.currentFilterCategory && plotVariables.currentFilterDeltaTime > plotParameters.filterMinDragTime">
+                            <g v-if="plotVariables.currentFilterCategory.title === c.title">
+                                <rect 
+                                    class="filter-box-proto"
+                                    :y="truncateDecimals(Math.min(plotVariables.currentFilterStartValue, plotVariables.currentFilterEndValue) - plotParameters.padding, 1)"
+                                    :height="truncateDecimals(Math.abs(plotVariables.currentFilterEndValue - plotVariables.currentFilterStartValue), 1)"
+                                />
+                            </g>
+                        </g>
+
+
                     </g>
 
                     <g class="scatter-plugin-container" :transform="`translate(${getPlotXBounds()[1] + 20} ${getPlotYBounds()[0]})`">
@@ -152,7 +161,9 @@ const plotParameters = reactive({
     filterMinDragTime: 125, // ms
 })
 const plotVariables = reactive({
+    mouseOverFilter: false,
     mousedown: false,
+    interactionType: null,
     currentFilterStartTime: 0,
     currentFilterDeltaTime: 0,
     currentFilterCategory: null,
@@ -201,17 +212,36 @@ watch([plotYBounds, () => plotParameters.axisTitlePadding], () => {
     axisLength.value = getPlotYBounds()[1]-(plotParameters.axisTitlePadding)
 })
 
-function onMouseMove (evt) {
-    dragFilterBox(evt)
+function onFilterInteraction (evt) {
+    if (evt.type === 'edge') {
+        handleFilterEdgeInteraction(evt);
+    } else if (evt.type === 'block') {
+        handleFilterBlockInteraction(evt);
+    } else {
+        throw new Error('Unknown filter interaction type');
+    }
+
 }
 
-function onFilterInteraction (evt) {
-    plotVariables.mousedown = true
-    plotVariables.currentFilterCategory = evt.category 
-    plotVariables.currentFilterStartValue = evt.start + plotParameters.padding
-    plotVariables.currentFilterStartTime = Date.now()
-    plotVariables.currentFilterDeltaTime = 0
-    plotVariables.filterToRemove = evt.filter		// Mark the original filter for deletion
+function handleFilterBlockInteraction (evt) {
+    plotVariables.interactionType = 'block';
+    plotVariables.mousedown = true;
+    plotVariables.currentFilterCategory = evt.category;
+    plotVariables.currentFilterStartValue = evt.start
+    plotVariables.currentFilterStartTime = Date.now();
+    plotVariables.currentFilterDeltaTime = 0;
+    plotVariables.filterToRemove = evt.filter;		// Mark the original filter for deletion
+}
+
+function handleFilterEdgeInteraction (evt) {
+    console.log('Start value: ', evt.start);
+    plotVariables.interactionType = 'edge';
+    plotVariables.mousedown = true;
+    plotVariables.currentFilterCategory = evt.category;
+    plotVariables.currentFilterStartValue = evt.start + plotParameters.padding;
+    plotVariables.currentFilterStartTime = Date.now();
+    plotVariables.currentFilterDeltaTime = 0;
+    plotVariables.filterToRemove = evt.filter;		// Mark the original filter for deletion
 }
 
 function getAxisLength () {
@@ -241,7 +271,13 @@ function resetFilterDrag () {
     plotVariables.filterToRemove = null
 }
 
+function onMouseMove (evt) {
+    dragFilterBox(evt)
+}
+
 function dragFilterBox (evt) {
+    if (!plotVariables.mousedown) return;
+    console.log("drag filter box")
     const loc = getTrueEventCoordinates(evt, plotCanvas.value)
     if (!plotVariables.mousedown) return
     plotVariables.currentFilterEndValue = loc.y
@@ -249,6 +285,7 @@ function dragFilterBox (evt) {
 }
 
 function dragFilterStart (evt, c) {
+    console.log("drag filter start")
     plotVariables.mousedown = true
     const loc = getTrueEventCoordinates(evt, plotCanvas.value)
     plotVariables.currentFilterCategory = c 
@@ -266,6 +303,7 @@ function triggerClickCooldown () {
 }
 
 function dragFilterDone () {
+    console.log("drag fiter done")
     let ignoreRequest = false
     if (!plotVariables.mousedown) ignoreRequest = true
     if (plotVariables.currentFilterDeltaTime < 100) ignoreRequest = true	
