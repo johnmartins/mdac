@@ -4,6 +4,9 @@
             class="filter-box"
             :y="y" 
             :height="height"
+            @mousedown.stop.prevent="moveFilterBlock($event)"
+            @mouseenter="emit('onMouseEnter', props.filter)"
+            @mouseleave="emit('onMouseLeave', props.filter)"
         />
 
         <rect 
@@ -11,6 +14,7 @@
             :y="y - capHeight"
             :height="capHeight"
             @mousedown.prevent="moveFilterTop"
+
         />
 
         <rect 
@@ -37,20 +41,21 @@ const PCPStore = usePCPStore()
 const dataStore = useDataStore()
 
 const {axisLength} = storeToRefs(PCPStore)
-const emit = defineEmits(['interaction'])
+const emit = defineEmits(['onInteraction', 'onMouseEnter', 'onMouseLeave'])
 
 const props = defineProps({
     category: Object,
-    filter: Object
+    filter: Object,
+    canvas: Object,
 })
 
 const capHeight = ref(6)
 
 const y = computed(() => {
     if (props.filter.type === 'single-range') {
-        return truncateDecimals(props.category.scaleLinear(props.filter.thresholdB)*axisLength.value, 1)
+        return props.category.scaleLinear(props.filter.thresholdB)*axisLength.value
     } else if (props.filter.type === 'categoric') {
-        return truncateDecimals(props.filter.lowerBoundRatio*axisLength.value, 1)
+        return props.filter.lowerBoundRatio*axisLength.value
     } else {
         throw new Error('Encountered unknown filter type')
     }
@@ -58,16 +63,26 @@ const y = computed(() => {
 
 const height = computed( () => {
     if (props.filter.type === 'single-range') {
-        return truncateDecimals((props.category.scaleLinear(props.filter.thresholdA)-props.category.scaleLinear(props.filter.thresholdB))*axisLength.value, 1)
+        return (props.category.scaleLinear(props.filter.thresholdA)-props.category.scaleLinear(props.filter.thresholdB))*axisLength.value
     } else if (props.filter.type === 'categoric') {
-        return truncateDecimals((props.filter.upperBoundRatio - props.filter.lowerBoundRatio)*axisLength.value, 1)
+        return (props.filter.upperBoundRatio - props.filter.lowerBoundRatio)*axisLength.value
     } else {
         throw new Error('Encountered unknown filter type')
     }
 })
 
+function moveFilterBlock (evt) {
+    emit('onInteraction', {
+        type: 'block',
+        filter: props.filter, 
+        category: props.category,
+        mouseEvent: evt
+    });
+}
+
 function moveFilterTop () {
-    emit('interaction', {
+    emit('onInteraction', {
+        type: 'edge',
         filter: props.filter, 
         category: props.category,
         start: y.value + height.value
@@ -75,7 +90,8 @@ function moveFilterTop () {
 }
 
 function moveFilterBot () {
-    emit('interaction', {
+    emit('onInteraction', {
+        type: 'edge',
         filter: props.filter, 
         category: props.category,
         start: y.value
@@ -89,11 +105,12 @@ function moveFilterBot () {
         x: -8px;
         width: 16px; 
         z-index: 99;
+        cursor: grab;
     }
     .filter-pull-box {
         x: -10px;
         width: 20px;
         fill: transparentize($color: blue, $amount: 0.8);
-        cursor: row-resize;
+        cursor: ns-resize;
     }
 </style>
