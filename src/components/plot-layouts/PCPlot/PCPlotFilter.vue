@@ -111,6 +111,6 @@ function moveFilterBot () {
         x: -10px;
         width: 20px;
         fill: transparentize($color: blue, $amount: 0.8);
-        cursor: row-resize;
+        cursor: ns-resize;
     }
 </style>

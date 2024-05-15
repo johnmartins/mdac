@@ -35,7 +35,11 @@
                         v-for="(c, cIndex) in dataStore.enabledCategoriesSorted" 
                         :key="c.position" 
                         class="axis"
-                        :class="{highlighted: getSelectedCategoryTitle() == c.title}" 
+                        :class="{
+                            highlighted: getSelectedCategoryTitle() == c.title,
+                            pulling: plotVariables.interactionType === 'edge',
+                            grabbing: plotVariables.interactionType === 'block'
+                        }" 
                         :transform="`translate(${truncateDecimals(cIndex*horizontalOffset,2)} ${truncateDecimals(getPlotYBounds()[0], 2)})`"
                     >	
 
@@ -225,7 +229,6 @@ function onFilterInteraction (evt) {
 
 function handleFilterBlockInteraction (evt) {
     if (plotVariables.mousedown === false) {
-        console.log("FIRST")
         plotVariables.blockOriginCoordinates = getTrueEventCoordinates(evt.mouseEvent, plotCanvas.value).y
     }
 
@@ -240,7 +243,6 @@ function handleFilterBlockInteraction (evt) {
 }
 
 function handleFilterEdgeInteraction (evt) {
-    console.log('Start value: ', evt.start);
     plotVariables.interactionType = 'edge';
     plotVariables.mousedown = true;
     plotVariables.currentFilterCategory = evt.category;
@@ -293,18 +295,16 @@ function dragFilterBlock (evt) {
     let ta = plotVariables.filterToRemove.thresholdA
     let tb = plotVariables.filterToRemove.thresholdB
 
-    let taAdjusted = plotVariables.currentFilterCategory.scaleLinear(ta)*axisLength.value + plotParameters.padding
-    let tbAdjusted = plotVariables.currentFilterCategory.scaleLinear(tb)*axisLength.value + plotParameters.padding
+    let taAdjusted = plotVariables.currentFilterCategory.scaleLinear(ta)*axisLength.value + plotParameters.padding;
+    let tbAdjusted = plotVariables.currentFilterCategory.scaleLinear(tb)*axisLength.value + plotParameters.padding;
  
-    console.log("drag filter block");
     const loc = getTrueEventCoordinates(evt, plotCanvas.value);
-    plotVariables.currentFilterStartValue = loc.y - (taAdjusted - plotVariables.blockOriginCoordinates);
-    plotVariables.currentFilterEndValue =  loc.y - (tbAdjusted - plotVariables.blockOriginCoordinates);
+    plotVariables.currentFilterStartValue = loc.y + (taAdjusted - plotVariables.blockOriginCoordinates);
+    plotVariables.currentFilterEndValue =  loc.y + (tbAdjusted - plotVariables.blockOriginCoordinates);
     plotVariables.currentFilterDeltaTime = Date.now() - plotVariables.currentFilterStartTime;
 }
 
 function dragFilterBox (evt) {
-    console.log("drag filter box")
     const loc = getTrueEventCoordinates(evt, plotCanvas.value)
     if (!plotVariables.mousedown) return
     plotVariables.currentFilterEndValue = loc.y
@@ -312,7 +312,6 @@ function dragFilterBox (evt) {
 }
 
 function dragFilterStart (evt, c) {
-    console.log("drag filter start")
     plotVariables.mousedown = true
     const loc = getTrueEventCoordinates(evt, plotCanvas.value)
     plotVariables.currentFilterCategory = c 
@@ -330,7 +329,6 @@ function triggerClickCooldown () {
 }
 
 function dragFilterDone () {
-    console.log("drag fiter done")
     let ignoreRequest = false
     if (!plotVariables.mousedown) ignoreRequest = true
     if (plotVariables.currentFilterDeltaTime < 100) ignoreRequest = true	
@@ -484,6 +482,14 @@ function exportSVG () {
 .pcp-plot {
 	.axis {
 		cursor: pointer;
+
+        &.grabbing {
+            cursor: grabbing !important;
+        }
+
+        &.pulling {
+            cursor: ns-resize!important;
+        }
 
 		text {
 			fill: black;
