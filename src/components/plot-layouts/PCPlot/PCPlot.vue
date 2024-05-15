@@ -169,6 +169,7 @@ const plotVariables = reactive({
     currentFilterCategory: null,
     currentFilterStartValue: 0,
     currentFilterEndValue: 0,
+    blockOriginCoordinates: 0,
     clickOnCooldown: false,
     hasRendered: false,
     filterToRemove: null,			// Used when editing an existing filter to delete the original copy
@@ -220,14 +221,19 @@ function onFilterInteraction (evt) {
     } else {
         throw new Error('Unknown filter interaction type');
     }
-
 }
 
 function handleFilterBlockInteraction (evt) {
+    if (plotVariables.mousedown === false) {
+        console.log("FIRST")
+        plotVariables.blockOriginCoordinates = getTrueEventCoordinates(evt.mouseEvent, plotCanvas.value).y
+    }
+
     plotVariables.interactionType = 'block';
     plotVariables.mousedown = true;
     plotVariables.currentFilterCategory = evt.category;
     plotVariables.currentFilterStartValue = evt.start
+    plotVariables.currentFilterEndValue = evt.start
     plotVariables.currentFilterStartTime = Date.now();
     plotVariables.currentFilterDeltaTime = 0;
     plotVariables.filterToRemove = evt.filter;		// Mark the original filter for deletion
@@ -263,20 +269,41 @@ function getPlotXBounds () {
 }
 
 function resetFilterDrag () {
-    plotVariables.mousedown = false
-    plotVariables.currentFilterCategory = null
-    plotVariables.currentFilterStartValue = 0
-    plotVariables.currentFilterDeltaTime = 0
-    plotVariables.currentFilterEndValue = 0
-    plotVariables.filterToRemove = null
+    plotVariables.mousedown = false;
+    plotVariables.interactionType = null;
+    plotVariables.currentFilterCategory = null;
+    plotVariables.currentFilterStartValue = 0;
+    plotVariables.currentFilterDeltaTime = 0;
+    plotVariables.currentFilterEndValue = 0;
+    plotVariables.filterToRemove = null;
 }
 
 function onMouseMove (evt) {
+    if (!plotVariables.mousedown) return;
+
+    if (plotVariables.interactionType === 'block') {
+        return dragFilterBlock(evt)
+    }
+
     dragFilterBox(evt)
 }
 
+function dragFilterBlock (evt) {
+
+    let ta = plotVariables.filterToRemove.thresholdA
+    let tb = plotVariables.filterToRemove.thresholdB
+
+    let taAdjusted = plotVariables.currentFilterCategory.scaleLinear(ta)*axisLength.value + plotParameters.padding
+    let tbAdjusted = plotVariables.currentFilterCategory.scaleLinear(tb)*axisLength.value + plotParameters.padding
+ 
+    console.log("drag filter block");
+    const loc = getTrueEventCoordinates(evt, plotCanvas.value);
+    plotVariables.currentFilterStartValue = loc.y - (taAdjusted - plotVariables.blockOriginCoordinates);
+    plotVariables.currentFilterEndValue =  loc.y - (tbAdjusted - plotVariables.blockOriginCoordinates);
+    plotVariables.currentFilterDeltaTime = Date.now() - plotVariables.currentFilterStartTime;
+}
+
 function dragFilterBox (evt) {
-    if (!plotVariables.mousedown) return;
     console.log("drag filter box")
     const loc = getTrueEventCoordinates(evt, plotCanvas.value)
     if (!plotVariables.mousedown) return

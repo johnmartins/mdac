@@ -76,7 +76,7 @@ function moveFilterBlock (evt) {
         type: 'block',
         filter: props.filter, 
         category: props.category,
-        start: getTrueEventCoordinates(evt, props.canvas).y
+        mouseEvent: evt
     });
 }
 
