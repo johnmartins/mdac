@@ -38,6 +38,7 @@ eventBus.on('Router.TabChange', (viewName) => {
     if (viewName !== 'pcp') return
     resizeCanvas()
 })
+eventBus.on('RequestPCPRedraw', restartRedrawCountdown);
 
 // Canvas draw variables
 let pathCanvas = document.createElement('canvas');
