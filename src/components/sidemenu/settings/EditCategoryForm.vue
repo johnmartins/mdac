@@ -15,10 +15,34 @@
                 </div>
 
                 <div class="button-group" style="width: 100%">
-                    <button class="small success" @click="editCategory">Update</button>
-                    <button class="small info" @click="flipCategory">Flip</button>
-                    <button v-if="selectedCategory.enabled" class="small danger" @click="disableCategory">Disable</button>
-                    <button v-if="!selectedCategory.enabled" class="small" @click="enableCategory">Enable</button>
+                    <button 
+                        class="small success" 
+                        @click="editCategory"
+                    >
+                        Update
+                    </button>
+                    
+                    <button 
+                        class="small info" 
+                        @click="flipCategory" 
+                        :disabled="editedCategory.usesCategoricalData === true"
+                    >
+                        Flip
+                    </button>
+                    <button 
+                        v-if="selectedCategory.enabled" 
+                        class="small danger" 
+                        @click="disableCategory"
+                    >
+                        Disable
+                    </button>
+                    <button 
+                        v-if="!selectedCategory.enabled" 
+                        class="small" 
+                        @click="enableCategory"
+                    >
+                        Enable
+                    </button>
                 </div>
             </div>
         </div>
@@ -89,7 +113,6 @@ function flipCategory () {
 
 function editCategory () {
     selectedCategory.value.morph(editedCategory.value, {migrateReference: false});
-    // Request redraw
     eventBus.emit('RequestPCPRedraw');
 }
 
