@@ -16,6 +16,7 @@
 
                 <div class="button-group" style="width: 100%">
                     <button class="small success" @click="editCategory">Update</button>
+                    <button class="small info" @click="flipCategory">Flip</button>
                     <button v-if="selectedCategory.enabled" class="small danger" @click="disableCategory">Disable</button>
                     <button v-if="!selectedCategory.enabled" class="small" @click="enableCategory">Enable</button>
                 </div>
@@ -75,6 +76,15 @@ function disableCategory () {
 
 function enableCategory () {
     selectedCategory.value.enabled = true;
+}
+
+function flipCategory () {
+    let newLb = editedCategory.value.ub;
+    let newUb = editedCategory.value.lb;
+    editedCategory.value.lb = newLb;
+    editedCategory.value.ub = newUb;
+
+    editCategory();
 }
 
 function editCategory () {
