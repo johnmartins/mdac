@@ -30,13 +30,31 @@ button {
         font-size: 12px !important;
     }
 
+    &.success {
+        background-color: $color-success;
+        border: 1px solid $color-success-base;
+
+        &:hover {
+            background-color: $color-success-base;
+        }
+    }
+
     // Danger variation
     &.danger {
         background-color: $color-danger;
-        border: 1px solid $color-danger;
+        border: 1px solid $color-danger-base;
 
         &:hover {
             background-color: $color-danger-base;
+        }
+    }
+
+    &.info {
+        background-color: $color-info;
+        border: 1px solid $color-info-base;
+
+        &:hover {
+            background-color: $color-info-base;
         }
     }
 

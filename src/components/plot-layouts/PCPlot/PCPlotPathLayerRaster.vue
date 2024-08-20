@@ -8,10 +8,10 @@ import { storeToRefs } from "pinia";
 import * as d3 from "d3";
 
 // Stores
-import {useDataStore} from "../../../store/DataStore"
-import {usePCPStore} from "../../../store/PCPStore"
-import {useOptionsStore} from "../../../store/OptionsStore"
-import {useStateStore} from "../../../store/StateStore"
+import {useDataStore} from "@/store/DataStore"
+import {usePCPStore} from "@/store/PCPStore"
+import {useOptionsStore} from "@/store/OptionsStore"
+import {useStateStore} from "@/store/StateStore"
 
 defineExpose({
     generateDataUrl
@@ -38,6 +38,7 @@ eventBus.on('Router.TabChange', (viewName) => {
     if (viewName !== 'pcp') return
     resizeCanvas()
 })
+eventBus.on('RequestPCPRedraw', restartRedrawCountdown);
 
 // Canvas draw variables
 let pathCanvas = document.createElement('canvas');
@@ -75,23 +76,27 @@ async function generateDataUrl () {
 }
 
 function restartRedrawCountdown () {
-    if (PCPStore.renderingType !== 'raster') return
-    if (stateStore.activeView !== 'pcp') return
+    if (PCPStore.renderingType !== 'raster') return;
+    if (stateStore.activeView !== 'pcp') return;
+    if (!canvasContainer.value) return;
 
-    let refreshDelay = 250
+    let refreshDelay = 250;
 
     if (redrawTimerID) {
-        clearTimeout(redrawTimerID)
+        clearTimeout(redrawTimerID);
     }
 
     redrawTimerID = setTimeout( () => {
-        draw()
-        redrawTimerID = null
-    }, refreshDelay)
+        draw();
+        redrawTimerID = null;
+    }, refreshDelay);
 }
 
 async function draw () {
     if (PCPStore.renderingType !== 'raster') return;
+    if (!canvasContainer.value) {
+        console.warn('Canvas container not found');
+    }
     await stateStore.setLoading('Redrawing PCP canvas');
     const t_draw_start = performance.now();
     PCPStore.pathsDataUrl = null;
