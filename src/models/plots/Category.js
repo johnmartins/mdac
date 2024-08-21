@@ -7,7 +7,7 @@ class Category {
     static idLookupTable = new Map()
 
     constructor (title, lb, ub, {
-        ticks=5, 
+        ticks=3, 
         displayTitle=null, 
         overwrite=false, 
         position=Category.lookupTable.size, 

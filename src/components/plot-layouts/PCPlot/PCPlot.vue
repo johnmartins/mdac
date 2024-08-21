@@ -11,12 +11,20 @@
                 tabindex="0"
                 height="100%" 
                 width="100%" 
-                style="font-size: 1em; font-family: monospace; position: absolute; left: 0; top: 0; "
+                style="font-size: 1em; font-family: monospace; position: absolute; left: 0; top: 0; user-select: none;"
                 @mousemove.prevent="onMouseMove"
                 @mouseup.prevent="dragFilterDone"
                 @keydown.delete="dataStore.deleteCategory(selectedCategory)"
             >
-				
+            <filter x="0" y="0" width="1" height="1" id="solid">
+                <feFlood flood-color="white" :flood-opacity="optionsStore.tickBackgroundOpacity" result="bg" />
+                <feMerge>
+                    <feMergeNode in="bg"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+
+
                 <!-- Full graphics group -->
                 <g
                     v-if="data.length > 0"
@@ -460,7 +468,7 @@ function exportSVG () {
     let style = `<style>`
     style += 'svg {font-family: monospace;}'
     style += '.title {font-size: 0.8rem; text-anchor: start; x: 0px;}'
-    style += '.tick-string {font-size: 0.8rem; text-anchor: end; dominant-baseline: middle;}'
+    style += '.tick-string {font-size: 0.8rem; text-anchor: end; dominant-baseline: middle; filter: url(#solid);}'
     style += 'line {stroke: black; fill-opacity: 0;}'
     style += 'path {fill-opacity: 0;}'
     style += '.filter-box {stroke: white;stroke-opacity: 0.9;stroke-width: 2px;fill: #595959; fill-opacity: 0.6;x: -8px;width: 16px;}' 
@@ -513,10 +521,15 @@ function exportSVG () {
 
 		.filter-hitbox {
 			stroke: transparent;
-			fill-opacity: 0;
+			fill: transparent;
 			x: -10px;
 			y: -20px;
 			width: 20px;
+
+            &:hover {
+                stroke: rgb(0, 0, 0);
+                fill: rgba(255,255,255, 0.05);
+            }
 		}
 
 		.title {
@@ -528,6 +541,8 @@ function exportSVG () {
 			text-anchor: end;
 			dominant-baseline: middle;
 			font-weight: bold;
+            pointer-events: none;
+            filter: (url(#solid))
 		}
 	}
 

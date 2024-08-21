@@ -40,6 +40,11 @@
                 </div>
             </div>
 
+            <div class="labeled-form">
+                <span>Tick background opacity: </span>
+                <input v-model="optionsStore.tickBackgroundOpacity" type="number" step="0.05" max="1" min="0">
+            </div>
+
             <span class="title">Font size</span>
             <div class="labeled-form size-and-opacity-forms">
                 <span>Title size:</span>
