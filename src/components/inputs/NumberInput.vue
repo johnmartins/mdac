@@ -6,17 +6,36 @@
             </span>
         </div>
         <input 
-            type="text" 
-            class="form-control" 
-            :value="modelValue"
+            class="input-number"
+            type="number" 
+            :step="props.step" 
+            :max="props.max" 
+            :min="props.min"
+            :value="model"
             @input="$emit('update:modelValue', $event.target.value)"
         >
     </div>
 </template>
 
 <script setup>
-defineProps(['modelValue'])
-defineEmits(['update:modelValue'])
+import { defineModel } from "vue";
+
+const model = defineModel();
+
+const props = defineProps({
+    'step': {
+        type: Number,
+        default: 0.1
+    },
+    'max': {
+        type: Number,
+        default: 1.0
+    },
+    'min': {
+        type: Number,
+        default: 0.0
+    },
+})
 
 </script>
 
@@ -30,8 +49,8 @@ defineEmits(['update:modelValue'])
     
     .input-group-text {
         font-size: 0.8em;
-        width: 80px;
-        padding: 0.1em 0 0.1em 0.4em;
+        min-width: 50px;
+        padding: 0.1em 0.5em 0.1em 0.4em;
 
 
     }
@@ -45,6 +64,12 @@ defineEmits(['update:modelValue'])
         font-family: monospace;
         text-align: right;
         padding-right: 4px;
+    }
+
+    .input-number {
+        height: 1.8em;
+        font-size: 0.8em;
+        min-width: 30px;
     }
 
 </style>

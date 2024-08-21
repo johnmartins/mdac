@@ -9,6 +9,7 @@ export const useOptionsStore = defineStore('options', {
         // Plot fonts
         titleSize: 1.0,
         tickSize: 0.8,
+        tickBackgroundOpacity: 0.6,
 
         // Color-coding
         selectedColorCodeCategory: null,

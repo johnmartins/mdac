@@ -4,7 +4,7 @@
         :start-maximized="false"
     >
         <div class="control-group">
-            <div v-if="stateStore.activeView === 'pcp'" class="labeled-form mb-2">
+            <div v-if="stateStore.activeView === 'pcp'" class="labeled-form mb-2" style="font-size: 0.8em;">
                 <span>Rendering: </span>
                 <select ref="lineFormatSelector" v-model="pcpStore.renderingType">
                     <option value="raster">Rasterized</option>
@@ -12,7 +12,7 @@
                 </select>
             </div>
 
-            <div v-if="stateStore.activeView === 'pcp' && pcpStore.renderingType==='raster'" class="labeled-form mb-2">
+            <div v-if="stateStore.activeView === 'pcp' && pcpStore.renderingType==='raster'" class="labeled-form mb-2" style="font-size: 0.8em;">
                 <span>Resolution: </span>
                 <select ref="lineFormatSelector" v-model="pcpStore.resolution" @change="setResolutionManualOverride(true)">
                     <option :value="0.3">0.3 - Potato</option>
@@ -25,7 +25,7 @@
                 </select>
             </div>
 
-            <div v-if="stateStore.activeView === 'pcp'" class="labeled-form mb-2">
+            <div v-if="stateStore.activeView === 'pcp'" class="labeled-form mb-2" style="font-size: 0.8em;">
                 <span>Curve type: </span>
                 <select ref="lineFormatSelector" v-model="optionsStore.curveType">
                     <option value="curve">Curve</option>
@@ -33,27 +33,22 @@
                 </select>
             </div>
 
-            <div class="control-group">
-                <div style="display: flex; justify-content: space-between; flex-direction: row;">
-                    <label class="form-check-label">Show filters in plot</label>
-                    <input v-model="optionsStore.showFilters" type="checkbox">
-                </div>
-            </div>
+            <CheckboxInput v-model="optionsStore.showFilters">Show filters in plot</CheckboxInput>
+
+            <NumberInput v-model="optionsStore.tickBackgroundOpacity" :step="0.05" :min="0" :max="1">
+                Tick background opacity
+            </NumberInput>
 
             <span class="title">Font size</span>
-            <div class="labeled-form size-and-opacity-forms">
-                <span>Title size:</span>
-                <input v-model="optionsStore.titleSize" class="me-2" type="number" step="0.1" max="5" min="0">
-                <span>Tick size:</span>
-                <input v-model="optionsStore.tickSize" type="number" step="0.1" max="5" min="0">
+            <div class="size-and-opacity-forms" style="display: flex; justify-content: space-between;">
+                <NumberInput v-model="optionsStore.titleSize" class="me-2" :step="0.1" :max="5" :min="0">Title size:</NumberInput>
+                <NumberInput v-model="optionsStore.tickSize" :step="0.1" :max="5" :min="0">Tick size:</NumberInput>
             </div>
 
             <span class="title">Data opacity</span>
-            <div class="labeled-form size-and-opacity-forms">
-                <span>Included:</span>
-                <input v-model="optionsStore.includedDataOpacity" class="me-2" type="number" step="0.05" max="1" min="0">
-                <span>Excluded:</span>
-                <input type="number" step="0.05" max="1" min="0" :value="optionsStore.excludedDataOpacity" @change="setFilteredDataOpacity">
+            <div class="size-and-opacity-forms" style="display: flex; justify-content: space-between;">
+                <NumberInput v-model="optionsStore.includedDataOpacity" class="me-2" :step="0.05" :max="1" :min="0">Included:</NumberInput>
+                <NumberInput v-model="optionsStore.excludedDataOpacity" :step="0.05" :max="1" :min="0" @change="setFilteredDataOpacity">Excluded:</NumberInput>
             </div>
         </div>
     </SidebarSection>
@@ -63,13 +58,14 @@
 import { reactive, ref } from "vue"
 
 // Components
-import RangeInput from '@/components/inputs/RangeInput.vue'
+import NumberInput from '@/components/inputs/NumberInput.vue'
 import SidebarSection from "@/components/layouts/SidebarSection.vue"
 
 // State
 import {useOptionsStore} from "@/store/OptionsStore"
 import {usePCPStore} from "@/store/PCPStore"
 import {useStateStore} from "@/store/StateStore"
+import CheckboxInput from "@/components/inputs/CheckboxInput.vue"
 
 // State references
 const optionsStore = useOptionsStore()
@@ -77,6 +73,7 @@ const pcpStore = usePCPStore()
 const stateStore = useStateStore()
 
 function setFilteredDataOpacity (evt) {
+    console.log("change")
     optionsStore.setExcludedDataOpacity(parseFloat(evt.target.value)) 
 }
 
@@ -89,13 +86,6 @@ function setResolutionManualOverride (override) {
 <style lang="scss" scoped>
     .title {
         font-weight: bold;
-    }
-
-    .labeled-form.size-and-opacity-forms {
-
-        span {
-            min-width: 50px !important;
-        }
     }
 
 </style>

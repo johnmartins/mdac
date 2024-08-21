@@ -1,16 +1,16 @@
 <template>    
     <SidebarSection 
         ref="sidebarSection"
-        title="Modify category"
+        title="Modify axis"
         :start-maximized="false"
     >
         <div v-if="editedCategory">
-            <div class="control-group">
-                <strong>Edit selected category</strong>
+            <div class="control-group" @keyup.enter="editCategory">
+                <strong>Edit selected axis</strong>
                 <TextInput v-model="editedCategory.displayTitle">Title</TextInput>
                 <div v-if="editedCategory.usesCategoricalData == false">
-                    <TextInput v-model.number="editedCategory.ub">UB</TextInput>
-                    <TextInput v-model.number="editedCategory.lb">LB</TextInput>
+                    <TextInput v-model.number="editedCategory.ub">Upper bound</TextInput>
+                    <TextInput v-model.number="editedCategory.lb">Lower bound</TextInput>
                     <TextInput v-model.number="editedCategory.ticks">Ticks</TextInput>
                 </div>
 
