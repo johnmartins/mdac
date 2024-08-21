@@ -33,12 +33,7 @@
                 </select>
             </div>
 
-            <div class="control-group">
-                <div style="display: flex; justify-content: space-between; flex-direction: row;">
-                    <label class="form-check-label">Show filters in plot</label>
-                    <input v-model="optionsStore.showFilters" type="checkbox">
-                </div>
-            </div>
+            <CheckboxInput v-model="optionsStore.showFilters">Show filters in plot</CheckboxInput>
 
             <NumberInput v-model="optionsStore.tickBackgroundOpacity" :step="0.05" :min="0" :max="1">
                 Tick background opacity
@@ -70,6 +65,7 @@ import SidebarSection from "@/components/layouts/SidebarSection.vue"
 import {useOptionsStore} from "@/store/OptionsStore"
 import {usePCPStore} from "@/store/PCPStore"
 import {useStateStore} from "@/store/StateStore"
+import CheckboxInput from "@/components/inputs/CheckboxInput.vue"
 
 // State references
 const optionsStore = useOptionsStore()
@@ -90,13 +86,6 @@ function setResolutionManualOverride (override) {
 <style lang="scss" scoped>
     .title {
         font-weight: bold;
-    }
-
-    .labeled-form.size-and-opacity-forms {
-
-        span {
-            min-width: 50px !important;
-        }
     }
 
 </style>

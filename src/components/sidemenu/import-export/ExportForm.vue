@@ -18,25 +18,22 @@
         </div>
         <div class="control-group">
             <strong>Data export</strong>
-            <div 
-                style="display: flex; justify-content: space-between; flex-direction: row;"
-                title="Checking this box will export data that has been excluded using filters"    
-            >
-                <!-- Checkbox filtered data -->
-                <span>Include all data</span>
-                <input ref="filteredDataCheckbox" v-model="includeFilteredData" type="checkbox">
-            </div>
+
+            <CheckboxInput v-model="includeFilteredData" title="Checking this box will export data that has been excluded using filters">
+                Include all data
+            </CheckboxInput>
+
             <div class="d-grid gap-2 mt-2">
                 <button @click="exportDataRequest(includeFilteredData)">Download Data CSV</button>
             </div>
         </div>
         <div class="control-group">
             <strong>Filter export</strong>
-            <div style="display: flex; justify-content: space-between; flex-direction: row;">
-                <!-- Checkbox filtered data -->
-                <span>Interpret out-of-bounds limits as inf</span>
-                <input ref="filteredDataCheckbox" v-model="nearLimitAsInf" type="checkbox">
-            </div>
+
+            <CheckboxInput v-model="nearLimitAsInf" title="Checking this box will interpret filters that are out of bounds as infinity">
+                Interpret out-of-bounds limits as inf" 
+            </CheckboxInput>
+
             <div class="d-grid gap-2 mt-2">
                 <button @click="exportFilterRequest(nearLimitAsInf)">Download Filter CSV</button>
             </div>
@@ -53,6 +50,7 @@ import SidebarSection from "@/components/layouts/SidebarSection.vue";
 import { useDataStore } from "@/store/DataStore";
 import { usePCPStore } from "@/store/PCPStore";
 import { min } from "d3";
+import CheckboxInput from "@/components/inputs/CheckboxInput.vue";
 
 const dataStore = useDataStore();
 const pcpStore = usePCPStore();

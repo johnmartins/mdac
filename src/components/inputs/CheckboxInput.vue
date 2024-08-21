@@ -1,41 +1,26 @@
 <template>
-    <div class="labeled-input-container mb-1">
-        <div>
+    <div class="labeled-input-container mb-1" >
+        <div @click="cbox.click()" class="clickable">
             <span class="input-group-text">
                 <slot />
             </span>
         </div>
-        <input 
-            class="input-number"
-            type="number" 
-            :step="props.step" 
-            :max="props.max" 
-            :min="props.min"
-            :value="model"
-            @input="$emit('update:modelValue', $event.target.value)"
-        >
+        <div style="display:flex; justify-content: end;">
+            <input 
+                ref="cbox"
+                type="checkbox" 
+                v-model="model"
+            >
+        </div>
     </div>
 </template>
 
 <script setup>
-import { defineModel } from "vue";
+import { defineModel, ref } from "vue";
 
 const model = defineModel();
 
-const props = defineProps({
-    'step': {
-        type: Number,
-        default: 0.1
-    },
-    'max': {
-        type: Number,
-        default: 1.0
-    },
-    'min': {
-        type: Number,
-        default: 0.0
-    },
-})
+const cbox = ref(null);
 
 </script>
 
@@ -43,7 +28,7 @@ const props = defineProps({
 
     .labeled-input-container {
         display: grid;
-        grid-template-columns: 1fr 3fr;
+        grid-template-columns: auto 1fr;
         gap: 0.5em;
     }
     
