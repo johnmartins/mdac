@@ -5,7 +5,7 @@
     >
         <div class="control-group">
             <strong>Plot export</strong>
-            <div class="labeled-form">
+            <div class="labeled-form" style="font-size: 0.8em;">
                 <span>Format: </span>
                 <select ref="formatSelector" @change="onImageFormatChange">
                     <option value="png">Image (PNG)</option>

@@ -14,7 +14,7 @@
                 @change="readFile"
             >
 
-            <div class="labeled-form">                
+            <div class="labeled-form" style="font-size: 0.8em;">                
                 <span>Delimiter:</span>
                 <select id="formFileDelimiter" ref="fileDelimiterSelect" name="delimiter" @change="readFile">
                     <option value="auto" selected>Auto (default)</option>

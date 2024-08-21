@@ -4,21 +4,21 @@
         :start-maximized="false"
     >
         <div class="control-group">            
-            <div class="labeled-form">
+            <div class="labeled-form" style="font-size: 0.8em;">
                 <span>Fidelity column: </span>
                 <select v-model="fidelityColumn" class="mb-2">
                     <option :value="null">None</option>
                     <option v-for="c in categories.filter(filterCategoricalColumns)" :key="c.id" :value="c"> {{ c.displayTitle }}</option>
                 </select>
             </div>
-            <div class="labeled-form">
+            <div class="labeled-form" style="font-size: 0.8em;">
                 <span>HiFi indicator: </span>
                 <select v-model="fidelityValue" class="mb-2" :disabled="fidelityColumn == null">
                     <option :value="null">None</option>
                     <option v-for="val, i in fidelityColumnValues" :key="i" :value="val"> {{ val }}</option>
                 </select>
             </div>
-            <div class="labeled-form">
+            <div class="labeled-form" style="font-size: 0.8em;">
                 <span>I/O similarity: </span>
                 <select v-model="ioType" class="mb-2">
                     <option value="input">Input</option>

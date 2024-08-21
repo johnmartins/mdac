@@ -4,7 +4,7 @@
         :start-maximized="false"
     >
         <div class="control-group">
-            <div v-if="stateStore.activeView === 'pcp'" class="labeled-form mb-2">
+            <div v-if="stateStore.activeView === 'pcp'" class="labeled-form mb-2" style="font-size: 0.8em;">
                 <span>Rendering: </span>
                 <select ref="lineFormatSelector" v-model="pcpStore.renderingType">
                     <option value="raster">Rasterized</option>
@@ -12,7 +12,7 @@
                 </select>
             </div>
 
-            <div v-if="stateStore.activeView === 'pcp' && pcpStore.renderingType==='raster'" class="labeled-form mb-2">
+            <div v-if="stateStore.activeView === 'pcp' && pcpStore.renderingType==='raster'" class="labeled-form mb-2" style="font-size: 0.8em;">
                 <span>Resolution: </span>
                 <select ref="lineFormatSelector" v-model="pcpStore.resolution" @change="setResolutionManualOverride(true)">
                     <option :value="0.3">0.3 - Potato</option>
@@ -25,7 +25,7 @@
                 </select>
             </div>
 
-            <div v-if="stateStore.activeView === 'pcp'" class="labeled-form mb-2">
+            <div v-if="stateStore.activeView === 'pcp'" class="labeled-form mb-2" style="font-size: 0.8em;">
                 <span>Curve type: </span>
                 <select ref="lineFormatSelector" v-model="optionsStore.curveType">
                     <option value="curve">Curve</option>
