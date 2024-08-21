@@ -4,7 +4,7 @@
         :start-maximized="props.startMaximized"
     >
         <div class="control-group">
-            <div class="labeled-form" style="font-size: 0.8em;">                
+            <div class="labeled-form mb-2" style="font-size: 0.8em;">                
                 <span>Property:</span>
                 <select 
                     v-model="selectedColorCodeCategory" 
