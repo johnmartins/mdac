@@ -5,7 +5,7 @@
         :start-maximized="false"
     >
         <div v-if="editedCategory">
-            <div class="control-group">
+            <div class="control-group" @keyup.enter="editCategory">
                 <strong>Edit selected axis</strong>
                 <TextInput v-model="editedCategory.displayTitle">Title</TextInput>
                 <div v-if="editedCategory.usesCategoricalData == false">
