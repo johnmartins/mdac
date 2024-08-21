@@ -18,9 +18,12 @@
         </div>
         <div class="control-group">
             <strong>Data export</strong>
-            <div style="display: flex; justify-content: space-between; flex-direction: row;">
+            <div 
+                style="display: flex; justify-content: space-between; flex-direction: row;"
+                title="Checking this box will export data that has been excluded using filters"    
+            >
                 <!-- Checkbox filtered data -->
-                <span>Include filtered data</span>
+                <span>Include all data</span>
                 <input ref="filteredDataCheckbox" v-model="includeFilteredData" type="checkbox">
             </div>
             <div class="d-grid gap-2 mt-2">
