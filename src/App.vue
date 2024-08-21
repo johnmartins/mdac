@@ -1,7 +1,10 @@
 <template>
     <div id="app" style="height: 100%;">
         <div class="mdac-header px-3">
-            <div class="title-container">
+            <div 
+                class="title-container clickable"
+                @click="setView('pcp')"
+            >
                 MDAC
             </div>
 
