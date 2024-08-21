@@ -40,25 +40,20 @@
                 </div>
             </div>
 
-            <div class="labeled-form">
-                <span>Tick background opacity: </span>
-                <input v-model="optionsStore.tickBackgroundOpacity" type="number" step="0.05" max="1" min="0">
-            </div>
+            <NumberInput v-model="optionsStore.tickBackgroundOpacity" :step="0.05" :min="0" :max="1">
+                Tick background opacity
+            </NumberInput>
 
             <span class="title">Font size</span>
-            <div class="labeled-form size-and-opacity-forms">
-                <span>Title size:</span>
-                <input v-model="optionsStore.titleSize" class="me-2" type="number" step="0.1" max="5" min="0">
-                <span>Tick size:</span>
-                <input v-model="optionsStore.tickSize" type="number" step="0.1" max="5" min="0">
+            <div class="size-and-opacity-forms" style="display: flex; justify-content: space-between;">
+                <NumberInput v-model="optionsStore.titleSize" class="me-2" :step="0.1" :max="5" :min="0">Title size:</NumberInput>
+                <NumberInput v-model="optionsStore.tickSize" :step="0.1" :max="5" :min="0">Tick size:</NumberInput>
             </div>
 
             <span class="title">Data opacity</span>
-            <div class="labeled-form size-and-opacity-forms">
-                <span>Included:</span>
-                <input v-model="optionsStore.includedDataOpacity" class="me-2" type="number" step="0.05" max="1" min="0">
-                <span>Excluded:</span>
-                <input type="number" step="0.05" max="1" min="0" :value="optionsStore.excludedDataOpacity" @change="setFilteredDataOpacity">
+            <div class="size-and-opacity-forms" style="display: flex; justify-content: space-between;">
+                <NumberInput v-model="optionsStore.includedDataOpacity" class="me-2" :step="0.05" :max="1" :min="0">Included:</NumberInput>
+                <NumberInput v-model="optionsStore.excludedDataOpacity" :step="0.05" :max="1" :min="0" @change="setFilteredDataOpacity">Excluded:</NumberInput>
             </div>
         </div>
     </SidebarSection>
@@ -68,7 +63,7 @@
 import { reactive, ref } from "vue"
 
 // Components
-import RangeInput from '@/components/inputs/RangeInput.vue'
+import NumberInput from '@/components/inputs/NumberInput.vue'
 import SidebarSection from "@/components/layouts/SidebarSection.vue"
 
 // State
@@ -82,6 +77,7 @@ const pcpStore = usePCPStore()
 const stateStore = useStateStore()
 
 function setFilteredDataOpacity (evt) {
+    console.log("change")
     optionsStore.setExcludedDataOpacity(parseFloat(evt.target.value)) 
 }
 
