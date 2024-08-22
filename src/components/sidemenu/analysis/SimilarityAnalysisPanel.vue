@@ -40,7 +40,7 @@ import WorkerMessage from "@/models/WorkerMessage"
 import { calculateIntersimilarity } from "@/sadse/similarity"
 import { useStateStore } from "@/store/StateStore"
 import { storeToRefs } from "pinia"
-import { computed, ref } from "vue"
+import { computed, ref, inject } from "vue"
 import { useDataStore } from "../../../store/DataStore"
 import SidebarSection from "@/components/layouts/SidebarSection"
 
@@ -53,6 +53,8 @@ const { categories } = storeToRefs(dataStore)
 const fidelityColumn = ref(null)
 const fidelityValue = ref(null)
 const ioType = ref('input')
+
+const eventBus = inject('eventBus');
 
 const fidelityColumnValues = computed( () => {
     if (!fidelityColumn.value) return []
@@ -72,20 +74,22 @@ function filterCategoricalColumns (c) {
 }
 
 async function requestIntersimCalc () {
-    const fidelityColumnTitle = fidelityColumn.value.title
-    const targetColValue = fidelityValue.value
-    const ioSelection = ioType.value
+    const fidelityColumnTitle = fidelityColumn.value.title;
+    const targetColValue = fidelityValue.value;
+    const ioSelection = ioType.value;
 
-    analysisWorker.postMessage(new WorkerMessage('channel name here', 'payload message or object or whatever really.'))
+    analysisWorker.postMessage(new WorkerMessage('channel name here', 'payload message or object or whatever really.'));
 
-    stateStore.setLoading('Running similarity analysis')
+    await stateStore.setLoading('Running similarity analysis. This can take several minutes...');
     try {
-        // Use a worker for this shit
-        await calculateIntersimilarity(fidelityColumnTitle, targetColValue, ioSelection)
+        // Use a worker for this shit // 2024: we should still implement a service worker for this shit
+        await calculateIntersimilarity(fidelityColumnTitle, targetColValue, ioSelection);
     } catch (err) {
-        throw err
+        throw err;
     } finally {
-        stateStore.clearLoading()
+        // Request redraw and remove loading message
+        eventBus.emit('RequestPCPRedraw');
+        await stateStore.clearLoading();
     }
 }
 
