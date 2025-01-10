@@ -59,6 +59,7 @@
                             class="filter-hitbox"
                             :height="truncateDecimals(getAxisLength()+40, 1)"
                             @click="onClickAxis(c)"
+                            @dblclick="onDblClickAxis(c)"
                             @mousedown.prevent="dragFilterStart($event, c)"
                         />
 						
