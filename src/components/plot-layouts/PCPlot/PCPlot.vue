@@ -69,6 +69,7 @@
                             :style="{fontSize: `${optionsStore.titleSize}em`}"
                             :transform="`rotate(${axisLabelAngle} 0 ${truncateDecimals(getPlotYBounds()[1]-(plotBottomPadding-axisLabelMargin),1)})`"
                             @click="onClickAxis(c)"
+                            @dblclick="onDblClickAxis(c)"
                         >
                             {{ c.displayTitle }}
                         </text>
@@ -404,6 +405,23 @@ function onClickAxis (c) {
     plotCanvas.value.focus()
 
     selectedCategory.value = c ? c : null
+}
+
+function onDblClickAxis (c) {
+    if (!optionsStore.selectedColorCodeCategory) {
+        optionsStore.selectedColorCodeCategory = c;
+        optionsStore.resetColorCodeOverride();
+        return;
+    }
+
+    if (optionsStore.selectedColorCodeCategory.id === c.id) {
+        optionsStore.selectedColorCodeCategory = null;
+        optionsStore.resetColorCodeOverride();
+        return;
+    }
+
+    optionsStore.selectedColorCodeCategory = c;
+    optionsStore.resetColorCodeOverride();
 }
 
 function getSelectedCategoryTitle () {
