@@ -1,5 +1,5 @@
 <template>
-    <div class="labeled-input-container mb-1">
+    <div class="labeled-input-container mb-1" style="width: 100%;">
         <div>
             <span class="input-group-text">
                 <slot />
@@ -43,13 +43,13 @@ const props = defineProps({
 
     .labeled-input-container {
         display: grid;
-        grid-template-columns: 1fr 3fr;
+        grid-template-columns: 1fr 1.1fr;
         gap: 0.5em;
     }
     
     .input-group-text {
         font-size: 0.8em;
-        min-width: 50px;
+        min-width: 100%;
         padding: 0.1em 0.5em 0.1em 0.4em;
 
 
@@ -69,7 +69,7 @@ const props = defineProps({
     .input-number {
         height: 1.8em;
         font-size: 0.8em;
-        min-width: 30px;
+        width: 100%;
     }
 
 </style>
