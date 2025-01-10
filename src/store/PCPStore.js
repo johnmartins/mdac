@@ -15,6 +15,14 @@ export const usePCPStore = defineStore('pcp', {
         // Bounds
         plotXBounds: [0, 500],
         plotYBounds: [0, 500],
+
+        // Layout parameters
+        axisLabelMargin: 12,
+        axisLabelAngle: 45,
+        plotTopPadding: 75,
+        plotRightPadding: 150,
+        plotBottomPadding: 120,
+        plotLeftPadding: 75,
     }),
     getters: {},
     actions: {

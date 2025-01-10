@@ -28,7 +28,7 @@
                 <!-- Full graphics group -->
                 <g
                     v-if="data.length > 0"
-                    :transform="`translate(${plotParameters.padding} 0)`"
+                    :transform="`translate(${plotLeftPadding} 0)`"
                 > 
 
                     <!-- Vector rendering layer -->
@@ -52,7 +52,7 @@
                     >	
 
                         <!-- Axis vertical line -->
-                        <line x1="0" y1="0" x2="0" :y2="truncateDecimals(getPlotYBounds()[1]-(plotParameters.axisTitlePadding),2)" />
+                        <line x1="0" y1="0" x2="0" :y2="truncateDecimals(getPlotYBounds()[1]-(plotBottomPadding),2)" />
 
                         <!-- Hitbox -->
                         <rect 
@@ -64,10 +64,10 @@
 						
                         <!-- Axis label -->
                         <text 
-                            :y="truncateDecimals(getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10),1)" 
+                            :y="truncateDecimals(getPlotYBounds()[1]-(plotBottomPadding-axisLabelMargin),1)" 
                             class="title" 
                             :style="{fontSize: `${optionsStore.titleSize}em`}"
-                            :transform="`rotate(${plotParameters.axisTitleRotation} 0 ${truncateDecimals(getPlotYBounds()[1]-(plotParameters.axisTitlePadding-10),1)})`"
+                            :transform="`rotate(${axisLabelAngle} 0 ${truncateDecimals(getPlotYBounds()[1]-(plotBottomPadding-axisLabelMargin),1)})`"
                             @click="onClickAxis(c)"
                         >
                             {{ c.displayTitle }}
@@ -97,7 +97,7 @@
                             <g v-if="plotVariables.currentFilterCategory.title === c.title">
                                 <rect 
                                     class="filter-box-proto"
-                                    :y="truncateDecimals(Math.min(plotVariables.currentFilterStartValue, plotVariables.currentFilterEndValue) - plotParameters.padding, 1)"
+                                    :y="truncateDecimals(Math.min(plotVariables.currentFilterStartValue, plotVariables.currentFilterEndValue) - plotTopPadding, 1)"
                                     :height="truncateDecimals(Math.abs(plotVariables.currentFilterEndValue - plotVariables.currentFilterStartValue), 1)"
                                 />
                             </g>
@@ -151,7 +151,7 @@ const layoutStore = useLayoutStore()
 
 const {data, filterIDMap, filters, categories} = storeToRefs(dataStore)
 const {activeView, selectedCategory} = storeToRefs(stateStore)
-const {horizontalOffset, axisLength, plotXBounds, plotYBounds, pathsDataUrl} = storeToRefs(PCPStore)
+const {horizontalOffset, axisLength, plotXBounds, plotYBounds, pathsDataUrl, axisLabelMargin, axisLabelAngle, plotTopPadding, plotRightPadding, plotBottomPadding, plotLeftPadding} = storeToRefs(PCPStore)
 
 // Plotted data
 const dataIncluded = ref([])
@@ -163,9 +163,6 @@ const pcpPlot = ref(null)
 const rasterLayer = ref(null)
 
 const plotParameters = reactive({
-    padding: 100,
-    axisTitlePadding: 200,
-    axisTitleRotation: 45,
     filterMinDragTime: 125, // ms
 })
 const plotVariables = reactive({
@@ -216,8 +213,8 @@ watch([categories, plotXBounds, () => dataStore.enabledCategoriesCount], () => {
     horizontalOffset.value = plotXBounds.value[1]/Math.max(1,(dataStore.enabledCategoriesCount-1))
 })
 
-watch([plotYBounds, () => plotParameters.axisTitlePadding], () => {
-    axisLength.value = getPlotYBounds()[1]-(plotParameters.axisTitlePadding)
+watch([plotYBounds, () => plotBottomPadding], () => {
+    axisLength.value = getPlotYBounds()[1]-(plotBottomPadding.value)
 })
 
 function onFilterInteraction (evt) {
@@ -249,27 +246,28 @@ function handleFilterEdgeInteraction (evt) {
     plotVariables.interactionType = 'edge';
     plotVariables.mousedown = true;
     plotVariables.currentFilterCategory = evt.category;
-    plotVariables.currentFilterStartValue = evt.start + plotParameters.padding;
+    plotVariables.currentFilterStartValue = evt.start + plotTopPadding.value;
     plotVariables.currentFilterStartTime = Date.now();
     plotVariables.currentFilterDeltaTime = 0;
     plotVariables.filterToRemove = evt.filter;		// Mark the original filter for deletion
 }
 
 function getAxisLength () {
-    return plotYBounds.value[1]-(plotParameters.axisTitlePadding)
+    return plotYBounds.value[1]-(plotBottomPadding.value)
 }
 
 function getPlotYBounds () {
     if (!plotCanvas.value) return [0, 0]
 
-    const upperBoundary = plotParameters.padding
-    const lowerBoundary = plotCanvas.value.getBoundingClientRect().height - plotParameters.padding
-    const array = [upperBoundary, lowerBoundary]
-    return array
+    const upperBoundary = plotTopPadding.value;
+    // bottom padding is divided by 4 to compensate for stacking effects
+    const lowerBoundary = plotCanvas.value.getBoundingClientRect().height - plotBottomPadding.value / 4 - plotTopPadding.value;
+    const array = [upperBoundary, lowerBoundary];
+    return array;
 }
 
 function getPlotXBounds () {
-    const array = [plotParameters.padding, plotCanvas.value.getBoundingClientRect().width - plotParameters.padding - plotParameters.axisTitlePadding]
+    const array = [plotLeftPadding.value, plotCanvas.value.getBoundingClientRect().width - (plotLeftPadding.value + plotRightPadding.value)]
     return array
 }
 
@@ -299,11 +297,11 @@ function grabFilterBlock (evt) {
     if (!plotVariables.currentFilterCategory.usesCategoricalData) {
         let ta = plotVariables.filterToRemove.thresholdA
         let tb = plotVariables.filterToRemove.thresholdB
-        taAdjusted = plotVariables.currentFilterCategory.scaleLinear(ta)*axisLength.value + plotParameters.padding;
-        tbAdjusted = plotVariables.currentFilterCategory.scaleLinear(tb)*axisLength.value + plotParameters.padding;
+        taAdjusted = plotVariables.currentFilterCategory.scaleLinear(ta)*axisLength.value + plotTopPadding.value;
+        tbAdjusted = plotVariables.currentFilterCategory.scaleLinear(tb)*axisLength.value + plotTopPadding.value;
     } else {
-        taAdjusted = plotVariables.filterToRemove.upperBoundRatio * axisLength.value + plotParameters.padding;
-        tbAdjusted = plotVariables.filterToRemove.lowerBoundRatio * axisLength.value + plotParameters.padding;
+        taAdjusted = plotVariables.filterToRemove.upperBoundRatio * axisLength.value + plotTopPadding.value;
+        tbAdjusted = plotVariables.filterToRemove.lowerBoundRatio * axisLength.value + plotTopPadding.value;
     }
      
     const loc = getTrueEventCoordinates(evt, plotCanvas.value);
@@ -354,8 +352,8 @@ function dragFilterDone () {
 
     // Calculate domain extent
     const c = plotVariables.currentFilterCategory
-    const y1 = plotVariables.currentFilterStartValue - plotParameters.padding
-    const y2 = plotVariables.currentFilterEndValue - plotParameters.padding
+    const y1 = plotVariables.currentFilterStartValue - plotTopPadding.value
+    const y2 = plotVariables.currentFilterEndValue - plotTopPadding.value
     let y1Ratio = (y1 / getAxisLength())
     let y2Ratio = (y2 / getAxisLength())
 
