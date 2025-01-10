@@ -57,7 +57,6 @@ import { ref, watch, inject } from "vue";
 import { storeToRefs } from "pinia";
 
 // Stores
-import {useDataStore} from "@/store/DataStore";
 import {useStateStore} from "@/store/StateStore";
 
 // Components
@@ -70,7 +69,6 @@ import Category from '@/models/plots/Category';
 // DOM
 const sidebarSection = ref(null);
 
-const dataStore = useDataStore();
 const stateStore = useStateStore();
 
 const {selectedCategory} = storeToRefs(stateStore);
