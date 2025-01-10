@@ -54,17 +54,17 @@
             <div v-if="stateStore.activeView === 'pcp'">
                 <span class="title">PCP layout - Padding</span>
                 <div class="format-forms">
-                    <NumberInput v-model="tmpOptions.plotTopPadding" :step="1" :min="0" :max="1000" @change="requestPcpRender">Top</NumberInput>
+                    <NumberInput v-model="tmpOptions.plotTopPadding" class="me-2" :step="1" :min="0" :max="1000" @change="requestPcpRender">Top</NumberInput>
                     <NumberInput v-model="tmpOptions.plotBottomPadding" :step="1" :min="0" :max="1000" @change="requestPcpRender">Bottom</NumberInput>
                 </div>
                 <div class="format-forms">
-                    <NumberInput v-model="tmpOptions.plotLeftPadding" :step="1" :min="0" :max="1000" @change="requestPcpRender">Left</NumberInput>
+                    <NumberInput v-model="tmpOptions.plotLeftPadding" class="me-2" :step="1" :min="0" :max="1000" @change="requestPcpRender">Left</NumberInput>
                     <NumberInput v-model="tmpOptions.plotRightPadding" :step="1" :min="0" :max="1000" @change="requestPcpRender">Right</NumberInput>
                 </div>
                 <span class="title">PCP layout - Axis labels</span>
                 <div class="format-forms">
                     <NumberInput v-model="pcpStore.axisLabelMargin" class="me-2" :step="1" :min="0" :max="1000">Margin</NumberInput>
-                    <NumberInput v-model="pcpStore.axisLabelAngle" class="me-2" :step="1" :min="0" :max="90">Angle</NumberInput>
+                    <NumberInput v-model="pcpStore.axisLabelAngle" :step="1" :min="0" :max="90">Angle</NumberInput>
                 </div>
             </div>
         </div>
