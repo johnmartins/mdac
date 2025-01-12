@@ -437,8 +437,6 @@ function recreateCategoricFilters (c) {
     if (!c.usesCategoricalData) {
         throw new Error(`${c.title} does not use categorical data.`)
     }
-    console.log(dataStore.filters);
-    console.log(c.title)
 
     // Remove and then recreate all filters for this category with the same range ratios.
     if (dataStore.filters[c.title]) {

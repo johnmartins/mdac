@@ -17,7 +17,10 @@ export const useStateStore = defineStore('state', {
         loadingReason: null,        // If not null, then something is loading, preventing the user from interacting with the interface.
 
         // Queued re-renders
-        reRenderMvGrid: true
+        reRenderMvGrid: true,
+
+        // Keys
+        ctrl: false,
     }),
     getters: {},
     actions: {

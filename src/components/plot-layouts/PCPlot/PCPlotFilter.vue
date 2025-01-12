@@ -2,11 +2,12 @@
     <g>
         <rect 
             class="filter-box"
+            :class="{'filter-box-delete': hovering && ctrl}"
             :y="y" 
             :height="height"
             @mousedown.stop.prevent="moveFilterBlock($event)"
-            @mouseenter="emit('onMouseEnter', props.filter)"
-            @mouseleave="emit('onMouseLeave', props.filter)"
+            @mouseenter="onMouseEnter($event)"
+            @mouseleave="onMouseLeave($event)"
             @click.ctrl.stop="onClickCtrl"
         />
 
@@ -27,27 +28,35 @@
 </template>
 
 <script setup>
-import {computed, ref} from 'vue';
-import {storeToRefs} from "pinia";
+import { computed, ref } from 'vue';
+import { storeToRefs } from "pinia";
 
 import Category from '@/models/plots/Category';
 
 // Stores
 import { usePCPStore } from "@/store/PCPStore";
+import { useDataStore } from '@/store/DataStore';
+import { useStateStore } from '@/store/StateStore';
 
 const PCPStore = usePCPStore();
+const dataStore = useDataStore();
+const stateStore = useStateStore();
 
-const {axisLength} = storeToRefs(PCPStore)
-const emit = defineEmits(['onInteraction', 'onMouseEnter', 'onMouseLeave'])
+const { axisLength } = storeToRefs(PCPStore);
+const { ctrl } = storeToRefs(stateStore);
+const emit = defineEmits(['onInteraction', 'onMouseEnter', 'onMouseLeave']);
 
 const props = defineProps({
     category: Object,
     filter: Object,
     canvas: Object,
-})
+});
 
-const capHeight = ref(6)
+// Params
+const capHeight = ref(6);
 
+// State
+const hovering = ref(false);
 const y = computed(() => {
     if (props.filter.type === 'single-range') {
 
@@ -105,7 +114,17 @@ function moveFilterBot () {
 }
 
 function onClickCtrl () {
-    console.log("delete filter, please");
+    dataStore.deleteFilter(props.filter);
+}
+
+function onMouseEnter (evt) {
+    emit('onMouseEnter', props.filter);
+    hovering.value = true;
+}
+
+function onMouseLeave (evt) {
+    emit('onMouseLeave', props.filter);
+    hovering.value = false;
 }
 
 </script>
@@ -122,5 +141,9 @@ function onClickCtrl () {
         width: 20px;
         fill: transparentize($color: blue, $amount: 0.8);
         cursor: ns-resize;
+    }
+    .filter-box-delete {
+        cursor: default !important;
+        fill: red !important;
     }
 </style>

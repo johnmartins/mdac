@@ -1,5 +1,9 @@
 <template>
-    <div id="app" style="height: 100%;">
+    <div 
+        id="app" 
+        style="height: 100%;"
+        @mouseleave="onMouseLeave"
+    >
         <div class="mdac-header px-3">
             <div 
                 class="title-container clickable"
@@ -173,9 +177,33 @@ function setView (viewName) {
 onMounted( () => {
     // Add listener for resize
     window.onresize = () => {
-        eventBus.emit('Layout.contentResize')
+        eventBus.emit('Layout.contentResize');
     }
+
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keyup', onKeyUp);
 })
+
+function onKeyDown (evt) {
+   
+    // If ctrl
+    if (evt.key === 'Control') {
+        stateStore.ctrl = true;
+    }
+}   
+
+function onKeyUp (evt) {
+    
+    // If ctrl
+    if (evt.key === 'Control') {
+        stateStore.ctrl = false;
+    }
+
+}
+
+function onMouseLeave () {
+    // stateStore.ctrl = false;
+}
 
 </script>
 
