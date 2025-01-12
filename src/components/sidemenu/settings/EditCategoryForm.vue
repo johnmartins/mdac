@@ -25,7 +25,6 @@
                     <button 
                         class="small info" 
                         @click="flipCategory" 
-                        :disabled="editedCategory.usesCategoricalData === true"
                     >
                         Flip
                     </button>
@@ -101,12 +100,12 @@ function enableCategory () {
 }
 
 function flipCategory () {
-    let newLb = editedCategory.value.ub;
-    let newUb = editedCategory.value.lb;
-    editedCategory.value.lb = newLb;
-    editedCategory.value.ub = newUb;
-
+    editedCategory.value.flip();
     editCategory();
+    if (editedCategory.value.usesCategoricalData) {
+        eventBus.emit('RedrawCategoricalFilters', selectedCategory.value);
+    }
+    
 }
 
 function editCategory () {

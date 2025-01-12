@@ -7,6 +7,7 @@
             @mousedown.stop.prevent="moveFilterBlock($event)"
             @mouseenter="emit('onMouseEnter', props.filter)"
             @mouseleave="emit('onMouseLeave', props.filter)"
+            @click.ctrl.stop="onClickCtrl"
         />
 
         <rect 
@@ -32,11 +33,9 @@ import {storeToRefs} from "pinia";
 import Category from '@/models/plots/Category';
 
 // Stores
-import { useDataStore } from '@/store/DataStore';
 import { usePCPStore } from "@/store/PCPStore";
 
 const PCPStore = usePCPStore();
-const dataStore = useDataStore();
 
 const {axisLength} = storeToRefs(PCPStore)
 const emit = defineEmits(['onInteraction', 'onMouseEnter', 'onMouseLeave'])
@@ -103,6 +102,10 @@ function moveFilterBot () {
         category: props.category,
         start: y.value
     })
+}
+
+function onClickCtrl () {
+    console.log("delete filter, please");
 }
 
 </script>
