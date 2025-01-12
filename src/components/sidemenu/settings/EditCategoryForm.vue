@@ -25,7 +25,6 @@
                     <button 
                         class="small info" 
                         @click="flipCategory" 
-                        :disabled="editedCategory.usesCategoricalData === true"
                     >
                         Flip
                     </button>
@@ -57,7 +56,6 @@ import { ref, watch, inject } from "vue";
 import { storeToRefs } from "pinia";
 
 // Stores
-import {useDataStore} from "@/store/DataStore";
 import {useStateStore} from "@/store/StateStore";
 
 // Components
@@ -70,7 +68,6 @@ import Category from '@/models/plots/Category';
 // DOM
 const sidebarSection = ref(null);
 
-const dataStore = useDataStore();
 const stateStore = useStateStore();
 
 const {selectedCategory} = storeToRefs(stateStore);
@@ -103,12 +100,12 @@ function enableCategory () {
 }
 
 function flipCategory () {
-    let newLb = editedCategory.value.ub;
-    let newUb = editedCategory.value.lb;
-    editedCategory.value.lb = newLb;
-    editedCategory.value.ub = newUb;
-
+    editedCategory.value.flip();
     editCategory();
+    if (editedCategory.value.usesCategoricalData) {
+        eventBus.emit('RedrawCategoricalFilters', selectedCategory.value);
+    }
+    
 }
 
 function editCategory () {

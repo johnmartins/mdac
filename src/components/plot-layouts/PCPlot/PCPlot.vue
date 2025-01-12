@@ -58,7 +58,8 @@
                         <rect 
                             class="filter-hitbox"
                             :height="truncateDecimals(getAxisLength()+40, 1)"
-                            @click="onClickAxis(c)"
+                            @click="onClickAxis($event ,c)"
+                            @dblclick="onDblClickAxis($event, c)"
                             @mousedown.prevent="dragFilterStart($event, c)"
                         />
 						
@@ -68,8 +69,8 @@
                             class="title" 
                             :style="{fontSize: `${optionsStore.titleSize}em`}"
                             :transform="`rotate(${axisLabelAngle} 0 ${truncateDecimals(getPlotYBounds()[1]-(plotBottomPadding-axisLabelMargin),1)})`"
-                            @click="onClickAxis(c)"
-                            @dblclick="onDblClickAxis(c)"
+                            @click="onClickAxis($event, c)"
+                            @dblclick="onDblClickAxis($event, c)"
                         >
                             {{ c.displayTitle }}
                         </text>
@@ -201,6 +202,8 @@ eventBus.on('Router.TabChange', (viewName) => {
         updateContainerSize()
     }
 })
+
+eventBus.on('RedrawCategoricalFilters', recreateCategoricFilters);
 
 // Listeners
 watch(() => filterIDMap.value.size, () => {
@@ -394,7 +397,7 @@ function dragFilterDone () {
     resetFilterDrag()
 }
 
-function onClickAxis (c) {
+function onClickAxis (evt, c) {
     if (plotVariables.clickOnCooldown) return;
     if (plotVariables.mousedown === true) return;
     if (selectedCategory.value && selectedCategory.value.title === c.title) {
@@ -404,10 +407,48 @@ function onClickAxis (c) {
     // Remove focus from any form element to prevent erronious user input
     plotCanvas.value.focus()
 
+    if (evt.ctrlKey) {
+        return flipAxis(c);
+    }
+
+    if (evt.shiftKey) {
+        return setColorCodeCategory(c);
+    }
+
     selectedCategory.value = c ? c : null
 }
 
-function onDblClickAxis (c) {
+function onDblClickAxis (evt, c) {
+    setColorCodeCategory(c)
+}
+
+function flipAxis (c) {
+    c.flip();
+
+    if (c.usesCategoricalData) {
+        recreateCategoricFilters(c);
+    }
+
+    requestRasterRedraw();
+}
+
+function recreateCategoricFilters (c) {
+
+    if (!c.usesCategoricalData) {
+        throw new Error(`${c.title} does not use categorical data.`)
+    }
+
+    // Remove and then recreate all filters for this category with the same range ratios.
+    if (dataStore.filters[c.title]) {
+        dataStore.filters[c.title].forEach(f => {
+            f.flipRatio();
+        });
+    }
+
+
+}
+
+function setColorCodeCategory (c) {
     if (!optionsStore.selectedColorCodeCategory) {
         optionsStore.selectedColorCodeCategory = c;
         optionsStore.resetColorCodeOverride();
@@ -492,6 +533,10 @@ function exportSVG () {
     const full_svg = head +  style + svgData + "</svg>"
     const blob = new Blob([full_svg], {type: "image/svg+xml"});  
     saveAs(blob, "PCPlot.svg");
+}
+
+function requestRasterRedraw () {
+    eventBus.emit('RequestPCPRedraw');
 }
     
 </script>

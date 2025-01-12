@@ -1,6 +1,6 @@
 {
   "name": "md-analysis-cli",
-  "version": "1.17.0",
+  "version": "1.17.1",
   "private": true,
   "author": {
     "name": "Julian Martinsson Bonde",
@@ -19,8 +19,8 @@
     "@fortawesome/free-regular-svg-icons": "6.x",
     "@fortawesome/free-solid-svg-icons": "6.x",
     "@fortawesome/vue-fontawesome": "3.x",
-    "@popperjs/core": "2.x",
-    "bootstrap": "5.x",
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.3",
     "core-js": "3.x",
     "d3": "7.x",
     "file-saver": "2.x",
@@ -31,16 +31,16 @@
     "vue-router": "4.x"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.12.16",
     "@vue/cli-plugin-babel": "5.x",
+    "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-plugin-router": "5.x",
     "@vue/cli-service": "5.x",
     "@vue/compiler-sfc": "3.x",
+    "eslint-plugin-vue": "^8.0.3",
     "sass": "1.x",
     "sass-loader": "13.x",
-    "vue-cli-plugin-pinia": "0.x",
-    "eslint-plugin-vue": "^8.0.3",
-    "@babel/eslint-parser": "^7.12.16",
-    "@vue/cli-plugin-eslint": "~5.0.0"
+    "vue-cli-plugin-pinia": "0.x"
   },
   "overrides": {
     "autoprefixer": "10.x",

@@ -13,11 +13,16 @@ class CategoricFilter extends Filter {
         
         this.upperBoundRatio = boundaryRatioA > boundaryRatioB ? boundaryRatioA : boundaryRatioB         
         this.lowerBoundRatio = boundaryRatioB < boundaryRatioA ? boundaryRatioB : boundaryRatioA        
-
     }
 
     filter (value) {
         return this.includedValueSet.has(value)
+    }
+
+    flipRatio () {
+        let tmpLower = this.lowerBoundRatio;
+        this.lowerBoundRatio = 1 - this.upperBoundRatio;
+        this.upperBoundRatio = 1 - tmpLower;
     }
 
     static createFromRatios (c, y1Ratio, y2Ratio) {

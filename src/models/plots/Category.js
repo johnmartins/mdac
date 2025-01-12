@@ -138,6 +138,15 @@ class Category {
         }
     }
 
+    flip () {
+        let newLb = this.ub;
+        let newUb = this.lb;
+        this.lb = newLb;
+        this.ub = newUb;
+
+        this.availableCategoricalValues = this.availableCategoricalValues.reverse();
+    }
+
     static wipeLookupTable () {
         Category.lookupTable.clear()
         Category.idLookupTable.clear()

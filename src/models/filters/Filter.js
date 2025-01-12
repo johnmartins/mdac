@@ -1,12 +1,12 @@
 class Filter {
 
-    static counter = 0
+    static counter = 0;
 
     constructor () {
-        this.id = Filter.counter
-        Filter.counter++
+        this.id = Filter.counter;
+        Filter.counter++;
     }
 
 }
 
-export default Filter
+export default Filter;
