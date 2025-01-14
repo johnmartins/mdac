@@ -537,7 +537,7 @@ function exportSVG () {
 }
 
 function requestRasterRedraw () {
-    eventBus.emit('RequestPCPRedraw');
+    eventBus.emit('PCPRasterLayer.RequestPCPRedraw');
 }
     
 </script>

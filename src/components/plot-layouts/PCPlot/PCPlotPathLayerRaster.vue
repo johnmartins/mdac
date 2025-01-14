@@ -33,10 +33,15 @@ const {horizontalOffset, axisLength, plotYBounds, plotXBounds, resolution} = sto
 const {data} = storeToRefs(dataStore)
 
 // Layout references
-const canvasContainer = ref(null)
+const canvasContainer = ref(null);
 
 // Events
-const eventBus = inject('eventBus')
+const eventBus = inject('eventBus');
+eventBus.on('Layout.contentResize', resizeCanvas);
+eventBus.on('Router.TabChange', (viewName) => {
+    if (viewName !== 'pcp') return;
+    resizeCanvas();
+});
 
 // Canvas draw variables
 let pathCanvas = document.createElement('canvas');
@@ -46,19 +51,11 @@ let redrawTimerID = null;
 onMounted(() => {
     canvasContainer.value.appendChild(pathCanvas);
     resizeCanvas();
-
-    eventBus.on('Layout.contentResize', resizeCanvas);
-    eventBus.on('Router.TabChange', (viewName) => {
-        if (viewName !== 'pcp') return
-        resizeCanvas();
-    })
-    eventBus.on('RequestPCPRedraw', restartRedrawCountdown);
+    eventBus.on('PCPRasterLayer.RequestPCPRedraw', restartRedrawCountdown);
 });
 
 onUnmounted(() => {
-    eventBus.off('RequestPCPRedraw');
-    eventBus.off('Layout.contentResize');
-    eventBus.off('Router.TabChange');
+    eventBus.off('PCPRasterLayer.RequestPCPRedraw');
 });
 
 watch([() => PCPStore.resolution, () => PCPStore.renderingType], () => {

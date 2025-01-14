@@ -110,7 +110,7 @@ function flipCategory () {
 
 function editCategory () {
     selectedCategory.value.morph(editedCategory.value, {migrateReference: false});
-    eventBus.emit('RequestPCPRedraw');
+    eventBus.emit('PCPRasterLayer.RequestPCPRedraw');
 }
 
 </script>

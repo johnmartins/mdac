@@ -88,7 +88,7 @@ async function requestIntersimCalc () {
         throw err;
     } finally {
         // Request redraw and remove loading message
-        eventBus.emit('RequestPCPRedraw');
+        eventBus.emit('PCPRasterLayer.RequestPCPRedraw');
         await stateStore.clearLoading();
     }
 }
