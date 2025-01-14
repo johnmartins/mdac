@@ -58,7 +58,7 @@
                         <rect 
                             class="filter-hitbox"
                             :height="truncateDecimals(getAxisLength()+40, 1)"
-                            @click="onClickAxis($event ,c)"
+                            @click="onClickAxis($event, c)"
                             @dblclick="onDblClickAxis($event, c)"
                             @mousedown.prevent="dragFilterStart($event, c)"
                         />
@@ -400,8 +400,11 @@ function dragFilterDone () {
 function onClickAxis (evt, c) {
     if (plotVariables.clickOnCooldown) return;
     if (plotVariables.mousedown === true) return;
+    // Manage selected category
     if (selectedCategory.value && selectedCategory.value.title === c.title) {
-        c = null
+        selectedCategory.value = null;
+    } else {
+        selectedCategory.value = c;
     }	
 	
     // Remove focus from any form element to prevent erronious user input
@@ -414,8 +417,6 @@ function onClickAxis (evt, c) {
     if (evt.shiftKey) {
         return setColorCodeCategory(c);
     }
-
-    selectedCategory.value = c ? c : null
 }
 
 function onDblClickAxis (evt, c) {
