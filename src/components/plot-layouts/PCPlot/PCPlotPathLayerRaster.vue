@@ -1,9 +1,13 @@
 <template>
-    <div ref="canvasContainer" style="width: 100%; height: 100%;" :style="{paddingTop: `${plotYBounds[0]}px`, paddingLeft: `${plotXBounds[0]}px`}" />
+    <div 
+        ref="canvasContainer" 
+        style="width: 100%; height: 100%;" 
+        :style="{paddingTop: `${plotYBounds[0]}px`, paddingLeft: `${plotXBounds[0]}px`}" 
+    />
 </template>
 
 <script setup>
-import { onMounted, ref, inject, watch, nextTick } from "vue";
+import { onMounted, ref, inject, watch, nextTick, onUnmounted } from "vue";
 import { storeToRefs } from "pinia";
 import * as d3 from "d3";
 
@@ -29,16 +33,15 @@ const {horizontalOffset, axisLength, plotYBounds, plotXBounds, resolution} = sto
 const {data} = storeToRefs(dataStore)
 
 // Layout references
-const canvasContainer = ref(null)
+const canvasContainer = ref(null);
 
 // Events
-const eventBus = inject('eventBus')
-eventBus.on('Layout.contentResize', resizeCanvas)
+const eventBus = inject('eventBus');
+eventBus.on('Layout.contentResize', resizeCanvas);
 eventBus.on('Router.TabChange', (viewName) => {
-    if (viewName !== 'pcp') return
-    resizeCanvas()
-})
-eventBus.on('RequestPCPRedraw', restartRedrawCountdown);
+    if (viewName !== 'pcp') return;
+    resizeCanvas();
+});
 
 // Canvas draw variables
 let pathCanvas = document.createElement('canvas');
@@ -47,8 +50,13 @@ let redrawTimerID = null;
 
 onMounted(() => {
     canvasContainer.value.appendChild(pathCanvas);
-    resizeCanvas()
-})
+    resizeCanvas();
+    eventBus.on('PCPRasterLayer.RequestPCPRedraw', restartRedrawCountdown);
+});
+
+onUnmounted(() => {
+    eventBus.off('PCPRasterLayer.RequestPCPRedraw');
+});
 
 watch([() => PCPStore.resolution, () => PCPStore.renderingType], () => {
     resizeCanvas()

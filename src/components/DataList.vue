@@ -76,9 +76,13 @@ const sortFunction = ref((a,b) => {
 })
 
 function shiftIO (category) {
-    if (category.io === 'input') category.io = 'output'
-    else if (category.io === 'output') category.io = null
-    else if (category.io === null) category.io = 'input'
+    if (category.usesCategoricalData) {
+        console.warn('Cannot change IO-type for categorical data.');
+        return;
+    }
+    if (category.io === 'input') category.io = 'output';
+    else if (category.io === 'output') category.io = null;
+    else if (category.io === null) category.io = 'input';
 }
 
 function moveCategory (category, n) {
