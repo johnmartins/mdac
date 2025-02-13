@@ -26,6 +26,11 @@ export const usePCPStore = defineStore('pcp', {
         filterMinDragTime: 125,
 
         // PCP State
+        mousedown: false,
+        clickOnCooldown: false,
+        interactionType: null,
+        filterToRemove: null,
+        blockOriginCoordinates: 0,
         currentFilterStartTime: 0,
         currentFilterCategory: null,
         currentFilterDeltaTime: 0,

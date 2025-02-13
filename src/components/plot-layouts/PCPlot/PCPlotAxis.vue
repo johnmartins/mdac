@@ -6,6 +6,11 @@
 <!-- Hitbox -->
 <rect 
     class="filter-hitbox"
+    :class="{
+        highlighted: getSelectedCategoryTitle() == c.title,
+        pulling: interactionType === 'edge',
+        grabbing: interactionType === 'block'
+    }" 
     :height="truncateDecimals(props.axisLength+40, 1)"
     @click="onClickAxis($event, c)"
     @dblclick="onDblClickAxis($event, c)"
@@ -37,14 +42,14 @@
         <PCPlotFilter 
             :filter="f" 
             :category="c" 
-            :canvas="plotCanvas"
+            :canvas="props.canvas"
             @onInteraction="onFilterInteraction" 
         />
     </g>
 </g>
 
 <!-- Proto axis filters -->
-<g v-if="currentFilterCategory && currentFilterDeltaTime > plotParameters.filterMinDragTime">
+<g v-if="currentFilterCategory && currentFilterDeltaTime > filterMinDragTime">
     <g v-if="currentFilterCategory.title === c.title">
         <rect 
             class="filter-box-proto"
@@ -57,137 +62,227 @@
 </template>
 
 <script setup>
+import { inject } from "vue";
+
 import { truncateDecimals } from "@/utils/data-utils";
 import { storeToRefs } from "pinia";
 
 import PCPlotFilter from "./PCPlotFilter.vue";
 
+// Utils
+import { getTrueEventCoordinates } from "@/utils/svg-utils";
+
 // Stores
-import {useDataStore} from "../../../store/DataStore";
+import { useDataStore } from "@/store/DataStore";
 import { usePCPStore } from "@/store/PCPStore";
 import { useOptionsStore } from "@/store/OptionsStore";
 import { useStateStore } from "@/store/StateStore";
 
+const eventBus = inject('eventBus');
+
+// Stores
 const dataStore = useDataStore()
 const PCPStore = usePCPStore();
 const optionsStore = useOptionsStore();
 const stateStore = useStateStore();
 
-const {data, filterIDMap, filters, categories} = storeToRefs(dataStore);
-const {activeView, selectedCategory} = storeToRefs(stateStore);
-const { horizontalOffset, axisLength, plotXBounds, plotYBounds, 
-    pathsDataUrl, axisLabelMargin, axisLabelAngle, plotTopPadding, 
-    plotRightPadding, plotBottomPadding, plotLeftPadding, currentFilterStartTime,
-    currentFilterCategory, currentFilterDeltaTime, currentFilterStartValue,
-    currentFilterEndValue, filterMinDragTime } = storeToRefs(PCPStore);
+const { filters } = storeToRefs(dataStore);
+const { selectedCategory } = storeToRefs(stateStore);
+const { axisLabelMargin, axisLabelAngle, plotTopPadding, plotBottomPadding, 
+    currentFilterStartTime, currentFilterCategory, currentFilterDeltaTime, 
+    currentFilterStartValue, currentFilterEndValue, filterMinDragTime, 
+    mousedown, clickOnCooldown, filterToRemove, blockOriginCoordinates, 
+    interactionType } = storeToRefs(PCPStore);
 
 const props = defineProps({
     axisLength: Number,
-    c: Object,
+    c: Object,  // Category represented by this axis
     canvas: Object,
     plotYBounds: Array,
 });
 
-function onClickAxis(event, category) {
-    // ..
+function onClickAxis (evt, c) {
+    if (clickOnCooldown.value === true) return;
+    if (mousedown.value === true) return;
+    // Manage selected category
+    if (selectedCategory.value && selectedCategory.value.title === c.title) {
+        selectedCategory.value = null;
+    } else {
+        selectedCategory.value = c;
+    }	
+	
+    // Remove focus from any form element to prevent erronious user input
+    props.canvas.focus()
+
+    if (evt.ctrlKey) {
+        return flipAxis(c);
+    }
+
+    if (evt.shiftKey) {
+        return setColorCodeCategory(c);
+    }
 }
 
-function onDblClickAxis(event, category) {
-    //
+function onDblClickAxis (evt, c) {
+    setColorCodeCategory(c)
 }
 
-function dragFilterStart(event, category) {
-    //
+function setColorCodeCategory (c) {
+    if (!optionsStore.selectedColorCodeCategory) {
+        optionsStore.selectedColorCodeCategory = c;
+        optionsStore.resetColorCodeOverride();
+        return;
+    }
+
+    if (optionsStore.selectedColorCodeCategory.id === c.id) {
+        optionsStore.selectedColorCodeCategory = null;
+        optionsStore.resetColorCodeOverride();
+        return;
+    }
+
+    optionsStore.selectedColorCodeCategory = c;
+    optionsStore.resetColorCodeOverride();
 }
 
+function dragFilterStart (evt, c) {
+    mousedown.value = true
+    const loc = getTrueEventCoordinates(evt, props.canvas)
+    currentFilterCategory.value = c 
+    currentFilterStartValue.value = loc.y
+    currentFilterStartTime.value = Date.now()
+    currentFilterDeltaTime.value = 0
+}
+
+function flipAxis (c) {
+    c.flip();
+
+    if (c.usesCategoricalData) {
+        recreateCategoricFilters(c);
+    }
+
+    requestRasterRedraw();
+}
+
+function onFilterInteraction (evt) {
+    if (evt.type === 'edge') {
+        handleFilterEdgeInteraction(evt);
+    } else if (evt.type === 'block') {
+        handleFilterBlockInteraction(evt);
+    } else {
+        throw new Error('Unknown filter interaction type');
+    }
+}
+
+function handleFilterBlockInteraction (evt) {
+    if (mousedown.value === false) {
+        blockOriginCoordinates.value = getTrueEventCoordinates(evt.mouseEvent, props.canvas).y
+    }
+
+    interactionType.value = 'block';
+    mousedown.value = true;
+    currentFilterCategory.value = evt.category;
+    currentFilterStartValue.value = evt.start
+    currentFilterEndValue.value = evt.start
+    currentFilterStartTime.value = Date.now();
+    currentFilterDeltaTime.value = 0;
+    filterToRemove.value = evt.filter;		// Mark the original filter for deletion
+}
+
+function handleFilterEdgeInteraction (evt) {
+    interactionType.value = 'edge';
+    mousedown.value = true;
+    currentFilterCategory.value = evt.category;
+    currentFilterStartValue.value = evt.start + plotTopPadding.value;
+    currentFilterStartTime.value = Date.now();
+    currentFilterDeltaTime.value = 0;
+    filterToRemove.value = evt.filter;		// Mark the original filter for deletion
+}
+
+function requestRasterRedraw () {
+    eventBus.emit('PCPRasterLayer.RequestPCPRedraw');
+}
+
+function getSelectedCategoryTitle () {
+    return selectedCategory.value ? selectedCategory.value.title : null
+}
 
 </script>
 
 <style lang="scss" scoped>
 
-.pcp-plot {
-	.axis {
-		cursor: pointer;
+.axis {
+    text {
+        fill: black;
+        stroke-opacity: 0;
+    }
 
-        &.grabbing {
-            cursor: grabbing !important;
+    line {
+        stroke: black;
+        fill-opacity: 0;
+    }
+
+    .filter-box {
+        x: -8px;
+        width: 16px; 
+    }
+
+    .filter-box-proto {
+        x: -8px;
+        width: 16px;
+    }
+
+    .filter-hitbox {
+        stroke: transparent;
+        fill: transparent;
+        x: -10px;
+        y: -20px;
+        width: 20px;
+
+        &:hover {
+            stroke: rgb(0, 0, 0);
+            fill: rgba(255,255,255, 0.05);
         }
 
-        &.pulling {
-            cursor: ns-resize!important;
-        }
+        cursor: pointer;
+    }
 
-		text {
-			fill: black;
-			stroke-opacity: 0;
-		}
+    .title {
+        x: 0px;
+        text-anchor: start;
+    }
 
-		line {
-			stroke: black;
-			fill-opacity: 0;
-		}
+    .tick-string {
+        text-anchor: end;
+        dominant-baseline: middle;
+        font-weight: bold;
+        pointer-events: none;
+        filter: (url(#solid))
+    }
+}
 
-		.filter-box {
-			x: -8px;
-			width: 16px; 
-		}
+.axis:hover {
+    .title {
+        fill: darkblue;
+        font-weight: bold;
+    }
 
-		.filter-box-proto {
-			x: -8px;
-			width: 16px;
-		}
+    line {
+        stroke-width: 2px;
+        stroke: darkblue;
+    }
+    
+}
 
-		.filter-hitbox {
-			stroke: transparent;
-			fill: transparent;
-			x: -10px;
-			y: -20px;
-			width: 20px;
+.highlighted {
+    .title {
+        fill: darkblue;
+        font-weight: bold;
+    }
 
-            &:hover {
-                stroke: rgb(0, 0, 0);
-                fill: rgba(255,255,255, 0.05);
-            }
-		}
-
-		.title {
-			x: 0px;
-			text-anchor: start;
-		}
-
-		.tick-string {
-			text-anchor: end;
-			dominant-baseline: middle;
-			font-weight: bold;
-            pointer-events: none;
-            filter: (url(#solid))
-		}
-	}
-
-	.axis:hover {
-		.title {
-			fill: darkblue;
-			font-weight: bold;
-		}
-
-		line {
-			stroke-width: 2px;
-			stroke: darkblue;
-		}
-		
-	}
-
-	.highlighted {
-		.title {
-			fill: darkblue;
-			font-weight: bold;
-		}
-
-		line {
-			stroke-width: 2px;
-			stroke: darkblue;
-		}
-	}
+    line {
+        stroke-width: 2px;
+        stroke: darkblue;
+    }
 }
 
 </style>

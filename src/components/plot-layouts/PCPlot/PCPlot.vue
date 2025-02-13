@@ -1,5 +1,11 @@
 <template>
-    <div class="component-container">
+    <div 
+        class="component-container"
+        :class="{
+            pulling: interactionType === 'edge',
+            grabbing: interactionType === 'block'
+        }" 
+    >
         <div ref="pcpPlot" style="height: 100%; position: relative;" class="svg-container">
             <!-- Raster rendering layer -->
             <div v-if="PCPStore.renderingType === 'raster'" style="width: 100%; height: 100%;">
@@ -43,11 +49,6 @@
                     v-for="(c, cIndex) in dataStore.enabledCategoriesSorted" 
                     :key="c.position" 
                     class="axis"
-                    :class="{
-                        highlighted: getSelectedCategoryTitle() == c.title,
-                        pulling: plotVariables.interactionType === 'edge',
-                        grabbing: plotVariables.interactionType === 'block'
-                    }" 
                     :transform="`translate(${truncateDecimals(cIndex*horizontalOffset,2)} ${truncateDecimals(getPlotYBounds()[0], 2)})`"
                 >	
                     <PCPlotAxis 
@@ -68,11 +69,11 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, onUpdated, inject, computed, watch, nextTick} from "vue";
+import { reactive, ref, inject, watch, nextTick} from "vue";
 import { storeToRefs } from "pinia";
 
-import { saveAs } from "file-saver"
-import { saveSvgAsPng } from "save-svg-as-png"
+import { saveAs } from "file-saver";
+import { saveSvgAsPng } from "save-svg-as-png";
 
 // Components
 import PCPlotPathLayerVector from "./PCPlotPathLayerVector";
@@ -81,73 +82,69 @@ import RangeIndicator from "@/components/plot-features/RangeIndicator";
 import PCPlotAxis from "./PCPlotAxis.vue";
 
 // Models
-import SingleRangeFilter from "@/models/filters/SingleRangeFilter"
-import CategoricFilter from "@/models/filters/CategoricFilter"
-import Popup from '@/models/layout/Popup'
+import SingleRangeFilter from "@/models/filters/SingleRangeFilter";
+import CategoricFilter from "@/models/filters/CategoricFilter";
+import Popup from '@/models/layout/Popup';
 
 // Misc
-import {truncateDecimals} from "@/utils/data-utils"
-import {getTrueEventCoordinates} from "@/utils/svg-utils"
+import { truncateDecimals } from "@/utils/data-utils";
+import { getTrueEventCoordinates } from "@/utils/svg-utils";
 
 // Stores
-import {useDataStore} from "../../../store/DataStore"
-import {useOptionsStore} from "../../../store/OptionsStore"
-import {useStateStore} from "../../../store/StateStore"
-import {usePCPStore} from "../../../store/PCPStore"
-import {useLayoutStore} from "../../../store/LayoutStore"
+import { useDataStore } from "@/store/DataStore";
+import { useOptionsStore } from "@/store/OptionsStore";
+import { useStateStore } from "@/store/StateStore";
+import { usePCPStore } from "@/store/PCPStore";
+import { useLayoutStore } from "@/store/LayoutStore";
 
 // Store references
-const dataStore = useDataStore()
-const optionsStore = useOptionsStore()
-const stateStore = useStateStore()
-const PCPStore = usePCPStore()
-const layoutStore = useLayoutStore()
+const dataStore = useDataStore();
+const optionsStore = useOptionsStore();
+const stateStore = useStateStore();
+const PCPStore = usePCPStore();
+const layoutStore = useLayoutStore();
 
-const {data, filterIDMap, filters, categories} = storeToRefs(dataStore)
-const {activeView, selectedCategory} = storeToRefs(stateStore)
+const {data, filterIDMap, categories} = storeToRefs(dataStore);
+const {activeView, selectedCategory} = storeToRefs(stateStore);
 const {horizontalOffset, axisLength, plotXBounds, plotYBounds, pathsDataUrl, 
-    axisLabelMargin, axisLabelAngle, plotTopPadding, plotRightPadding, 
-    plotBottomPadding, plotLeftPadding, currentFilterStartTime,
-    currentFilterCategory, currentFilterDeltaTime, currentFilterStartValue,
-    currentFilterEndValue, filterMinDragTime} = storeToRefs(PCPStore)
+    plotTopPadding, plotRightPadding, plotBottomPadding, plotLeftPadding, 
+    currentFilterStartTime, currentFilterCategory, currentFilterDeltaTime, 
+    currentFilterStartValue, currentFilterEndValue, filterMinDragTime, 
+    mousedown, clickOnCooldown,interactionType, filterToRemove, 
+    blockOriginCoordinates} = storeToRefs(PCPStore);
 
 // Plotted data
-const dataIncluded = ref([])
-const dataExcluded = ref([])
+const dataIncluded = ref([]);
+const dataExcluded = ref([]);
 
 // Layout references
-const plotCanvas = ref(null)
-const pcpPlot = ref(null)
-const rasterLayer = ref(null)
+const plotCanvas = ref(null);
+const pcpPlot = ref(null);
+const rasterLayer = ref(null);
 
 const plotVariables = reactive({
-    mousedown: false,
-    interactionType: null,
-    blockOriginCoordinates: 0,
-    clickOnCooldown: false,
     hasRendered: false,
-    filterToRemove: null,			// Used when editing an existing filter to delete the original copy
-})
+});
 
 function updateContainerSize () {
-    if (activeView.value !== 'pcp') return
+    if (activeView.value !== 'pcp') return;
 
-    plotXBounds.value = getPlotXBounds()
-    plotYBounds.value = getPlotYBounds()
+    plotXBounds.value = getPlotXBounds();
+    plotYBounds.value = getPlotYBounds();
 }
 
 // Event buss listeners and triggers
-const eventBus = inject('eventBus')
+const eventBus = inject('eventBus');
 
-eventBus.on('ExportForm.exportFigureRequest', handleExportRequest)
+eventBus.on('ExportForm.exportFigureRequest', handleExportRequest);
 
 // Update container size if certain events occur
-eventBus.on('SourceForm.readData', updateContainerSize)
-eventBus.on('Layout.contentResize', updateContainerSize)
+eventBus.on('SourceForm.readData', updateContainerSize);
+eventBus.on('Layout.contentResize', updateContainerSize);
 eventBus.on('Router.TabChange', (viewName) => {
     if (viewName === 'pcp') {
-        plotVariables.hasRendered = true
-        updateContainerSize()
+        plotVariables.hasRendered = true;
+        updateContainerSize();
     }
 })
 
@@ -169,41 +166,6 @@ watch([plotYBounds, () => plotBottomPadding], () => {
     axisLength.value = getPlotYBounds()[1]-(plotBottomPadding.value)
 })
 
-function onFilterInteraction (evt) {
-    if (evt.type === 'edge') {
-        handleFilterEdgeInteraction(evt);
-    } else if (evt.type === 'block') {
-        handleFilterBlockInteraction(evt);
-    } else {
-        throw new Error('Unknown filter interaction type');
-    }
-}
-
-function handleFilterBlockInteraction (evt) {
-    if (plotVariables.mousedown === false) {
-        plotVariables.blockOriginCoordinates = getTrueEventCoordinates(evt.mouseEvent, plotCanvas.value).y
-    }
-
-    plotVariables.interactionType = 'block';
-    plotVariables.mousedown = true;
-    currentFilterCategory = evt.category;
-    currentFilterStartValue = evt.start
-    currentFilterEndValue = evt.start
-    currentFilterStartTime = Date.now();
-    currentFilterDeltaTime = 0;
-    plotVariables.filterToRemove = evt.filter;		// Mark the original filter for deletion
-}
-
-function handleFilterEdgeInteraction (evt) {
-    plotVariables.interactionType = 'edge';
-    plotVariables.mousedown = true;
-    currentFilterCategory = evt.category;
-    currentFilterStartValue = evt.start + plotTopPadding.value;
-    currentFilterStartTime = Date.now();
-    currentFilterDeltaTime = 0;
-    plotVariables.filterToRemove = evt.filter;		// Mark the original filter for deletion
-}
-
 function getAxisLength () {
     return plotYBounds.value[1]-(plotBottomPadding.value)
 }
@@ -224,19 +186,20 @@ function getPlotXBounds () {
 }
 
 function resetFilterDrag () {
-    plotVariables.mousedown = false;
-    plotVariables.interactionType = null;
-    currentFilterCategory = null;
-    currentFilterStartValue = 0;
-    currentFilterDeltaTime = 0;
-    currentFilterEndValue = 0;
-    plotVariables.filterToRemove = null;
+    console.log("reset")
+    mousedown.value = false;
+    interactionType.value = null;
+    currentFilterCategory.value = null;
+    currentFilterStartValue.value = 0;
+    currentFilterDeltaTime.value = 0;
+    currentFilterEndValue.value = 0;
+    filterToRemove.value = null;
 }
 
 function onMouseMove (evt) {
-    if (!plotVariables.mousedown) return;
+    if (!mousedown.value) return;
 
-    if (plotVariables.interactionType === 'block') {
+    if (interactionType.value === 'block') {
         return grabFilterBlock(evt)
     }
 
@@ -246,50 +209,41 @@ function onMouseMove (evt) {
 function grabFilterBlock (evt) {
     let taAdjusted, tbAdjusted;
 
-    if (!currentFilterCategory.usesCategoricalData) {
-        let ta = plotVariables.filterToRemove.thresholdA
-        let tb = plotVariables.filterToRemove.thresholdB
-        taAdjusted = currentFilterCategory.scaleLinear(ta)*axisLength.value + plotTopPadding.value;
-        tbAdjusted = currentFilterCategory.scaleLinear(tb)*axisLength.value + plotTopPadding.value;
+    if (!currentFilterCategory.value.usesCategoricalData) {
+        let ta = filterToRemove.value.thresholdA
+        let tb = filterToRemove.value.thresholdB
+        taAdjusted = currentFilterCategory.value.scaleLinear(ta)*axisLength.value + plotTopPadding.value;
+        tbAdjusted = currentFilterCategory.value.scaleLinear(tb)*axisLength.value + plotTopPadding.value;
     } else {
-        taAdjusted = plotVariables.filterToRemove.upperBoundRatio * axisLength.value + plotTopPadding.value;
-        tbAdjusted = plotVariables.filterToRemove.lowerBoundRatio * axisLength.value + plotTopPadding.value;
+        taAdjusted = filterToRemove.value.upperBoundRatio * axisLength.value + plotTopPadding.value;
+        tbAdjusted = filterToRemove.value.lowerBoundRatio * axisLength.value + plotTopPadding.value;
     }
      
     const loc = getTrueEventCoordinates(evt, plotCanvas.value);
-    currentFilterStartValue = loc.y + (taAdjusted - plotVariables.blockOriginCoordinates);
-    currentFilterEndValue =  loc.y + (tbAdjusted - plotVariables.blockOriginCoordinates);
-    currentFilterDeltaTime = Date.now() - currentFilterStartTime;
+    currentFilterStartValue.value = loc.y + (taAdjusted - blockOriginCoordinates.value);
+    currentFilterEndValue.value =  loc.y + (tbAdjusted - blockOriginCoordinates.value);
+    currentFilterDeltaTime.value = Date.now() - currentFilterStartTime.value;
 }
 
 function dragFilterBox (evt) {
     const loc = getTrueEventCoordinates(evt, plotCanvas.value)
-    if (!plotVariables.mousedown) return
-    currentFilterEndValue = loc.y
-    currentFilterDeltaTime = Date.now() - currentFilterStartTime
-}
-
-function dragFilterStart (evt, c) {
-    plotVariables.mousedown = true
-    const loc = getTrueEventCoordinates(evt, plotCanvas.value)
-    currentFilterCategory = c 
-    currentFilterStartValue = loc.y
-    currentFilterStartTime = Date.now()
-    currentFilterDeltaTime = 0
+    if (!mousedown.value) return
+    currentFilterEndValue.value = loc.y
+    currentFilterDeltaTime.value = Date.now() - currentFilterStartTime.value
 }
 
 function triggerClickCooldown () {
     // This method prevents the end of filter mousedrags to be perceived as clicks
-    plotVariables.clickOnCooldown = true
+    clickOnCooldown.value = true;
     setTimeout(() => {
-        plotVariables.clickOnCooldown = false
-    }, 250)
+        clickOnCooldown.value = false
+    }, 250);
 }
 
 function dragFilterDone () {
     let ignoreRequest = false
-    if (!plotVariables.mousedown) ignoreRequest = true
-    if (currentFilterDeltaTime < 100) ignoreRequest = true	
+    if (!mousedown.value) ignoreRequest = true
+    if (currentFilterDeltaTime.value < 100) ignoreRequest = true	
 
     if (ignoreRequest) {
         // This filter was likely unintentional.
@@ -300,12 +254,12 @@ function dragFilterDone () {
         triggerClickCooldown()
     }
 
-    if (Date.now() - currentFilterStartTime < filterMinDragTime) return
+    if (Date.now() - currentFilterStartTime.value < filterMinDragTime) return
 
     // Calculate domain extent
-    const c = currentFilterCategory
-    const y1 = currentFilterStartValue - plotTopPadding.value
-    const y2 = currentFilterEndValue - plotTopPadding.value
+    const c = currentFilterCategory.value
+    const y1 = currentFilterStartValue.value - plotTopPadding.value
+    const y2 = currentFilterEndValue.value - plotTopPadding.value
     let y1Ratio = (y1 / getAxisLength())
     let y2Ratio = (y2 / getAxisLength())
 
@@ -338,47 +292,11 @@ function dragFilterDone () {
     }
 
     // If this new filter is replacing an existing filter, then delete the original copy.
-    if (plotVariables.filterToRemove) {
-        dataStore.deleteFilter(plotVariables.filterToRemove)
+    if (filterToRemove.value) {
+        dataStore.deleteFilter(filterToRemove.value)
     }
 
     resetFilterDrag()
-}
-
-function onClickAxis (evt, c) {
-    if (plotVariables.clickOnCooldown) return;
-    if (plotVariables.mousedown === true) return;
-    // Manage selected category
-    if (selectedCategory.value && selectedCategory.value.title === c.title) {
-        selectedCategory.value = null;
-    } else {
-        selectedCategory.value = c;
-    }	
-	
-    // Remove focus from any form element to prevent erronious user input
-    plotCanvas.value.focus()
-
-    if (evt.ctrlKey) {
-        return flipAxis(c);
-    }
-
-    if (evt.shiftKey) {
-        return setColorCodeCategory(c);
-    }
-}
-
-function onDblClickAxis (evt, c) {
-    setColorCodeCategory(c)
-}
-
-function flipAxis (c) {
-    c.flip();
-
-    if (c.usesCategoricalData) {
-        recreateCategoricFilters(c);
-    }
-
-    requestRasterRedraw();
 }
 
 function recreateCategoricFilters (c) {
@@ -393,29 +311,6 @@ function recreateCategoricFilters (c) {
             f.flipRatio();
         });
     }
-
-
-}
-
-function setColorCodeCategory (c) {
-    if (!optionsStore.selectedColorCodeCategory) {
-        optionsStore.selectedColorCodeCategory = c;
-        optionsStore.resetColorCodeOverride();
-        return;
-    }
-
-    if (optionsStore.selectedColorCodeCategory.id === c.id) {
-        optionsStore.selectedColorCodeCategory = null;
-        optionsStore.resetColorCodeOverride();
-        return;
-    }
-
-    optionsStore.selectedColorCodeCategory = c;
-    optionsStore.resetColorCodeOverride();
-}
-
-function getSelectedCategoryTitle () {
-    return selectedCategory.value ? selectedCategory.value.title : null
 }
 
 async function handleExportRequest (format) {
@@ -483,10 +378,6 @@ function exportSVG () {
     const blob = new Blob([full_svg], {type: "image/svg+xml"});  
     saveAs(blob, "PCPlot.svg");
 }
-
-function requestRasterRedraw () {
-    eventBus.emit('PCPRasterLayer.RequestPCPRedraw');
-}
     
 </script>
 
@@ -495,6 +386,14 @@ function requestRasterRedraw () {
 .component-container {
 	height: 100%;
 	overflow: hidden;
+
+    &.grabbing {
+        cursor: grabbing !important;
+    }
+
+    &.pulling {
+        cursor: ns-resize !important;
+    }
 }
 
 </style>
