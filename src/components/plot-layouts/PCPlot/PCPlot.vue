@@ -25,91 +25,91 @@
             </filter>
 
 
-                <!-- Full graphics group -->
-                <g
-                    v-if="data.length > 0"
-                    :transform="`translate(${plotLeftPadding} 0)`"
-                > 
+            <!-- Full graphics group -->
+            <g
+                v-if="data.length > 0"
+                :transform="`translate(${plotLeftPadding} 0)`"
+            > 
 
-                    <!-- Vector rendering layer -->
-                    <PCPlotPathLayerVector />
+                <!-- Vector rendering layer -->
+                <PCPlotPathLayerVector />
 
-                    <!-- Raster export image -->
-                    <image v-if="PCPStore.renderingType === 'raster' && pathsDataUrl" :href="pathsDataUrl" width="100%" height="100%" :y="getPlotYBounds()[0]" />
+                <!-- Raster export image -->
+                <image v-if="PCPStore.renderingType === 'raster' && pathsDataUrl" :href="pathsDataUrl" width="100%" height="100%" :y="getPlotYBounds()[0]" />
+                
+
+                <!-- Axis group. Filter for enabled, sort by position, position using index. -->
+                <g 
+                    v-for="(c, cIndex) in dataStore.enabledCategoriesSorted" 
+                    :key="c.position" 
+                    class="axis"
+                    :class="{
+                        highlighted: getSelectedCategoryTitle() == c.title,
+                        pulling: plotVariables.interactionType === 'edge',
+                        grabbing: plotVariables.interactionType === 'block'
+                    }" 
+                    :transform="`translate(${truncateDecimals(cIndex*horizontalOffset,2)} ${truncateDecimals(getPlotYBounds()[0], 2)})`"
+                >	
+
+                    <!-- Axis vertical line -->
+                    <line x1="0" y1="0" x2="0" :y2="truncateDecimals(getPlotYBounds()[1]-(plotBottomPadding),2)" />
+
+                    <!-- Hitbox -->
+                    <rect 
+                        class="filter-hitbox"
+                        :height="truncateDecimals(getAxisLength()+40, 1)"
+                        @click="onClickAxis($event, c)"
+                        @dblclick="onDblClickAxis($event, c)"
+                        @mousedown.prevent="dragFilterStart($event, c)"
+                    />
                     
-
-                    <!-- Axis group. Filter for enabled, sort by position, position using index. -->
-                    <g 
-                        v-for="(c, cIndex) in dataStore.enabledCategoriesSorted" 
-                        :key="c.position" 
-                        class="axis"
-                        :class="{
-                            highlighted: getSelectedCategoryTitle() == c.title,
-                            pulling: plotVariables.interactionType === 'edge',
-                            grabbing: plotVariables.interactionType === 'block'
-                        }" 
-                        :transform="`translate(${truncateDecimals(cIndex*horizontalOffset,2)} ${truncateDecimals(getPlotYBounds()[0], 2)})`"
-                    >	
-
-                        <!-- Axis vertical line -->
-                        <line x1="0" y1="0" x2="0" :y2="truncateDecimals(getPlotYBounds()[1]-(plotBottomPadding),2)" />
-
-                        <!-- Hitbox -->
-                        <rect 
-                            class="filter-hitbox"
-                            :height="truncateDecimals(getAxisLength()+40, 1)"
-                            @click="onClickAxis($event, c)"
-                            @dblclick="onDblClickAxis($event, c)"
-                            @mousedown.prevent="dragFilterStart($event, c)"
-                        />
-						
-                        <!-- Axis label -->
-                        <text 
-                            :y="truncateDecimals(getPlotYBounds()[1]-(plotBottomPadding-axisLabelMargin),1)" 
-                            class="title" 
-                            :style="{fontSize: `${optionsStore.titleSize}em`}"
-                            :transform="`rotate(${axisLabelAngle} 0 ${truncateDecimals(getPlotYBounds()[1]-(plotBottomPadding-axisLabelMargin),1)})`"
-                            @click="onClickAxis($event, c)"
-                            @dblclick="onDblClickAxis($event, c)"
-                        >
-                            {{ c.displayTitle }}
-                        </text>
-						
-                        <!-- Axis tick group -->
-                        <g v-for="(tick, index) in c.getTickArray()" :key="index" class="tick"> 
-                            <text x="-10" :y="c.scaleLinear(tick)*getAxisLength()" class="tick-string" :style="{fontSize: `${optionsStore.tickSize}em`}">{{ c.getTickString(tick) }}</text>
-                            <line x1="0" :y1="c.scaleLinear(tick)*getAxisLength()" x2="-5" :y2="c.scaleLinear(tick)*getAxisLength()" />	
-                            <!-- Top tick -->
-                        </g>
-
-                        <!-- Axis Filters -->
-                        <g v-if="optionsStore.showFilters">
-                            <g v-for="(f, index) in filters[c.title]" :key="index">
-                                <PCPlotFilter 
-                                    :filter="f" 
-                                    :category="c" 
-                                    :canvas="plotCanvas"
-                                    @onInteraction="onFilterInteraction" 
-                                />
-                            </g>
-                        </g>
-						
-                        <!-- Proto axis filters -->
-                        <g v-if="plotVariables.currentFilterCategory && plotVariables.currentFilterDeltaTime > plotParameters.filterMinDragTime">
-                            <g v-if="plotVariables.currentFilterCategory.title === c.title">
-                                <rect 
-                                    class="filter-box-proto"
-                                    :y="truncateDecimals(Math.min(plotVariables.currentFilterStartValue, plotVariables.currentFilterEndValue) - plotTopPadding, 1)"
-                                    :height="truncateDecimals(Math.abs(plotVariables.currentFilterEndValue - plotVariables.currentFilterStartValue), 1)"
-                                />
-                            </g>
-                        </g>
+                    <!-- Axis label -->
+                    <text 
+                        :y="truncateDecimals(getPlotYBounds()[1]-(plotBottomPadding-axisLabelMargin),1)" 
+                        class="title" 
+                        :style="{fontSize: `${optionsStore.titleSize}em`}"
+                        :transform="`rotate(${axisLabelAngle} 0 ${truncateDecimals(getPlotYBounds()[1]-(plotBottomPadding-axisLabelMargin),1)})`"
+                        @click="onClickAxis($event, c)"
+                        @dblclick="onDblClickAxis($event, c)"
+                    >
+                        {{ c.displayTitle }}
+                    </text>
+                    
+                    <!-- Axis tick group -->
+                    <g v-for="(tick, index) in c.getTickArray()" :key="index" class="tick"> 
+                        <text x="-10" :y="c.scaleLinear(tick)*getAxisLength()" class="tick-string" :style="{fontSize: `${optionsStore.tickSize}em`}">{{ c.getTickString(tick) }}</text>
+                        <line x1="0" :y1="c.scaleLinear(tick)*getAxisLength()" x2="-5" :y2="c.scaleLinear(tick)*getAxisLength()" />	
+                        <!-- Top tick -->
                     </g>
 
-                    <g class="scatter-plugin-container" :transform="`translate(${getPlotXBounds()[1] + 20} ${getPlotYBounds()[0]})`">
-                        <RangeIndicator />
+                    <!-- Axis Filters -->
+                    <g v-if="optionsStore.showFilters">
+                        <g v-for="(f, index) in filters[c.title]" :key="index">
+                            <PCPlotFilter 
+                                :filter="f" 
+                                :category="c" 
+                                :canvas="plotCanvas"
+                                @onInteraction="onFilterInteraction" 
+                            />
+                        </g>
+                    </g>
+                    
+                    <!-- Proto axis filters -->
+                    <g v-if="plotVariables.currentFilterCategory && plotVariables.currentFilterDeltaTime > plotParameters.filterMinDragTime">
+                        <g v-if="plotVariables.currentFilterCategory.title === c.title">
+                            <rect 
+                                class="filter-box-proto"
+                                :y="truncateDecimals(Math.min(plotVariables.currentFilterStartValue, plotVariables.currentFilterEndValue) - plotTopPadding, 1)"
+                                :height="truncateDecimals(Math.abs(plotVariables.currentFilterEndValue - plotVariables.currentFilterStartValue), 1)"
+                            />
+                        </g>
                     </g>
                 </g>
+
+                <g class="scatter-plugin-container" :transform="`translate(${getPlotXBounds()[1] + 20} ${getPlotYBounds()[0]})`">
+                    <RangeIndicator />
+                </g>
+            </g>
             </svg>
         </div>
     </div>
