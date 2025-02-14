@@ -23,6 +23,20 @@ export const usePCPStore = defineStore('pcp', {
         plotRightPadding: 150,
         plotBottomPadding: 120,
         plotLeftPadding: 75,
+        filterMinDragTime: 125,
+
+        // PCP State
+        mousedown: false,
+        clickOnCooldown: false,
+        interactionType: null,
+        filterToRemove: null,
+        blockOriginCoordinates: 0,
+        currentFilterStartTime: 0,
+        currentFilterCategory: null,
+        currentFilterDeltaTime: 0,
+        currentFilterStartValue: 0,
+        currentFilterEndValue: 0,
+
     }),
     getters: {},
     actions: {
