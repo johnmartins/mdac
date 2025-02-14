@@ -249,6 +249,7 @@ function getSelectedCategoryTitle () {
     .title {
         x: 0px;
         text-anchor: start;
+        cursor: pointer;
     }
 
     .tick-string {
