@@ -26,7 +26,7 @@
                 </select>
             </div>
             <div class="d-grid">
-                <button class="" :disabled="!similarityAnalysisAvailable" @click="requestIntersimCalc">
+                <button class="small" :disabled="!similarityAnalysisAvailable" @click="requestIntersimCalc">
                     Calculate inter-similarity
                 </button>
             </div>

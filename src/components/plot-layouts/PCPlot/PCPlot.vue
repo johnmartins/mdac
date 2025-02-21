@@ -1,5 +1,11 @@
 <template>
-    <div class="component-container">
+    <div 
+        class="component-container"
+        :class="{
+            pulling: interactionType === 'edge',
+            grabbing: interactionType === 'block'
+        }" 
+    >
         <div ref="pcpPlot" style="height: 100%; position: relative;" class="svg-container">
             <!-- Raster rendering layer -->
             <div v-if="PCPStore.renderingType === 'raster'" style="width: 100%; height: 100%;">
@@ -25,181 +31,120 @@
             </filter>
 
 
-                <!-- Full graphics group -->
-                <g
-                    v-if="data.length > 0"
-                    :transform="`translate(${plotLeftPadding} 0)`"
-                > 
+            <!-- Full graphics group -->
+            <g
+                v-if="data.length > 0"
+                :transform="`translate(${plotLeftPadding} 0)`"
+            > 
 
-                    <!-- Vector rendering layer -->
-                    <PCPlotPathLayerVector />
+                <!-- Vector rendering layer -->
+                <PCPlotPathLayerVector />
 
-                    <!-- Raster export image -->
-                    <image v-if="PCPStore.renderingType === 'raster' && pathsDataUrl" :href="pathsDataUrl" width="100%" height="100%" :y="getPlotYBounds()[0]" />
-                    
+                <!-- Raster export image -->
+                <image v-if="PCPStore.renderingType === 'raster' && pathsDataUrl" :href="pathsDataUrl" width="100%" height="100%" :y="getPlotYBounds()[0]" />
+                
 
-                    <!-- Axis group. Filter for enabled, sort by position, position using index. -->
-                    <g 
-                        v-for="(c, cIndex) in dataStore.enabledCategoriesSorted" 
-                        :key="c.position" 
-                        class="axis"
-                        :class="{
-                            highlighted: getSelectedCategoryTitle() == c.title,
-                            pulling: plotVariables.interactionType === 'edge',
-                            grabbing: plotVariables.interactionType === 'block'
-                        }" 
-                        :transform="`translate(${truncateDecimals(cIndex*horizontalOffset,2)} ${truncateDecimals(getPlotYBounds()[0], 2)})`"
-                    >	
-
-                        <!-- Axis vertical line -->
-                        <line x1="0" y1="0" x2="0" :y2="truncateDecimals(getPlotYBounds()[1]-(plotBottomPadding),2)" />
-
-                        <!-- Hitbox -->
-                        <rect 
-                            class="filter-hitbox"
-                            :height="truncateDecimals(getAxisLength()+40, 1)"
-                            @click="onClickAxis($event, c)"
-                            @dblclick="onDblClickAxis($event, c)"
-                            @mousedown.prevent="dragFilterStart($event, c)"
-                        />
-						
-                        <!-- Axis label -->
-                        <text 
-                            :y="truncateDecimals(getPlotYBounds()[1]-(plotBottomPadding-axisLabelMargin),1)" 
-                            class="title" 
-                            :style="{fontSize: `${optionsStore.titleSize}em`}"
-                            :transform="`rotate(${axisLabelAngle} 0 ${truncateDecimals(getPlotYBounds()[1]-(plotBottomPadding-axisLabelMargin),1)})`"
-                            @click="onClickAxis($event, c)"
-                            @dblclick="onDblClickAxis($event, c)"
-                        >
-                            {{ c.displayTitle }}
-                        </text>
-						
-                        <!-- Axis tick group -->
-                        <g v-for="(tick, index) in c.getTickArray()" :key="index" class="tick"> 
-                            <text x="-10" :y="c.scaleLinear(tick)*getAxisLength()" class="tick-string" :style="{fontSize: `${optionsStore.tickSize}em`}">{{ c.getTickString(tick) }}</text>
-                            <line x1="0" :y1="c.scaleLinear(tick)*getAxisLength()" x2="-5" :y2="c.scaleLinear(tick)*getAxisLength()" />	
-                            <!-- Top tick -->
-                        </g>
-
-                        <!-- Axis Filters -->
-                        <g v-if="optionsStore.showFilters">
-                            <g v-for="(f, index) in filters[c.title]" :key="index">
-                                <PCPlotFilter 
-                                    :filter="f" 
-                                    :category="c" 
-                                    :canvas="plotCanvas"
-                                    @onInteraction="onFilterInteraction" 
-                                />
-                            </g>
-                        </g>
-						
-                        <!-- Proto axis filters -->
-                        <g v-if="plotVariables.currentFilterCategory && plotVariables.currentFilterDeltaTime > plotParameters.filterMinDragTime">
-                            <g v-if="plotVariables.currentFilterCategory.title === c.title">
-                                <rect 
-                                    class="filter-box-proto"
-                                    :y="truncateDecimals(Math.min(plotVariables.currentFilterStartValue, plotVariables.currentFilterEndValue) - plotTopPadding, 1)"
-                                    :height="truncateDecimals(Math.abs(plotVariables.currentFilterEndValue - plotVariables.currentFilterStartValue), 1)"
-                                />
-                            </g>
-                        </g>
-                    </g>
-
-                    <g class="scatter-plugin-container" :transform="`translate(${getPlotXBounds()[1] + 20} ${getPlotYBounds()[0]})`">
-                        <RangeIndicator />
-                    </g>
+                <!-- Axis group. Filter for enabled, sort by position, position using index. -->
+                <g 
+                    v-for="(c, cIndex) in dataStore.enabledCategoriesSorted" 
+                    :key="c.position" 
+                    class="axis"
+                    :transform="`translate(${truncateDecimals(cIndex*horizontalOffset,2)} ${truncateDecimals(getPlotYBounds()[0], 2)})`"
+                >	
+                    <PCPlotAxis 
+                        :axisLength="getAxisLength()"
+                        :c="c"
+                        :canvas="plotCanvas"
+                        :plotYBounds="getPlotYBounds()"
+                    />
                 </g>
+
+                <g class="scatter-plugin-container" :transform="`translate(${getPlotXBounds()[1] + 20} ${getPlotYBounds()[0]})`">
+                    <RangeIndicator />
+                </g>
+            </g>
             </svg>
         </div>
     </div>
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, onUpdated, inject, computed, watch, nextTick} from "vue"
-import { storeToRefs } from "pinia"
+import { reactive, ref, inject, watch, nextTick} from "vue";
+import { storeToRefs } from "pinia";
 
-import { saveAs } from "file-saver"
-import { saveSvgAsPng } from "save-svg-as-png"
+import { saveAs } from "file-saver";
+import { saveSvgAsPng } from "save-svg-as-png";
 
 // Components
-import PCPlotPathLayerVector from "./PCPlotPathLayerVector"
-import PCPlotPathLayerRaster from "./PCPlotPathLayerRaster"
-import PCPlotFilter from "./PCPlotFilter.vue"
-import RangeIndicator from "@/components/plot-features/RangeIndicator"
+import PCPlotPathLayerVector from "./PCPlotPathLayerVector";
+import PCPlotPathLayerRaster from "./PCPlotPathLayerRaster";
+import RangeIndicator from "@/components/plot-features/RangeIndicator";
+import PCPlotAxis from "./PCPlotAxis.vue";
 
 // Models
-import SingleRangeFilter from "@/models/filters/SingleRangeFilter"
-import CategoricFilter from "@/models/filters/CategoricFilter"
-import Popup from '@/models/layout/Popup'
+import SingleRangeFilter from "@/models/filters/SingleRangeFilter";
+import CategoricFilter from "@/models/filters/CategoricFilter";
+import Popup from '@/models/layout/Popup';
 
 // Misc
-import {truncateDecimals} from "@/utils/data-utils"
-import {getTrueEventCoordinates} from "@/utils/svg-utils"
+import { truncateDecimals } from "@/utils/data-utils";
+import { getTrueEventCoordinates } from "@/utils/svg-utils";
 
 // Stores
-import {useDataStore} from "../../../store/DataStore"
-import {useOptionsStore} from "../../../store/OptionsStore"
-import {useStateStore} from "../../../store/StateStore"
-import {usePCPStore} from "../../../store/PCPStore"
-import {useLayoutStore} from "../../../store/LayoutStore"
+import { useDataStore } from "@/store/DataStore";
+import { useOptionsStore } from "@/store/OptionsStore";
+import { useStateStore } from "@/store/StateStore";
+import { usePCPStore } from "@/store/PCPStore";
+import { useLayoutStore } from "@/store/LayoutStore";
 
 // Store references
-const dataStore = useDataStore()
-const optionsStore = useOptionsStore()
-const stateStore = useStateStore()
-const PCPStore = usePCPStore()
-const layoutStore = useLayoutStore()
+const dataStore = useDataStore();
+const optionsStore = useOptionsStore();
+const stateStore = useStateStore();
+const PCPStore = usePCPStore();
+const layoutStore = useLayoutStore();
 
-const {data, filterIDMap, filters, categories} = storeToRefs(dataStore)
-const {activeView, selectedCategory} = storeToRefs(stateStore)
-const {horizontalOffset, axisLength, plotXBounds, plotYBounds, pathsDataUrl, axisLabelMargin, axisLabelAngle, plotTopPadding, plotRightPadding, plotBottomPadding, plotLeftPadding} = storeToRefs(PCPStore)
+const {data, filterIDMap, categories} = storeToRefs(dataStore);
+const {activeView, selectedCategory} = storeToRefs(stateStore);
+const {horizontalOffset, axisLength, plotXBounds, plotYBounds, pathsDataUrl, 
+    plotTopPadding, plotRightPadding, plotBottomPadding, plotLeftPadding, 
+    currentFilterStartTime, currentFilterCategory, currentFilterDeltaTime, 
+    currentFilterStartValue, currentFilterEndValue, filterMinDragTime, 
+    mousedown, clickOnCooldown,interactionType, filterToRemove, 
+    blockOriginCoordinates} = storeToRefs(PCPStore);
 
 // Plotted data
-const dataIncluded = ref([])
-const dataExcluded = ref([])
+const dataIncluded = ref([]);
+const dataExcluded = ref([]);
 
 // Layout references
-const plotCanvas = ref(null)
-const pcpPlot = ref(null)
-const rasterLayer = ref(null)
+const plotCanvas = ref(null);
+const pcpPlot = ref(null);
+const rasterLayer = ref(null);
 
-const plotParameters = reactive({
-    filterMinDragTime: 125, // ms
-})
 const plotVariables = reactive({
-    mousedown: false,
-    interactionType: null,
-    currentFilterStartTime: 0,
-    currentFilterDeltaTime: 0,
-    currentFilterCategory: null,
-    currentFilterStartValue: 0,
-    currentFilterEndValue: 0,
-    blockOriginCoordinates: 0,
-    clickOnCooldown: false,
     hasRendered: false,
-    filterToRemove: null,			// Used when editing an existing filter to delete the original copy
-})
+});
 
 function updateContainerSize () {
-    if (activeView.value !== 'pcp') return
+    if (activeView.value !== 'pcp') return;
 
-    plotXBounds.value = getPlotXBounds()
-    plotYBounds.value = getPlotYBounds()
+    plotXBounds.value = getPlotXBounds();
+    plotYBounds.value = getPlotYBounds();
 }
 
 // Event buss listeners and triggers
-const eventBus = inject('eventBus')
+const eventBus = inject('eventBus');
 
-eventBus.on('ExportForm.exportFigureRequest', handleExportRequest)
+eventBus.on('ExportForm.exportFigureRequest', handleExportRequest);
 
 // Update container size if certain events occur
-eventBus.on('SourceForm.readData', updateContainerSize)
-eventBus.on('Layout.contentResize', updateContainerSize)
+eventBus.on('SourceForm.readData', updateContainerSize);
+eventBus.on('Layout.contentResize', updateContainerSize);
 eventBus.on('Router.TabChange', (viewName) => {
     if (viewName === 'pcp') {
-        plotVariables.hasRendered = true
-        updateContainerSize()
+        plotVariables.hasRendered = true;
+        updateContainerSize();
     }
 })
 
@@ -221,41 +166,6 @@ watch([plotYBounds, () => plotBottomPadding], () => {
     axisLength.value = getPlotYBounds()[1]-(plotBottomPadding.value)
 })
 
-function onFilterInteraction (evt) {
-    if (evt.type === 'edge') {
-        handleFilterEdgeInteraction(evt);
-    } else if (evt.type === 'block') {
-        handleFilterBlockInteraction(evt);
-    } else {
-        throw new Error('Unknown filter interaction type');
-    }
-}
-
-function handleFilterBlockInteraction (evt) {
-    if (plotVariables.mousedown === false) {
-        plotVariables.blockOriginCoordinates = getTrueEventCoordinates(evt.mouseEvent, plotCanvas.value).y
-    }
-
-    plotVariables.interactionType = 'block';
-    plotVariables.mousedown = true;
-    plotVariables.currentFilterCategory = evt.category;
-    plotVariables.currentFilterStartValue = evt.start
-    plotVariables.currentFilterEndValue = evt.start
-    plotVariables.currentFilterStartTime = Date.now();
-    plotVariables.currentFilterDeltaTime = 0;
-    plotVariables.filterToRemove = evt.filter;		// Mark the original filter for deletion
-}
-
-function handleFilterEdgeInteraction (evt) {
-    plotVariables.interactionType = 'edge';
-    plotVariables.mousedown = true;
-    plotVariables.currentFilterCategory = evt.category;
-    plotVariables.currentFilterStartValue = evt.start + plotTopPadding.value;
-    plotVariables.currentFilterStartTime = Date.now();
-    plotVariables.currentFilterDeltaTime = 0;
-    plotVariables.filterToRemove = evt.filter;		// Mark the original filter for deletion
-}
-
 function getAxisLength () {
     return plotYBounds.value[1]-(plotBottomPadding.value)
 }
@@ -276,19 +186,20 @@ function getPlotXBounds () {
 }
 
 function resetFilterDrag () {
-    plotVariables.mousedown = false;
-    plotVariables.interactionType = null;
-    plotVariables.currentFilterCategory = null;
-    plotVariables.currentFilterStartValue = 0;
-    plotVariables.currentFilterDeltaTime = 0;
-    plotVariables.currentFilterEndValue = 0;
-    plotVariables.filterToRemove = null;
+    console.log("reset")
+    mousedown.value = false;
+    interactionType.value = null;
+    currentFilterCategory.value = null;
+    currentFilterStartValue.value = 0;
+    currentFilterDeltaTime.value = 0;
+    currentFilterEndValue.value = 0;
+    filterToRemove.value = null;
 }
 
 function onMouseMove (evt) {
-    if (!plotVariables.mousedown) return;
+    if (!mousedown.value) return;
 
-    if (plotVariables.interactionType === 'block') {
+    if (interactionType.value === 'block') {
         return grabFilterBlock(evt)
     }
 
@@ -298,50 +209,41 @@ function onMouseMove (evt) {
 function grabFilterBlock (evt) {
     let taAdjusted, tbAdjusted;
 
-    if (!plotVariables.currentFilterCategory.usesCategoricalData) {
-        let ta = plotVariables.filterToRemove.thresholdA
-        let tb = plotVariables.filterToRemove.thresholdB
-        taAdjusted = plotVariables.currentFilterCategory.scaleLinear(ta)*axisLength.value + plotTopPadding.value;
-        tbAdjusted = plotVariables.currentFilterCategory.scaleLinear(tb)*axisLength.value + plotTopPadding.value;
+    if (!currentFilterCategory.value.usesCategoricalData) {
+        let ta = filterToRemove.value.thresholdA
+        let tb = filterToRemove.value.thresholdB
+        taAdjusted = currentFilterCategory.value.scaleLinear(ta)*axisLength.value + plotTopPadding.value;
+        tbAdjusted = currentFilterCategory.value.scaleLinear(tb)*axisLength.value + plotTopPadding.value;
     } else {
-        taAdjusted = plotVariables.filterToRemove.upperBoundRatio * axisLength.value + plotTopPadding.value;
-        tbAdjusted = plotVariables.filterToRemove.lowerBoundRatio * axisLength.value + plotTopPadding.value;
+        taAdjusted = filterToRemove.value.upperBoundRatio * axisLength.value + plotTopPadding.value;
+        tbAdjusted = filterToRemove.value.lowerBoundRatio * axisLength.value + plotTopPadding.value;
     }
      
     const loc = getTrueEventCoordinates(evt, plotCanvas.value);
-    plotVariables.currentFilterStartValue = loc.y + (taAdjusted - plotVariables.blockOriginCoordinates);
-    plotVariables.currentFilterEndValue =  loc.y + (tbAdjusted - plotVariables.blockOriginCoordinates);
-    plotVariables.currentFilterDeltaTime = Date.now() - plotVariables.currentFilterStartTime;
+    currentFilterStartValue.value = loc.y + (taAdjusted - blockOriginCoordinates.value);
+    currentFilterEndValue.value =  loc.y + (tbAdjusted - blockOriginCoordinates.value);
+    currentFilterDeltaTime.value = Date.now() - currentFilterStartTime.value;
 }
 
 function dragFilterBox (evt) {
     const loc = getTrueEventCoordinates(evt, plotCanvas.value)
-    if (!plotVariables.mousedown) return
-    plotVariables.currentFilterEndValue = loc.y
-    plotVariables.currentFilterDeltaTime = Date.now() - plotVariables.currentFilterStartTime
-}
-
-function dragFilterStart (evt, c) {
-    plotVariables.mousedown = true
-    const loc = getTrueEventCoordinates(evt, plotCanvas.value)
-    plotVariables.currentFilterCategory = c 
-    plotVariables.currentFilterStartValue = loc.y
-    plotVariables.currentFilterStartTime = Date.now()
-    plotVariables.currentFilterDeltaTime = 0
+    if (!mousedown.value) return
+    currentFilterEndValue.value = loc.y
+    currentFilterDeltaTime.value = Date.now() - currentFilterStartTime.value
 }
 
 function triggerClickCooldown () {
     // This method prevents the end of filter mousedrags to be perceived as clicks
-    plotVariables.clickOnCooldown = true
+    clickOnCooldown.value = true;
     setTimeout(() => {
-        plotVariables.clickOnCooldown = false
-    }, 250)
+        clickOnCooldown.value = false
+    }, 250);
 }
 
 function dragFilterDone () {
     let ignoreRequest = false
-    if (!plotVariables.mousedown) ignoreRequest = true
-    if (plotVariables.currentFilterDeltaTime < 100) ignoreRequest = true	
+    if (!mousedown.value) ignoreRequest = true
+    if (currentFilterDeltaTime.value < 100) ignoreRequest = true	
 
     if (ignoreRequest) {
         // This filter was likely unintentional.
@@ -352,12 +254,12 @@ function dragFilterDone () {
         triggerClickCooldown()
     }
 
-    if (Date.now() - plotVariables.currentFilterStartTime < plotParameters.filterMinDragTime) return
+    if (Date.now() - currentFilterStartTime.value < filterMinDragTime) return
 
     // Calculate domain extent
-    const c = plotVariables.currentFilterCategory
-    const y1 = plotVariables.currentFilterStartValue - plotTopPadding.value
-    const y2 = plotVariables.currentFilterEndValue - plotTopPadding.value
+    const c = currentFilterCategory.value
+    const y1 = currentFilterStartValue.value - plotTopPadding.value
+    const y2 = currentFilterEndValue.value - plotTopPadding.value
     let y1Ratio = (y1 / getAxisLength())
     let y2Ratio = (y2 / getAxisLength())
 
@@ -390,47 +292,11 @@ function dragFilterDone () {
     }
 
     // If this new filter is replacing an existing filter, then delete the original copy.
-    if (plotVariables.filterToRemove) {
-        dataStore.deleteFilter(plotVariables.filterToRemove)
+    if (filterToRemove.value) {
+        dataStore.deleteFilter(filterToRemove.value)
     }
 
     resetFilterDrag()
-}
-
-function onClickAxis (evt, c) {
-    if (plotVariables.clickOnCooldown) return;
-    if (plotVariables.mousedown === true) return;
-    // Manage selected category
-    if (selectedCategory.value && selectedCategory.value.title === c.title) {
-        selectedCategory.value = null;
-    } else {
-        selectedCategory.value = c;
-    }	
-	
-    // Remove focus from any form element to prevent erronious user input
-    plotCanvas.value.focus()
-
-    if (evt.ctrlKey) {
-        return flipAxis(c);
-    }
-
-    if (evt.shiftKey) {
-        return setColorCodeCategory(c);
-    }
-}
-
-function onDblClickAxis (evt, c) {
-    setColorCodeCategory(c)
-}
-
-function flipAxis (c) {
-    c.flip();
-
-    if (c.usesCategoricalData) {
-        recreateCategoricFilters(c);
-    }
-
-    requestRasterRedraw();
 }
 
 function recreateCategoricFilters (c) {
@@ -445,29 +311,6 @@ function recreateCategoricFilters (c) {
             f.flipRatio();
         });
     }
-
-
-}
-
-function setColorCodeCategory (c) {
-    if (!optionsStore.selectedColorCodeCategory) {
-        optionsStore.selectedColorCodeCategory = c;
-        optionsStore.resetColorCodeOverride();
-        return;
-    }
-
-    if (optionsStore.selectedColorCodeCategory.id === c.id) {
-        optionsStore.selectedColorCodeCategory = null;
-        optionsStore.resetColorCodeOverride();
-        return;
-    }
-
-    optionsStore.selectedColorCodeCategory = c;
-    optionsStore.resetColorCodeOverride();
-}
-
-function getSelectedCategoryTitle () {
-    return selectedCategory.value ? selectedCategory.value.title : null
 }
 
 async function handleExportRequest (format) {
@@ -535,10 +378,6 @@ function exportSVG () {
     const blob = new Blob([full_svg], {type: "image/svg+xml"});  
     saveAs(blob, "PCPlot.svg");
 }
-
-function requestRasterRedraw () {
-    eventBus.emit('PCPRasterLayer.RequestPCPRedraw');
-}
     
 </script>
 
@@ -547,93 +386,14 @@ function requestRasterRedraw () {
 .component-container {
 	height: 100%;
 	overflow: hidden;
+
+    &.grabbing {
+        cursor: grabbing !important;
+    }
+
+    &.pulling {
+        cursor: ns-resize !important;
+    }
 }
-
-.pcp-plot {
-	.axis {
-		cursor: pointer;
-
-        &.grabbing {
-            cursor: grabbing !important;
-        }
-
-        &.pulling {
-            cursor: ns-resize!important;
-        }
-
-		text {
-			fill: black;
-			stroke-opacity: 0;
-		}
-
-		line {
-			stroke: black;
-			fill-opacity: 0;
-		}
-
-		.filter-box {
-			x: -8px;
-			width: 16px; 
-		}
-
-		.filter-box-proto {
-			x: -8px;
-			width: 16px;
-		}
-
-		.filter-hitbox {
-			stroke: transparent;
-			fill: transparent;
-			x: -10px;
-			y: -20px;
-			width: 20px;
-
-            &:hover {
-                stroke: rgb(0, 0, 0);
-                fill: rgba(255,255,255, 0.05);
-            }
-		}
-
-		.title {
-			x: 0px;
-			text-anchor: start;
-		}
-
-		.tick-string {
-			text-anchor: end;
-			dominant-baseline: middle;
-			font-weight: bold;
-            pointer-events: none;
-            filter: (url(#solid))
-		}
-	}
-
-	.axis:hover {
-		.title {
-			fill: darkblue;
-			font-weight: bold;
-		}
-
-		line {
-			stroke-width: 2px;
-			stroke: darkblue;
-		}
-		
-	}
-
-	.highlighted {
-		.title {
-			fill: darkblue;
-			font-weight: bold;
-		}
-
-		line {
-			stroke-width: 2px;
-			stroke: darkblue;
-		}
-	}
-}
-
-
 
 </style>
