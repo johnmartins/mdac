@@ -13,7 +13,7 @@
                 </select>
             </div>
             <div class="d-grid gap-2 mt-2">
-                <button @click="exportRequest">Download Image</button>
+                <button class="small" @click="exportRequest">Download Image</button>
             </div>
         </div>
         <div class="control-group">
@@ -24,7 +24,7 @@
             </CheckboxInput>
 
             <div class="d-grid gap-2 mt-2">
-                <button @click="exportDataRequest(includeFilteredData)">Download Data CSV</button>
+                <button class="small" @click="exportDataRequest(includeFilteredData)">Download Data CSV</button>
             </div>
         </div>
         <div class="control-group">
@@ -35,7 +35,7 @@
             </CheckboxInput>
 
             <div class="d-grid gap-2 mt-2">
-                <button @click="exportFilterRequest(nearLimitAsInf)">Download Filter CSV</button>
+                <button class="small" @click="exportFilterRequest(nearLimitAsInf)">Download Filter CSV</button>
             </div>
         </div>
     </SidebarSection>

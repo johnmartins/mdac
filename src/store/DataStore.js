@@ -10,6 +10,8 @@ export const useDataStore = defineStore('data', {
         filters: {},         // "ColumnID" -> [filterA, filterB, ..]
         filterIDMap: new Map(),
         idCol: '$ID$',
+        distributionBucketCount: 10,
+        distributionMap: new Map(), // "ColumnID" -> [0,0,...,0]
     }),
     getters: {
         inputColumns: (state) => {
@@ -60,17 +62,19 @@ export const useDataStore = defineStore('data', {
     },
     actions: {
         wipeAllData () {
-            this.data = []
-            this.categories = []
-            this.categoryNameMap.clear()
-            this.clearFilters()
+            this.data = [];
+            this.categories = [];
+            this.categoryNameMap.clear();
+            this.clearFilters();
+            this.distributionBucketCount = 10;
+            this.distributionMap.clear();
 
             // Reset static class data
-            Category.wipeLookupTable()
+            Category.wipeLookupTable();
             Category.count = 0;
         },
         setData (data) {
-            this.data = data
+            this.data = data;
         },
         addFilter (f) {
             const stateStore = useStateStore();
@@ -142,12 +146,13 @@ export const useDataStore = defineStore('data', {
             this.filterIDMap.clear()
         },
         addCategory (c) {
-            let position = 0
+            let position = 0;
             if (this.categories.length > 0) {
-                position = this.categories[this.categories.length - 1].position + 1
+                position = this.categories[this.categories.length - 1].position + 1;
             }
-            this.categories.push(c)
-            this.categoryNameMap.set(c.title, c)
+            this.categories.push(c);
+            this.categoryNameMap.set(c.title, c);
+            this.distributionMap.set(c.title, new Uint32Array(this.distributionBucketCount));   // Empty array of 0s.
         },
         getCategoryWithName (categoryName) {
             return this.categoryNameMap.get(categoryName)
@@ -161,22 +166,23 @@ export const useDataStore = defineStore('data', {
             throw new Error('Could not resolve true category position')
         },
         deleteCategory (c) {
-            if (!c) return
+            if (!c) return;
             // Delete category from category list
-            let deleteIndex = -1
+            let deleteIndex = -1;
             for (let i = 0; i < this.categories.length; i++) {
-                const cat = this.categories[i]
-                if (c.title !== cat.title) continue
-                deleteIndex = i
-                break
+                const cat = this.categories[i];
+                if (c.title !== cat.title) continue;
+                deleteIndex = i;
+                break;
             }
-            this.categoryNameMap.set(c.title, null)
-            this.categories.splice(deleteIndex, 1)
+            this.categoryNameMap.set(c.title, null);
+            this.distributionMap.delete(c.title);
+            this.categories.splice(deleteIndex, 1);
         
             // Adjust positions of other categories
             for (let i=deleteIndex; i < this.categories.length; i++) {
-                const cat = this.categories[i]
-                cat.position--
+                const cat = this.categories[i];
+                cat.position--;
             }
         },
         dataPointFilterCheck (dataPoint) {
