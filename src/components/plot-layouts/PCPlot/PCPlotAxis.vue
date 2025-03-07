@@ -59,6 +59,20 @@
     </g>
 </g>
 
+<!-- Distribution analysis -->
+<g v-if="optionsStore.showDistributions && dataStore.distributionMap[c.title]">
+    <rect
+        class="distribution-box" 
+        v-for="(count, index) in dataStore.distributionMap[c.title]"
+        :key="index"
+        x="1"
+        :y="props.axisLength - (index / dataStore.distributionBucketCount) * props.axisLength - props.axisLength/dataStore.distributionBucketCount" 
+        :width="(count/Math.max(...dataStore.distributionMap[c.title])) * horizontalOffset * 0.9"
+        :height="props.axisLength / dataStore.distributionBucketCount"
+        
+    />
+</g>
+
 </template>
 
 <script setup>
@@ -92,7 +106,7 @@ const { axisLabelMargin, axisLabelAngle, plotTopPadding, plotBottomPadding,
     currentFilterStartTime, currentFilterCategory, currentFilterDeltaTime, 
     currentFilterStartValue, currentFilterEndValue, filterMinDragTime, 
     mousedown, clickOnCooldown, filterToRemove, blockOriginCoordinates, 
-    interactionType } = storeToRefs(PCPStore);
+    interactionType, horizontalOffset } = storeToRefs(PCPStore);
 
 const props = defineProps({
     axisLength: Number,
@@ -284,6 +298,11 @@ function getSelectedCategoryTitle () {
         stroke-width: 2px;
         stroke: darkblue;
     }
+}
+
+.distribution-box {
+    fill: rgba(255,0,0,0.3);
+    stroke: white;
 }
 
 </style>

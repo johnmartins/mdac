@@ -28,6 +28,7 @@ export const useOptionsStore = defineStore('options', {
 
         // Misc
         showFilters: true,
+        showDistributions: false,
 
     }),
     getters: {},
