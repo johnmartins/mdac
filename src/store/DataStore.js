@@ -152,7 +152,7 @@ export const useDataStore = defineStore('data', {
             }
             this.categories.push(c);
             this.categoryNameMap.set(c.title, c);
-            this.distributionMap.set(c.title, new Uint32Array(this.distributionBucketCount));   // Empty array of 0s.
+            this.distributionMap.set(c.title, new Uint32Array(parseInt(this.distributionBucketCount)));   // Empty array of 0s.
         },
         getCategoryWithName (categoryName) {
             return this.categoryNameMap.get(categoryName)
