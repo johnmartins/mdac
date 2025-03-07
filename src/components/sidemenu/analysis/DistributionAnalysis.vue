@@ -6,6 +6,14 @@
     <div class="d-grid">
 
         <CheckboxInput 
+            v-model="optionsStore.showDistributions" 
+            title="Visualize distributions in parallel coordinates plot."
+            @change="onChange"
+            >
+            Show distributions
+        </CheckboxInput>
+
+        <CheckboxInput 
             v-model="useFilters" 
             title="Apply filters to distribution calculation"
             @change="onChange"
@@ -21,14 +29,8 @@
             :step="1"
             @change="onChange"
         >
-        Bucket count:
-    </NumberInput>
-
-        <button class="small" @click="runAnalysis">Run analysis</button>
-
-        <CheckboxInput v-model="optionsStore.showDistributions" title="Visualize distributions in parallel coordinates plot.">
-            Show distributions
-        </CheckboxInput>
+            Bucket count:
+        </NumberInput>
 
     </div>
 
@@ -52,11 +54,19 @@ const optionsStore = useOptionsStore();
 const { distributionBucketCount } = storeToRefs(dataStore);
 const useFilters = ref(true);
 
-watch(() => dataStore.filterIDMap.size, onChange);
+watch(() => dataStore.filterIDMap.size, () => {
+    if (useFilters.value === true) {
+        runAnalysis();
+    }
+});
 
 async function runAnalysis () {
-    dataStore.distributionMap.clear();
+    if (optionsStore.showDistributions === false) {
+        return;
+    }
     optionsStore.showDistributions = false;
+
+    dataStore.distributionMap.clear();
 
     await nextTick();
 
@@ -90,10 +100,7 @@ async function runAnalysis () {
 
     await nextTick();
 
-    // Automatically show distributions after analysis.
     optionsStore.showDistributions = true;
-
-    console.log(dataStore.distributionMap);
 }
 
 function onChange () {
