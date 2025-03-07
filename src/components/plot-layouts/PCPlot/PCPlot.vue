@@ -297,6 +297,8 @@ function dragFilterDone () {
     }
 
     resetFilterDrag()
+
+    eventBus.emit('PCPlot.dragFilterDone');
 }
 
 function recreateCategoricFilters (c) {

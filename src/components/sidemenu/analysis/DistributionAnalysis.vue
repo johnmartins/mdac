@@ -38,7 +38,7 @@
 </template>
 
 <script setup>
-import { nextTick, ref, watch } from "vue";
+import { nextTick, ref, watch, inject } from "vue";
 import { storeToRefs } from "pinia";
 import SidebarSection from "@/components/layouts/SidebarSection";
 
@@ -52,11 +52,23 @@ const dataStore = useDataStore();
 const optionsStore = useOptionsStore();
 
 const { distributionBucketCount } = storeToRefs(dataStore);
-const useFilters = ref(true);
 
+// State
+const useFilters = ref(true);
+let redrawTimeout = null;
+
+// Listeners
+const eventBus = inject('eventBus');
+// Checks if filters are being edited in the PCP plot
+eventBus.on('PCPlot.dragFilterDone', () => {
+    if (useFilters.value === true) {
+        onChange();
+    }
+});
+// Checks if new filters are being added, even in the scatter plot
 watch(() => dataStore.filterIDMap.size, () => {
     if (useFilters.value === true) {
-        runAnalysis();
+        onChange();
     }
 });
 
@@ -64,12 +76,14 @@ async function runAnalysis () {
     if (optionsStore.showDistributions === false) {
         return;
     }
+    console.log("ANALYZING");
+
+    // Allow the visualization to update
     optionsStore.showDistributions = false;
-
     dataStore.distributionMap.clear();
-
     await nextTick();
 
+    // Perform distribution calculations
     const buckets = parseInt(distributionBucketCount.value);
     
     for (const c of dataStore.categories) {
@@ -98,17 +112,24 @@ async function runAnalysis () {
         }
     }
 
+    // Update visualization
     await nextTick();
-
     optionsStore.showDistributions = true;
 }
 
 function onChange () {
+    console.log("knock knock");
     if (!optionsStore.showDistributions) {
         return;
     }
 
-    runAnalysis();
+    if (redrawTimeout) {
+        clearTimeout(redrawTimeout);
+    }
+
+    redrawTimeout = setTimeout(() => {
+        runAnalysis();
+    }, 100);
 }
 
 </script>
