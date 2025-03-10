@@ -76,7 +76,6 @@ async function runAnalysis () {
     if (optionsStore.showDistributions === false) {
         return;
     }
-    console.log("ANALYZING");
 
     // Allow the visualization to update
     optionsStore.showDistributions = false;
