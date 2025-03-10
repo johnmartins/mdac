@@ -33,6 +33,30 @@ export const useOptionsStore = defineStore('options', {
     }),
     getters: {},
     actions: {
+        /**
+         * Reset to refault options
+         */
+        wipe () {
+            this.titleSize = 1.0;
+            this.tickSize = 0.8;
+            this.tickBackgroundOpacity = 0.6;
+
+            this.selectedColorCodeCategory = null;
+            this.overrideColorCodeColumn = null;
+            this.overrideColorCodeFunction = null;
+            this.colorCodeUpperBound = null;
+            this.colorCodeLowerBound = null;
+            this.useSimilarityColorCoding = true;
+            this.showColorCodeLegend = true;
+
+            this.includedDataOpacity = 1;
+            this.excludedDataOpacity = 0;
+            this.hideExcluded = true;
+            this.curveType = 'line';
+
+            this.showFilters = true;
+            this.showDistributions = false;
+        },
         setExcludedDataOpacity (opacity) {
             if (opacity < 0.001) {
                 this.hideExcluded = true
