@@ -299,11 +299,9 @@ function getSelectedCategoryTitle () {
         stroke: darkblue;
     }
 }
-
 .distribution-box {
     fill: rgba(255,0,0,0.3);
     stroke: white;
     pointer-events: none;
 }
-
 </style>

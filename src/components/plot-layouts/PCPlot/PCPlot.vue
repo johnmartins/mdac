@@ -297,7 +297,6 @@ function dragFilterDone () {
     }
 
     resetFilterDrag()
-
     eventBus.emit('PCPlot.dragFilterDone');
 }
 
