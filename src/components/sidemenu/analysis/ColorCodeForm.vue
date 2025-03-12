@@ -21,6 +21,8 @@
             >
                 Use similarity color coding
             </CheckboxInput>
+
+            <strong>Color code legend</strong>
             
             <CheckboxInput 
                 v-model="showColorCodeLegend"
@@ -28,6 +30,41 @@
             >
                 Show color code legend
             </CheckboxInput>
+
+            <NumberInput
+                v-model="optionsStore.rangeIndicatorTitleSize"
+                :step="0.1"
+                :min="0"
+                :max="null"
+            >
+                Title font size:
+            </NumberInput>
+
+            <NumberInput
+                v-model="optionsStore.rangeIndicatorTickSize"
+                :step="0.1"
+                :min="0"
+                :max="null"
+            >
+                Tick font size:
+            </NumberInput>
+
+            <NumberInput
+                v-model="optionsStore.rangeIndicatorVerticalOffset"
+                :step="1"
+                :min="null"
+                :max="null"
+            >
+                Position vertical:
+            </NumberInput>
+            <NumberInput
+                v-model="optionsStore.rangeIndicatorHorizontalOffset"
+                :step="1"
+                :min="null"
+                :max="null"
+            >
+                Position horizontal
+            </NumberInput>
         </div>
     </SidebarSection>
 </template>
@@ -38,6 +75,7 @@ import SidebarSection from "@/components/layouts/SidebarSection";
 import {useOptionsStore} from "@/store/OptionsStore";
 import {useDataStore} from "@/store/DataStore";
 import CheckboxInput from "@/components/inputs/CheckboxInput.vue";
+import NumberInput from "@/components/inputs/NumberInput.vue";
 
 const optionsStore = useOptionsStore();
 const dataStore = useDataStore();

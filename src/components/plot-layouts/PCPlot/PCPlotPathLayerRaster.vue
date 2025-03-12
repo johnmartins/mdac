@@ -9,28 +9,28 @@
 <script setup>
 import { onMounted, ref, inject, watch, nextTick, onUnmounted } from "vue";
 import { storeToRefs } from "pinia";
-import * as d3 from "d3";
+
+import { lineGenerator } from "@/utils/data-utils";
 
 // Stores
-import {useDataStore} from "@/store/DataStore"
-import {usePCPStore} from "@/store/PCPStore"
-import {useOptionsStore} from "@/store/OptionsStore"
-import {useStateStore} from "@/store/StateStore"
+import { useDataStore } from "@/store/DataStore";
+import { usePCPStore } from "@/store/PCPStore";
+import { useOptionsStore } from "@/store/OptionsStore";
+import { useStateStore } from "@/store/StateStore";
 
 defineExpose({
     generateDataUrl
 })
 
 // Store references
-const dataStore = useDataStore()
-const PCPStore = usePCPStore()
-const optionsStore = useOptionsStore()
-const stateStore = useStateStore()
+const dataStore = useDataStore();
+const PCPStore = usePCPStore();
+const optionsStore = useOptionsStore();
+const stateStore = useStateStore();
 
 // Store refs
-const {selectedColorCodeCategory} = storeToRefs(optionsStore)
-const {horizontalOffset, axisLength, plotYBounds, plotXBounds, resolution} = storeToRefs(PCPStore)
-const {data} = storeToRefs(dataStore)
+const { plotYBounds, plotXBounds, resolution } = storeToRefs(PCPStore);
+const {data} = storeToRefs(dataStore);
 
 // Layout references
 const canvasContainer = ref(null);
@@ -59,7 +59,7 @@ onUnmounted(() => {
 });
 
 watch([() => PCPStore.resolution, () => PCPStore.renderingType], () => {
-    resizeCanvas()
+    resizeCanvas();
 })
 
 watch([() => data.value.filter(dp => !dataStore.dataPointFilterCheck(dp), 
@@ -68,11 +68,11 @@ watch([() => data.value.filter(dp => !dataStore.dataPointFilterCheck(dp),
     optionsStore.curveType,
     optionsStore.selectedColorCodeCategory,
     optionsStore.overrideColorCodeColumn)], () => {
-    restartRedrawCountdown()
+    restartRedrawCountdown();
 })
 
 watch(() => dataStore.enabledCategoriesCount, () => {
-    restartRedrawCountdown()
+    restartRedrawCountdown();
 })
 
 async function generateDataUrl () {
@@ -133,12 +133,12 @@ async function draw () {
     console.debug(`Draw time: ${(t_draw_end - t_draw_start)/1000} [s]`);
 
     await stateStore.clearLoading();
-    return 
+    return; 
 }
 
 function renderLine (d, color, opacity) {
     ctx.beginPath();
-    lineGenerator(d);
+    lineGenerator(d, ctx);
     ctx.lineWidth = 1;
     ctx.globalAlpha = opacity;
     ctx.strokeStyle = color;
@@ -163,63 +163,23 @@ function getChunkCount (dataArrayLength) {
 }
 
 async function resizeCanvas () {
-    if (PCPStore.renderingType !== 'raster') return
-    if (!canvasContainer.value) return
-    PCPStore.pathsDataUrl = null	// Triggers the image in PCP to become hidden
+    if (PCPStore.renderingType !== 'raster') return;
+    if (!canvasContainer.value) return;
+    PCPStore.pathsDataUrl = null;	// Triggers the image in PCP to become hidden
 
     await nextTick();
 
-    const w = canvasContainer.value.offsetWidth
-    const h = canvasContainer.value.offsetHeight
-    pathCanvas.width = w * resolution.value
-    pathCanvas.height = h * resolution.value
-    pathCanvas.style.width = w + 'px'
-    pathCanvas.style.height = h + 'px'
-    restartRedrawCountdown()
-}
-
-function lineGenerator(d) {
-    let dataCats = Object.keys(d) // TODO: Refactor potential
-    let dataArray = Array(dataCats.length).fill(null)
-
-    for (let i = 0; i < dataCats.length; i++) {		
-        let c = dataStore.getCategoryWithName(dataCats[i])
-
-        // Ignore disabled categories
-        if (!c || !c.enabled)  {
-            continue
-        }
-
-        // Set data point coordinates
-        const x = dataStore.getTrueCategoryPosition(c.title)*horizontalOffset.value
-        const y = c.scaleLinear(d[c.title])*axisLength.value
-
-        // Build data array
-        dataArray[c.position] = {
-            x: x, 
-            y: y
-        }
-    }
-
-    dataArray = dataArray.filter((obj) => { return obj != null })
-
-    let d3CurveType = d3.curveMonotoneX
-    if (optionsStore.curveType === 'curve') {
-        d3CurveType = d3.curveMonotoneX
-    } else if (optionsStore.curveType === 'line') {
-        d3CurveType = d3.curveLinear
-    }
-	
-    return d3.line([])
-        .x((de) => {return de.x})
-        .y((de) => {return de.y})
-        .curve(d3CurveType)
-        .context(ctx)
-        (dataArray)
+    const w = canvasContainer.value.offsetWidth;
+    const h = canvasContainer.value.offsetHeight;
+    pathCanvas.width = w * resolution.value;
+    pathCanvas.height = h * resolution.value;
+    pathCanvas.style.width = w + 'px';
+    pathCanvas.style.height = h + 'px';
+    restartRedrawCountdown();
 }
 
 function getLineColor (d) {
-    return optionsStore.getSampleColor(d)
+    return optionsStore.getSampleColor(d);
 }
 
 </script>

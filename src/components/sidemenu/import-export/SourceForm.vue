@@ -91,19 +91,20 @@ function detectDelimiter (data) {
 
 async function readFile () {
     // Read the CSV file
-    const file = fileInput.value.files[0] 
-    if (!file) return
-    await stateStore.setLoading('Parsing imported file..')
+    const file = fileInput.value.files[0]; 
+    if (!file) return;
+    await stateStore.setLoading('Parsing imported file..');
     // Reset existing data state (in case another file was previously loaded)
-    scatterStore.resetDataSelection() // TODO: This should ideally be in the state store.
-    optionsStore.resetColorCoding()
-    dataStore.wipeAllData()
-    const reader = new FileReader()
-    stateStore.importedFileName = file.name
-    reader.readAsText(new Blob([file], {"type": file.type}))	
+    scatterStore.resetDataSelection(); // TODO: This should ideally be in the state store.
+    optionsStore.wipe();
+    dataStore.wipeAllData();
+
+    const reader = new FileReader();
+    stateStore.importedFileName = file.name;
+    reader.readAsText(new Blob([file], {"type": file.type}));	
     reader.onloadend = async (res) => {
-        parseCSV(res)
-        await stateStore.clearLoading()
+        parseCSV(res);
+        await stateStore.clearLoading();
     } 
 }
 

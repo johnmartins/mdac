@@ -51,8 +51,6 @@ const props = defineProps({
         font-size: 0.8em;
         min-width: 100%;
         padding: 0.1em 0.5em 0.1em 0.4em;
-
-
     }
     .input-group-prepend {
         padding: 0;

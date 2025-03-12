@@ -19,19 +19,62 @@ export const useOptionsStore = defineStore('options', {
         colorCodeLowerBound: null,
         useSimilarityColorCoding: true,
         showColorCodeLegend: true,
+        rangeIndicatorTitleSize: 0.8,
+        rangeIndicatorTickSize: 0.8,
+        rangeIndicatorVerticalOffset: 0,
+        rangeIndicatorHorizontalOffset: 20,
 
         // PCP lines
+        showPcpLines: true,
         includedDataOpacity: 1,
         excludedDataOpacity: 0,
         hideExcluded: true,
         curveType: 'line',
 
+        // Distributions
+        showDistributions: false,
+        distributionOpacity: 0.3,
+        distributionFill: '#FF0000',
+        distributionStroke: '#FFFFFF',
+
         // Misc
         showFilters: true,
+        
 
     }),
-    getters: {},
+    getters: {
+        colorLegendOffsetV: (state) => {
+            return parseInt(state.rangeIndicatorVerticalOffset);
+        },
+        colorLegendOffsetH: (state) => {
+            return parseInt(state.rangeIndicatorHorizontalOffset);
+        }
+    },
     actions: {
+        /**
+         * Reset to refault options
+         */
+        wipe () {
+            this.titleSize = 1.0;
+            this.tickSize = 0.8;
+            this.tickBackgroundOpacity = 0.6;
+
+            this.selectedColorCodeCategory = null;
+            this.overrideColorCodeColumn = null;
+            this.overrideColorCodeFunction = null;
+            this.colorCodeUpperBound = null;
+            this.colorCodeLowerBound = null;
+            this.useSimilarityColorCoding = true;
+            this.showColorCodeLegend = true;
+
+            this.includedDataOpacity = 1;
+            this.excludedDataOpacity = 0;
+            this.hideExcluded = true;
+            this.curveType = 'line';
+
+            this.showFilters = true;
+            this.showDistributions = false;
+        },
         setExcludedDataOpacity (opacity) {
             if (opacity < 0.001) {
                 this.hideExcluded = true
