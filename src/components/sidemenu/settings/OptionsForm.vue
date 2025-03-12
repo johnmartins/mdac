@@ -33,6 +33,7 @@
                 </select>
             </div>
 
+            <CheckboxInput v-model="optionsStore.showPcpLines">Show data lines</CheckBoxInput>
             <CheckboxInput v-model="optionsStore.showFilters">Show filters in plot</CheckboxInput>
 
             <NumberInput v-model="optionsStore.tickBackgroundOpacity" :step="0.05" :min="0" :max="1">

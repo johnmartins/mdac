@@ -8,7 +8,7 @@
     >
         <div ref="pcpPlot" style="height: 100%; position: relative;" class="svg-container">
             <!-- Raster rendering layer -->
-            <div v-if="PCPStore.renderingType === 'raster'" style="width: 100%; height: 100%;">
+            <div v-if="PCPStore.renderingType === 'raster' && optionsStore.showPcpLines" style="width: 100%; height: 100%;">
                 <PCPlotPathLayerRaster ref="rasterLayer" />
             </div>
             <svg 
@@ -38,11 +38,10 @@
             > 
 
                 <!-- Vector rendering layer -->
-                <PCPlotPathLayerVector />
+                <PCPlotPathLayerVector v-if="optionsStore.showPcpLines === true" />
 
-                <!-- Raster export image -->
+                <!-- Raster EXPORT image (only visible when exporting) -->
                 <image v-if="PCPStore.renderingType === 'raster' && pathsDataUrl" :href="pathsDataUrl" width="100%" height="100%" :y="getPlotYBounds()[0]" />
-                
 
                 <!-- Axis group. Filter for enabled, sort by position, position using index. -->
                 <g 
@@ -59,7 +58,9 @@
                     />
                 </g>
 
-                <g class="scatter-plugin-container" :transform="`translate(${getPlotXBounds()[1] + 20} ${getPlotYBounds()[0]})`">
+                <g class="scatter-plugin-container" 
+                    :transform="`translate(${getPlotXBounds()[1] + optionsStore.colorLegendOffsetH} ${getPlotYBounds()[0] + optionsStore.colorLegendOffsetV})`"
+                >
                     <RangeIndicator />
                 </g>
             </g>
@@ -186,7 +187,6 @@ function getPlotXBounds () {
 }
 
 function resetFilterDrag () {
-    console.log("reset")
     mousedown.value = false;
     interactionType.value = null;
     currentFilterCategory.value = null;
@@ -297,6 +297,7 @@ function dragFilterDone () {
     }
 
     resetFilterDrag()
+    eventBus.emit('PCPlot.dragFilterDone');
 }
 
 function recreateCategoricFilters (c) {
@@ -327,7 +328,9 @@ async function handleExportRequest (format) {
         }
 
         try {
-            await rasterLayer.value.generateDataUrl();
+            if (rasterLayer.value) {
+                await rasterLayer.value.generateDataUrl();
+            }
             await nextTick();
             await exportPNG();
         } finally {
