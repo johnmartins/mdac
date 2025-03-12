@@ -31,6 +31,7 @@ const model = defineModel();
     width: 100%;
     padding: 0;
     cursor: pointer;
+    border: 1px solid whitesmoke;
 }
 
 .labeled-input-container {
