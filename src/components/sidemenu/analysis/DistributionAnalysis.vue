@@ -86,7 +86,14 @@ async function runAnalysis () {
     const buckets = parseInt(distributionBucketCount.value);
     
     for (const c of dataStore.categories) {
-        dataStore.distributionMap[c.title] = Array(buckets).fill(0);
+        
+        if (!c.usesCategoricalData) {
+            // If continuous
+            dataStore.distributionMap[c.title] = Array(buckets).fill(0);
+        } else {
+            // If categorical
+            dataStore.distributionMap[c.title] = Array(c.availableCategoricalValues.length).fill(0);
+        }
     }
 
     let data = dataStore.data;
@@ -96,16 +103,13 @@ async function runAnalysis () {
 
     for (const dp of data) {
         for (const c of dataStore.categories) {
-            if (c.usesCategoricalData) continue;
-            let max = Math.max(c.lb, c.ub);   
-            const min = Math.min(c.lb, c.ub);
-            // Add RELATIVELY small number to include max values into final bucket
-            max = max + (max - min) * 1e-6; 
-            const val = dp[c.title];
-            const bucketRange = (max - min)/(buckets);
-            const x = (val - min) / bucketRange;
-            const bucketIndex = Math.floor(x);
-
+            let bucketIndex;
+            if (!c.usesCategoricalData){
+                bucketIndex = calculateContinuousDataBucket(dp, c, buckets);
+            } else {
+                bucketIndex = calculateCategoricalDataBucket(dp, c);
+            }
+            
             // Update stored distribution map used for visualization
             dataStore.distributionMap[c.title][bucketIndex]++;
         }
@@ -116,8 +120,28 @@ async function runAnalysis () {
     optionsStore.showDistributions = true;
 }
 
+function calculateCategoricalDataBucket (dp, c) {
+    const val = dp[c.title];
+    return c.availableCategoricalValues.indexOf(val);
+}
+
+
+/**
+ * Calculate which bucket index this continuous data point belongs to 
+ */
+function calculateContinuousDataBucket (dp, c, buckets) {
+    let max = Math.max(c.lb, c.ub);   
+    const min = Math.min(c.lb, c.ub);
+    // Add RELATIVELY small number to include max values into final bucket
+    max = max + (max - min) * 1e-6; 
+    const val = dp[c.title];
+    const bucketRange = (max - min)/(buckets);
+    const x = (val - min) / bucketRange;
+    const bucketIndex = Math.floor(x);
+    return bucketIndex;
+}
+
 function onChange () {
-    console.log("knock knock");
     if (!optionsStore.showDistributions) {
         return;
     }

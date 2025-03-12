@@ -60,7 +60,7 @@
 </g>
 
 <!-- Distribution analysis -->
-<g v-if="optionsStore.showDistributions && dataStore.distributionMap[c.title]">
+<g v-if="!c.usesCategoricalData && optionsStore.showDistributions && dataStore.distributionMap[c.title]">
     <rect
         class="distribution-box" 
         v-for="(count, index) in dataStore.distributionMap[c.title]"
@@ -69,8 +69,18 @@
         :y="props.axisLength - (index / dataStore.distributionBucketCount) * props.axisLength - props.axisLength/dataStore.distributionBucketCount" 
         :width="(count/Math.max(...dataStore.distributionMap[c.title])) * horizontalOffset * 0.9"
         :height="props.axisLength / dataStore.distributionBucketCount"
-        
     />
+</g>
+<g v-else-if="c.usesCategoricalData && optionsStore.showDistributions && dataStore.distributionMap[c.title]">
+    <rect 
+        class="distribution-box"
+        v-for="(count, index) in dataStore.distributionMap[c.title]"
+        :key="index"
+        x="1"
+        :y="index * props.axisLength/c.availableCategoricalValues.length"
+        :width="(count/Math.max(...dataStore.distributionMap[c.title])) * horizontalOffset * 0.9"
+        :height="props.axisLength / c.availableCategoricalValues.length"
+    />    
 </g>
 
 </template>
@@ -95,7 +105,7 @@ import { useStateStore } from "@/store/StateStore";
 const eventBus = inject('eventBus');
 
 // Stores
-const dataStore = useDataStore()
+const dataStore = useDataStore();
 const PCPStore = usePCPStore();
 const optionsStore = useOptionsStore();
 const stateStore = useStateStore();
@@ -126,7 +136,7 @@ function onClickAxis (evt, c) {
     }	
 	
     // Remove focus from any form element to prevent erronious user input
-    props.canvas.focus()
+    props.canvas.focus();
 
     if (evt.ctrlKey) {
         return flipAxis(c);
@@ -138,7 +148,7 @@ function onClickAxis (evt, c) {
 }
 
 function onDblClickAxis (evt, c) {
-    setColorCodeCategory(c)
+    setColorCodeCategory(c);
 }
 
 function setColorCodeCategory (c) {
@@ -159,12 +169,12 @@ function setColorCodeCategory (c) {
 }
 
 function dragFilterStart (evt, c) {
-    mousedown.value = true
-    const loc = getTrueEventCoordinates(evt, props.canvas)
-    currentFilterCategory.value = c 
-    currentFilterStartValue.value = loc.y
-    currentFilterStartTime.value = Date.now()
-    currentFilterDeltaTime.value = 0
+    mousedown.value = true;
+    const loc = getTrueEventCoordinates(evt, props.canvas);
+    currentFilterCategory.value = c;
+    currentFilterStartValue.value = loc.y;
+    currentFilterStartTime.value = Date.now();
+    currentFilterDeltaTime.value = 0;
 }
 
 function flipAxis (c) {
@@ -189,14 +199,14 @@ function onFilterInteraction (evt) {
 
 function handleFilterBlockInteraction (evt) {
     if (mousedown.value === false) {
-        blockOriginCoordinates.value = getTrueEventCoordinates(evt.mouseEvent, props.canvas).y
+        blockOriginCoordinates.value = getTrueEventCoordinates(evt.mouseEvent, props.canvas).y;
     }
 
     interactionType.value = 'block';
     mousedown.value = true;
     currentFilterCategory.value = evt.category;
-    currentFilterStartValue.value = evt.start
-    currentFilterEndValue.value = evt.start
+    currentFilterStartValue.value = evt.start;
+    currentFilterEndValue.value = evt.start;
     currentFilterStartTime.value = Date.now();
     currentFilterDeltaTime.value = 0;
     filterToRemove.value = evt.filter;		// Mark the original filter for deletion
@@ -217,7 +227,7 @@ function requestRasterRedraw () {
 }
 
 function getSelectedCategoryTitle () {
-    return selectedCategory.value ? selectedCategory.value.title : null
+    return selectedCategory.value ? selectedCategory.value.title : null;
 }
 
 </script>

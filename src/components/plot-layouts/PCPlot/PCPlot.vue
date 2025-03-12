@@ -186,7 +186,6 @@ function getPlotXBounds () {
 }
 
 function resetFilterDrag () {
-    console.log("reset")
     mousedown.value = false;
     interactionType.value = null;
     currentFilterCategory.value = null;
