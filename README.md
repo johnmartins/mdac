@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6784231.svg)](https://doi.org/10.5281/zenodo.6784231)
 
-The tool can be used at this link: [https://mdac.netlify.app/](https://mdac.netlify.app/)
+The tool can be used at this link: [https://mdac.martinsson-bonde.com/](https://mdac.martinsson-bonde.com/)
 
 ## How to use
 MDAC is an interactive data visualisation tool. It uses a parallel coordinates diagram to display the data, which the user can interact with by adding filters.
