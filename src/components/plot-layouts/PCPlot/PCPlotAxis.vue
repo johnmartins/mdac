@@ -89,7 +89,6 @@
         :stroke="optionsStore.distributionStroke"
     />    
 </g>
-
 </template>
 
 <script setup>
@@ -316,6 +315,7 @@ function getSelectedCategoryTitle () {
         stroke: darkblue;
     }
 }
+
 .distribution-box {
     pointer-events: none;
 }
