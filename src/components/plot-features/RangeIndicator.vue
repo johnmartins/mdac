@@ -1,7 +1,7 @@
 <template>
     <g v-if="column && showColorCodeLegend" class="range-indicator">
         <text 
-            :style="{fontSize: `${optionsStore.titleSize}em`}"
+            :style="{fontSize: `${optionsStore.rangeIndicatorTitleSize}em`}"
             class="title"
         >
             {{ column.displayTitle }}
@@ -9,7 +9,7 @@
         <g :transform="`translate(0 ${tickMargin})`">
             <text 
                 class="tick-ub"
-                :style="{fontSize: `${optionsStore.tickSize}em`}"
+                :style="{fontSize: `${optionsStore.rangeIndicatorTickSize}em`}"
                 :x="barWidth + tickMargin"
             >
                 {{ parseFloat(colorCodeUpperBound).toFixed(4) }}
@@ -26,7 +26,7 @@
 
             <text 
                 class="text-lb"
-                :style="{fontSize: `${optionsStore.tickSize}em`}"
+                :style="{fontSize: `${optionsStore.rangeIndicatorTickSize}em`}"
                 :x="barWidth + tickMargin" 
                 :y="4*resolution"
             >
@@ -47,7 +47,7 @@ const optionsStore = useOptionsStore();
 const {colorCodeUpperBound, colorCodeLowerBound, showColorCodeLegend} = storeToRefs(optionsStore);
 
 const resolution = 30;
-const barWidth = 20;
+const barWidth = 10;
 const barHeight = 4;
 const tickMargin = 8;
 

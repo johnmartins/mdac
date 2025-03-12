@@ -10,7 +10,7 @@ export const useDataStore = defineStore('data', {
         filters: {},         // "ColumnID" -> [filterA, filterB, ..]
         filterIDMap: new Map(),
         idCol: '$ID$',
-        distributionBucketCount: 10,
+        distributionBucketCount: 20,
         distributionMap: new Map(), // "ColumnID" -> [0,0,...,0]
     }),
     getters: {
@@ -66,7 +66,7 @@ export const useDataStore = defineStore('data', {
             this.categories = [];
             this.categoryNameMap.clear();
             this.clearFilters();
-            this.distributionBucketCount = 10;
+            this.distributionBucketCount = 20;
             this.distributionMap.clear();
 
             // Reset static class data
@@ -152,7 +152,7 @@ export const useDataStore = defineStore('data', {
             }
             this.categories.push(c);
             this.categoryNameMap.set(c.title, c);
-            this.distributionMap.set(c.title, new Uint32Array(this.distributionBucketCount));   // Empty array of 0s.
+            this.distributionMap.set(c.title, new Uint32Array(parseInt(this.distributionBucketCount)));   // Empty array of 0s.
         },
         getCategoryWithName (categoryName) {
             return this.categoryNameMap.get(categoryName)
