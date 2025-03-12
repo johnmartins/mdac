@@ -19,19 +19,37 @@ export const useOptionsStore = defineStore('options', {
         colorCodeLowerBound: null,
         useSimilarityColorCoding: true,
         showColorCodeLegend: true,
+        rangeIndicatorTitleSize: 0.8,
+        rangeIndicatorTickSize: 0.8,
+        rangeIndicatorVerticalOffset: 0,
+        rangeIndicatorHorizontalOffset: 20,
 
         // PCP lines
+        showPcpLines: true,
         includedDataOpacity: 1,
         excludedDataOpacity: 0,
         hideExcluded: true,
         curveType: 'line',
 
+        // Distributions
+        showDistributions: false,
+        distributionOpacity: 0.3,
+        distributionFill: '#FF0000',
+        distributionStroke: '#FFFFFF',
+
         // Misc
         showFilters: true,
-        showDistributions: false,
+        
 
     }),
-    getters: {},
+    getters: {
+        colorLegendOffsetV: (state) => {
+            return parseInt(state.rangeIndicatorVerticalOffset);
+        },
+        colorLegendOffsetH: (state) => {
+            return parseInt(state.rangeIndicatorHorizontalOffset);
+        }
+    },
     actions: {
         /**
          * Reset to refault options

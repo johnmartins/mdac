@@ -23,7 +23,6 @@
 
         <NumberInput 
             v-model="distributionBucketCount" 
-            label="Bucket count" 
             :min="1" 
             :max="100" 
             :step="1"
@@ -31,6 +30,23 @@
         >
             Bucket count:
         </NumberInput>
+
+        <NumberInput
+            v-model="distributionOpacity"
+            :min="0"
+            :max="1"
+            :step="0.05"
+        >
+            Opacity:
+        </NumberInput>
+
+        <ColorInput v-model="distributionFill">
+            Fill color:
+        </ColorInput>
+
+        <ColorInput v-model="distributionStroke">
+            Edge color:
+        </ColorInput>
 
     </div>
 
@@ -47,11 +63,13 @@ import { useOptionsStore } from "@/store/OptionsStore";
 import { useDataStore } from "@/store/DataStore";
 import NumberInput from "@/components/inputs/NumberInput.vue";
 import CheckboxInput from "@/components/inputs/CheckboxInput.vue";
+import ColorInput from "@/components/inputs/ColorInput.vue";
 
 const dataStore = useDataStore();
 const optionsStore = useOptionsStore();
 
 const { distributionBucketCount } = storeToRefs(dataStore);
+const { distributionOpacity, distributionFill, distributionStroke } = storeToRefs(optionsStore);
 
 // State
 const useFilters = ref(true);
