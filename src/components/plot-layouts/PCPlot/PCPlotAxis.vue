@@ -69,9 +69,10 @@
         :y="props.axisLength - (index / dataStore.distributionBucketCount) * props.axisLength - props.axisLength/dataStore.distributionBucketCount" 
         :width="(count/Math.max(...dataStore.distributionMap[c.title])) * horizontalOffset * 0.9"
         :height="props.axisLength / dataStore.distributionBucketCount"
-        :fill-opacity="optionsStore.distributionOpacity"
+        :fill-opacity="optionsStore.distributionFillOpacity"
         :fill="optionsStore.distributionFill"
         :stroke="optionsStore.distributionStroke"
+        :stroke-opacity="optionsStore.distributionStrokeOpacity"
 
     />
 </g>
@@ -84,9 +85,10 @@
         :y="index * props.axisLength/c.availableCategoricalValues.length"
         :width="(count/Math.max(...dataStore.distributionMap[c.title])) * horizontalOffset * 0.9"
         :height="props.axisLength / c.availableCategoricalValues.length"
-        :fill-opacity="optionsStore.distributionOpacity"
+        :fill-opacity="optionsStore.distributionFillOpacity"
         :fill="optionsStore.distributionFill"
         :stroke="optionsStore.distributionStroke"
+        :stroke-opacity="optionsStore.distributionStrokeOpacity"
     />    
 </g>
 
