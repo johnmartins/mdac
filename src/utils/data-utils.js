@@ -1,3 +1,8 @@
+import * as d3 from "d3";
+
+import { useDataStore } from "@/store/DataStore";
+import { useOptionsStore } from "@/store/OptionsStore";
+import { usePCPStore } from "@/store/PCPStore";
 
 /**
  * Deletes decimals without mercy. No rounding.
@@ -26,4 +31,62 @@ function linspace (start, stop, n) {
     return linspaceArray
 }
 
-export {truncateDecimals, isNumeric, linspace}
+function createDataArray(d) {
+    const dataStore = useDataStore();
+    const pcpStore = usePCPStore();
+
+    const horizontalOffset = pcpStore.horizontalOffset;
+    const axisLength = pcpStore.axisLength;
+
+    let dataCats = Object.keys(d);
+    let dataArray = Array(dataCats.length).fill(null);
+
+    for (let i = 0; i < dataCats.length; i++) {		
+        let c = dataStore.getCategoryWithName(dataCats[i]);
+
+        // Ignore disabled categories
+        if (!c || !c.enabled)  {
+            continue;
+        }
+
+        // Set data point coordinates
+        const x = dataStore.getTrueCategoryPosition(c.title)*horizontalOffset;
+        const y = c.scaleLinear(d[c.title])*axisLength;
+
+        // Build data array
+        dataArray[c.position] = {
+            x: x, 
+            y: y
+        }
+    }
+
+    dataArray = dataArray.filter((obj) => { return obj != null });
+
+    return dataArray;
+}
+
+function lineGenerator(d, rasterContext = null) {
+    const optionsStore = useOptionsStore();
+    const dataArray = createDataArray(d);
+
+    let d3CurveType = d3.curveMonotoneX;
+    if (optionsStore.curveType === 'curve') {
+        d3CurveType = d3.curveMonotoneX;
+    } else if (optionsStore.curveType === 'line') {
+        d3CurveType = d3.curveLinear;
+    }
+
+    let line = d3.line([])
+        .x((de) => {return de.x})
+        .y((de) => {return de.y})
+        .curve(d3CurveType);
+
+    if (rasterContext) {
+        // Used only for raster-based rendering
+        line.context(rasterContext);
+    }
+
+    return line(dataArray);
+}
+
+export {truncateDecimals, isNumeric, linspace, createDataArray, lineGenerator}
