@@ -88,10 +88,9 @@
         :fill-opacity="optionsStore.distributionFillOpacity"
         :fill="optionsStore.distributionFill"
         :stroke="optionsStore.distributionStroke"
-        :stroke-opacity="optionsStore.distributionStrokeOpacity"
-    />    
+        :stroke-opacity="optionsStore.distributionStrokeOpacity"  
+    />
 </g>
-
 </template>
 
 <script setup>
@@ -318,6 +317,7 @@ function getSelectedCategoryTitle () {
         stroke: darkblue;
     }
 }
+
 .distribution-box {
     pointer-events: none;
 }
