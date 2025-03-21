@@ -32,12 +32,21 @@
         </NumberInput>
 
         <NumberInput
-            v-model="distributionOpacity"
+            v-model="distributionFillOpacity"
             :min="0"
             :max="1"
             :step="0.05"
         >
-            Opacity:
+            Fill opacity:
+        </NumberInput>
+
+        <NumberInput
+            v-model="distributionStrokeOpacity"
+            :min="0"
+            :max="1"
+            :step="0.05"
+        >
+            Edge opacity:
         </NumberInput>
 
         <ColorInput v-model="distributionFill">
@@ -69,7 +78,7 @@ const dataStore = useDataStore();
 const optionsStore = useOptionsStore();
 
 const { distributionBucketCount } = storeToRefs(dataStore);
-const { distributionOpacity, distributionFill, distributionStroke } = storeToRefs(optionsStore);
+const { distributionFillOpacity, distributionStrokeOpacity, distributionFill, distributionStroke } = storeToRefs(optionsStore);
 
 // State
 const useFilters = ref(true);

@@ -33,7 +33,8 @@ export const useOptionsStore = defineStore('options', {
 
         // Distributions
         showDistributions: false,
-        distributionOpacity: 0.3,
+        distributionFillOpacity: 0.3,
+        distributionStrokeOpacity: 1,
         distributionFill: '#FF0000',
         distributionStroke: '#FFFFFF',
 
