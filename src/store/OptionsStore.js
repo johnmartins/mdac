@@ -33,10 +33,10 @@ export const useOptionsStore = defineStore('options', {
 
         // Distributions
         showDistributions: false,
-        distributionFillOpacity: 0.3,
+        distributionFillOpacity: 0.6,
         distributionStrokeOpacity: 1,
-        distributionFill: '#000000',
-        distributionStroke: '#FFFFFF',
+        distributionFill: '#FFFFFF',
+        distributionStroke: '#000000',
 
         // Misc
         showFilters: true,
