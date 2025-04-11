@@ -30,6 +30,7 @@ const stateStore = useStateStore();
 
 // Store refs
 const { plotYBounds, plotXBounds, resolution } = storeToRefs(PCPStore);
+const { includedDataOpacity, excludedDataOpacity, curveType, selectedColorCodeCategory, overrideColorCodeColumn } = storeToRefs(optionsStore);
 const {data} = storeToRefs(dataStore);
 
 // Layout references
@@ -37,6 +38,7 @@ const canvasContainer = ref(null);
 
 // Events
 const eventBus = inject('eventBus');
+
 eventBus.on('Layout.contentResize', resizeCanvas);
 eventBus.on('Router.TabChange', (viewName) => {
     if (viewName !== 'pcp') return;
@@ -60,18 +62,18 @@ onUnmounted(() => {
 
 watch([() => PCPStore.resolution, () => PCPStore.renderingType], () => {
     resizeCanvas();
-})
+});
 
-watch([() => data.value.filter(dp => !dataStore.dataPointFilterCheck(dp), 
-    optionsStore.includedDataOpacity, 
-    optionsStore.excludedDataOpacity, 
-    optionsStore.curveType,
-    optionsStore.selectedColorCodeCategory,
-    optionsStore.overrideColorCodeColumn)], () => {
+watch([includedDataOpacity, excludedDataOpacity, curveType,selectedColorCodeCategory, overrideColorCodeColumn], () => {
     restartRedrawCountdown();
-})
+});
 
 watch(() => dataStore.enabledCategoriesCount, () => {
+    restartRedrawCountdown();
+});
+
+eventBus.on('filterUpdate', () => {
+    console.log("filter update!");
     restartRedrawCountdown();
 })
 

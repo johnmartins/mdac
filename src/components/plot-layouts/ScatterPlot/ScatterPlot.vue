@@ -215,42 +215,43 @@ function dragFilterStart (evt) {
 }
 
 function dragFilterEnd (evt) {
-    const filterTolerance = 200 // ms
+    const filterTolerance = 200; // ms
 
     // Ensure that filters are created intentionally
     if (!filterVariables.mousedown || (Date.now() - filterVariables.startTime) < filterTolerance) {
         dragFilterReset();
-        return
+        return;
     } 
     
     // Then, delete all existing filters
-    dataStore.clearFilters()
+    dataStore.clearFilters();
 
     // Categories
-    const cx = dataStore.getCategoryWithName(selectedPlot.value.xAxisCategoryName)
-    const cy = dataStore.getCategoryWithName(selectedPlot.value.yAxisCategoryName)
+    const cx = dataStore.getCategoryWithName(selectedPlot.value.xAxisCategoryName);
+    const cy = dataStore.getCategoryWithName(selectedPlot.value.yAxisCategoryName);
 
     // Proto filter coordinates
-    const x1 = filterVariables.startValue.x - scatterStore.paddingLeft
-    const x2 = filterVariables.endValue.x - scatterStore.paddingLeft
-    let x1Ratio = 1-(x1 / scatterStore.xAxisLength)
-    let x2Ratio = 1-(x2 / scatterStore.xAxisLength)
-    const y1 = filterVariables.startValue.y - scatterStore.paddingTop
-    const y2 = filterVariables.endValue.y - scatterStore.paddingTop
-    let y1Ratio = (y1 / scatterStore.yAxisLength)
-    let y2Ratio = (y2 / scatterStore.yAxisLength)
+    const x1 = filterVariables.startValue.x - scatterStore.paddingLeft;
+    const x2 = filterVariables.endValue.x - scatterStore.paddingLeft;
+    let x1Ratio = 1-(x1 / scatterStore.xAxisLength);
+    let x2Ratio = 1-(x2 / scatterStore.xAxisLength);
+    const y1 = filterVariables.startValue.y - scatterStore.paddingTop;
+    const y2 = filterVariables.endValue.y - scatterStore.paddingTop;
+    let y1Ratio = (y1 / scatterStore.yAxisLength);
+    let y2Ratio = (y2 / scatterStore.yAxisLength);
 
-    createFilter(cx, x1Ratio, x2Ratio)
-    createFilter(cy, y1Ratio, y2Ratio)
+    createFilter(cx, x1Ratio, x2Ratio);
+    createFilter(cy, y1Ratio, y2Ratio);
 
-    dragFilterReset()
+    dragFilterReset();
 }
 
 function createFilter (category, axisRatio1, axisRatio2) {
-    dataStore.addFilter(category.usesCategoricalData ? 
+    const f = dataStore.addFilter(category.usesCategoricalData ? 
         CategoricFilter.createFromRatios(category, axisRatio1, axisRatio2) : 
         SingleRangeFilter.createFromRatios(category, axisRatio1, axisRatio2)
-    )
+    );
+    eventBus.emit('filterUpdate', f);
 }
 
 function dragFilter (evt) {

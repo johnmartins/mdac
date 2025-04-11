@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, inject } from 'vue';
 import { storeToRefs } from "pinia";
 
 import Category from '@/models/plots/Category';
@@ -45,6 +45,7 @@ const stateStore = useStateStore();
 const { axisLength } = storeToRefs(PCPStore);
 const { ctrl } = storeToRefs(stateStore);
 const emit = defineEmits(['onInteraction', 'onMouseEnter', 'onMouseLeave']);
+const eventBus = inject('eventBus');
 
 const props = defineProps({
     category: Object,
@@ -115,6 +116,7 @@ function moveFilterBot () {
 
 function onClickCtrl () {
     dataStore.deleteFilter(props.filter);
+    eventBus.emit('filterUpdate', props.filter);
 }
 
 function onMouseEnter (evt) {
