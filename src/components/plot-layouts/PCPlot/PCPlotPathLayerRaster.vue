@@ -73,7 +73,9 @@ watch(() => dataStore.enabledCategoriesCount, () => {
 });
 
 eventBus.on('filterUpdate', () => {
-    console.log("filter update!");
+    restartRedrawCountdown();
+});
+eventBus.on('SourceForm.readData', () => {
     restartRedrawCountdown();
 })
 
@@ -90,7 +92,7 @@ function restartRedrawCountdown () {
     if (stateStore.activeView !== 'pcp') return;
     if (!canvasContainer.value) return;
 
-    let refreshDelay = 250;
+    let refreshDelay = 125;
 
     if (redrawTimerID) {
         clearTimeout(redrawTimerID);

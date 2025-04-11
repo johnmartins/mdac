@@ -58,6 +58,8 @@ import Category from '@/models/plots/Category';
 const dataStore = useDataStore();
 const eventBus = inject('eventBus');
 
+let updateTimeout = null;
+
 const props = defineProps({
     filterID: Number
 });
@@ -85,7 +87,11 @@ function deleteFilter () {
 }
 
 function onFilterThresholdChange (f) {
-    eventBus.emit('filterUpdate', f);
+    if (updateTimeout) clearTimeout(updateTimeout);
+    updateTimeout = setTimeout(() => {
+        eventBus.emit('filterUpdate', f);
+    }, 150);
+    
 }
 
 </script>

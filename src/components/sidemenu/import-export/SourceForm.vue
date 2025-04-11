@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-import { ref, inject } from "vue"
+import { ref, inject, nextTick } from "vue"
 import { storeToRefs } from "pinia"
 import * as d3 from "d3"
 
@@ -103,7 +103,7 @@ async function readFile () {
     stateStore.importedFileName = file.name;
     reader.readAsText(new Blob([file], {"type": file.type}));	
     reader.onloadend = async (res) => {
-        parseCSV(res);
+        await parseCSV(res);
         await stateStore.clearLoading();
     } 
 }
@@ -128,17 +128,17 @@ function _parseStringValue (value, col, categoricalDataMap) {
     categoricalDataMap.get(col).add(value)
 }
 
-function parseCSV (fileReaderRes) {
+async function parseCSV (fileReaderRes) {
     // Parse form data
-    let delimiter = fileDelimiterSelect.value.value
+    let delimiter = fileDelimiterSelect.value.value;
     if (delimiter === "\\t") delimiter = "\t";
 
     // If auto delimit detection, parse and return likely delimiter
-    if (delimiter === "auto") delimiter = detectDelimiter(fileReaderRes.target.result)
+    if (delimiter === "auto") delimiter = detectDelimiter(fileReaderRes.target.result);
 
     // Parse CSV based on selected delimiter
-    const dataFormat = d3.dsvFormat(delimiter)
-    let csvData = dataFormat.parse(fileReaderRes.target.result)
+    const dataFormat = d3.dsvFormat(delimiter);
+    let csvData = dataFormat.parse(fileReaderRes.target.result);
 
     // Allocate variables for CSV data parsing
     const dataToPlot = []
@@ -210,18 +210,15 @@ function parseCSV (fileReaderRes) {
             console.warn(`Ignored column ${col}. Unknown column type (numeric or categoric?).`)
             continue
         }
-		
     }
 	
     // Update the PCP to use an appropriate resolution
-    pcpStore.detectAppropriateGraphicsSettings(csvData.length) 
+    pcpStore.detectAppropriateGraphicsSettings(csvData.length);
 
     // Commit the extracted data to the data store. This triggers the visualization.
-    setTimeout(() => {
-        dataStore.setData(dataToPlot)
-        eventBus.emit('SourceForm.readData', data.value)
-    }, 200)
-	
+    dataStore.setData(dataToPlot);
+    eventBus.emit('SourceForm.readData', data.value);
+    await nextTick();
 } 
 
 </script>
