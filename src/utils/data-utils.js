@@ -79,7 +79,8 @@ function lineGenerator(d, rasterContext = null) {
     let line = d3.line([])
         .x((de) => {return de.x})
         .y((de) => {return de.y})
-        .curve(d3CurveType);
+        .curve(d3CurveType)
+        .digits(0);
 
     if (rasterContext) {
         // Used only for raster-based rendering

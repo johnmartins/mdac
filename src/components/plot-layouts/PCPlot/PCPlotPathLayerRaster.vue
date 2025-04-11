@@ -143,19 +143,19 @@ async function draw () {
 }
 
 function renderLine (d, color, opacity) {
-    ctx.beginPath();
     lineGenerator(d, ctx);
     ctx.lineWidth = 1;
     ctx.globalAlpha = opacity;
-    ctx.strokeStyle = color;
-    ctx.stroke();        
+    ctx.strokeStyle = color;   
 }
 
 async function batchRender (dataArray, opacity, overrideColor = null) {
     let chunkSize = dataArray.length / 20;
     for (let i = 0; i < dataArray.length; i += chunkSize) {
         let chunk = dataArray.slice(i, i + chunkSize);
+        ctx.beginPath();
         chunk.map(d => renderLine(d, overrideColor ? overrideColor : getLineColor(d), opacity));
+        ctx.stroke();  
         // Pause until next chunk 
         await new Promise(resolve => setTimeout(resolve, 0));
     }
@@ -168,6 +168,8 @@ async function resizeCanvas () {
 
     await nextTick();
 
+    // TODO: consider css transform scaling 
+    // https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas#scaling_canvas_using_css_transforms
     const w = canvasContainer.value.offsetWidth;
     const h = canvasContainer.value.offsetHeight;
     pathCanvas.width = w * resolution.value;
