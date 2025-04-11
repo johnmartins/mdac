@@ -153,10 +153,15 @@ eventBus.on('RedrawCategoricalFilters', recreateCategoricFilters);
 
 // Listeners
 watch(() => filterIDMap.value.size, () => {
-    // This is a bit wasteful. Use reduce instead to get both in one loop?
-    dataIncluded.value = data.value.filter(de => dataStore.dataPointFilterCheck(de))
-    dataExcluded.value = data.value.filter(de => !dataStore.dataPointFilterCheck(de))
-})
+    data.value.forEach(de => {
+        const included = dataStore.dataPointFilterCheck(de);
+        if (included) {
+            dataIncluded.value.push(de);
+        } else {
+            dataExcluded.value.push(de);
+        }
+    });
+});
 
 watch([categories, plotXBounds, () => dataStore.enabledCategoriesCount], () => {
     if (dataStore.enabledCategoriesCount < 2) return 50;
