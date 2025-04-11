@@ -7,6 +7,7 @@
                     v-model="filter.thresholdA" 
                     type="number"
                     :step="componentParameters.stepSize"
+                    @change="onFilterThresholdChange(filter)"
                 >
             </div>
             <div>
@@ -23,6 +24,7 @@
                     v-model="filter.thresholdB" 
                     type="number"
                     :step="componentParameters.stepSize"
+                    @change="onFilterThresholdChange(filter)"
                 >
             </div>
         </div>
@@ -48,36 +50,48 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from "vue"
+import { ref, onMounted, reactive, inject } from "vue";
 
-import {useDataStore} from "@/store/DataStore"
-import Category from '@/models/plots/Category'
+import {useDataStore} from "@/store/DataStore";
+import Category from '@/models/plots/Category';
 
-const dataStore = useDataStore()
+const dataStore = useDataStore();
+const eventBus = inject('eventBus');
+
+let updateTimeout = null;
 
 const props = defineProps({
     filterID: Number
-})
+});
 
-const filter = ref(null)
-const targetCategory = ref(null)
+const filter = ref(null);
+const targetCategory = ref(null);
 
 const componentParameters = reactive({
     stepSize: 0,
-})
+});
 
 onMounted( () => {
-    const filterID = parseInt(props.filterID)
-    const f = dataStore.getFilterByID(filterID)
-    filter.value = f
+    const filterID = parseInt(props.filterID);
+    const f = dataStore.getFilterByID(filterID);
+    filter.value = f;
 
-    targetCategory.value = Category.lookup(filter.value.columnID)
-    componentParameters.stepSize = Math.pow(10, Math.floor(Math.log10(filter.value.thresholdA)))/100
+    targetCategory.value = Category.lookup(filter.value.columnID);
+    componentParameters.stepSize = Math.pow(10, Math.floor(Math.log10(filter.value.thresholdA)))/100;
 })
 
 function deleteFilter () {
-    const f = filter.value
-    dataStore.deleteFilter(f)
+    const f = filter.value;
+    dataStore.deleteFilter(f);
+    eventBus.emit('filterUpdate', f);
+}
+
+function onFilterThresholdChange (f) {
+    if (updateTimeout) clearTimeout(updateTimeout);
+    updateTimeout = setTimeout(() => {
+        eventBus.emit('filterUpdate', f);
+    }, 150);
+    
 }
 
 </script>

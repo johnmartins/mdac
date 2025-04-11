@@ -153,10 +153,15 @@ eventBus.on('RedrawCategoricalFilters', recreateCategoricFilters);
 
 // Listeners
 watch(() => filterIDMap.value.size, () => {
-    // This is a bit wasteful. Use reduce instead to get both in one loop?
-    dataIncluded.value = data.value.filter(de => dataStore.dataPointFilterCheck(de))
-    dataExcluded.value = data.value.filter(de => !dataStore.dataPointFilterCheck(de))
-})
+    data.value.forEach(de => {
+        const included = dataStore.dataPointFilterCheck(de);
+        if (included) {
+            dataIncluded.value.push(de);
+        } else {
+            dataExcluded.value.push(de);
+        }
+    });
+});
 
 watch([categories, plotXBounds, () => dataStore.enabledCategoriesCount], () => {
     if (dataStore.enabledCategoriesCount < 2) return 50;
@@ -226,78 +231,85 @@ function grabFilterBlock (evt) {
 }
 
 function dragFilterBox (evt) {
-    const loc = getTrueEventCoordinates(evt, plotCanvas.value)
-    if (!mousedown.value) return
-    currentFilterEndValue.value = loc.y
-    currentFilterDeltaTime.value = Date.now() - currentFilterStartTime.value
+    const loc = getTrueEventCoordinates(evt, plotCanvas.value);
+    if (!mousedown.value) return;
+    currentFilterEndValue.value = loc.y;
+    currentFilterDeltaTime.value = Date.now() - currentFilterStartTime.value;
 }
 
 function triggerClickCooldown () {
     // This method prevents the end of filter mousedrags to be perceived as clicks
     clickOnCooldown.value = true;
     setTimeout(() => {
-        clickOnCooldown.value = false
+        clickOnCooldown.value = false;
     }, 250);
 }
 
 function dragFilterDone () {
-    let ignoreRequest = false
-    if (!mousedown.value) ignoreRequest = true
-    if (currentFilterDeltaTime.value < 100) ignoreRequest = true	
+    let ignoreRequest = false;
+    if (!mousedown.value) ignoreRequest = true;
+    if (currentFilterDeltaTime.value < 100) ignoreRequest = true;	
 
     if (ignoreRequest) {
         // This filter was likely unintentional.
-        resetFilterDrag()
+        resetFilterDrag();
         return
     } else {
         // This filter was likely intentional. Prevent follow up click
-        triggerClickCooldown()
+        triggerClickCooldown();
     }
 
-    if (Date.now() - currentFilterStartTime.value < filterMinDragTime) return
+    if (Date.now() - currentFilterStartTime.value < filterMinDragTime) return;
 
     // Calculate domain extent
-    const c = currentFilterCategory.value
-    const y1 = currentFilterStartValue.value - plotTopPadding.value
-    const y2 = currentFilterEndValue.value - plotTopPadding.value
-    let y1Ratio = (y1 / getAxisLength())
-    let y2Ratio = (y2 / getAxisLength())
+    const c = currentFilterCategory.value;
+    const y1 = currentFilterStartValue.value - plotTopPadding.value;
+    const y2 = currentFilterEndValue.value - plotTopPadding.value;
+    let y1Ratio = (y1 / getAxisLength());
+    let y2Ratio = (y2 / getAxisLength());
 
     // Check if completely out of bounds
     if ((y1Ratio > 1 || y1Ratio < 0) && (y2Ratio > 1 || y2Ratio < 0) ) {
-        console.warn('Filter out of bounds. Ignoring.')
-        resetFilterDrag()
-        return
+        console.warn('Filter out of bounds. Ignoring.');
+        resetFilterDrag();
+        return;
     }
 
     // Limit ratio to be within bounds
-    if (y1Ratio > 1) y1Ratio = 1.01
-    if (y1Ratio < 0) y1Ratio = -0.01
-    if (y2Ratio > 1) y2Ratio = 1.01
-    if (y2Ratio < 0) y2Ratio = -0.01
+    if (y1Ratio > 1) y1Ratio = 1.01;
+    if (y1Ratio < 0) y1Ratio = -0.01;
+    if (y2Ratio > 1) y2Ratio = 1.01;
+    if (y2Ratio < 0) y2Ratio = -0.01;
 	
     // Check that the range is large enough to be tangible
     const minRange = 0.001
     if (Math.abs(y1Ratio - y2Ratio) < minRange) {
-        resetFilterDrag()
-        return
+        resetFilterDrag();
+        return;
     }
 
+    let f = null;
+
     if (c.usesCategoricalData) {
-        const f = CategoricFilter.createFromRatios(c, y1Ratio, y2Ratio)
-        dataStore.addFilter(f)
+        f = CategoricFilter.createFromRatios(c, y1Ratio, y2Ratio);
+        dataStore.addFilter(f);
     } else {
-        const f = SingleRangeFilter.createFromRatios(c, y1Ratio, y2Ratio)
-        dataStore.addFilter(f)
+        f = SingleRangeFilter.createFromRatios(c, y1Ratio, y2Ratio);
+        dataStore.addFilter(f);
+    }
+
+    if (f === null) {
+        throw new Error('Filter creation failed.');
     }
 
     // If this new filter is replacing an existing filter, then delete the original copy.
     if (filterToRemove.value) {
-        dataStore.deleteFilter(filterToRemove.value)
+        dataStore.deleteFilter(filterToRemove.value);
     }
 
-    resetFilterDrag()
+    resetFilterDrag();
     eventBus.emit('PCPlot.dragFilterDone');
+    eventBus.emit('filterUpdate', f);
 }
 
 function recreateCategoricFilters (c) {

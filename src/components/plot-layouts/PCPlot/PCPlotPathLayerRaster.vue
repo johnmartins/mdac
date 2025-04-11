@@ -30,6 +30,7 @@ const stateStore = useStateStore();
 
 // Store refs
 const { plotYBounds, plotXBounds, resolution } = storeToRefs(PCPStore);
+const { includedDataOpacity, excludedDataOpacity, curveType, selectedColorCodeCategory, overrideColorCodeColumn } = storeToRefs(optionsStore);
 const {data} = storeToRefs(dataStore);
 
 // Layout references
@@ -37,6 +38,7 @@ const canvasContainer = ref(null);
 
 // Events
 const eventBus = inject('eventBus');
+
 eventBus.on('Layout.contentResize', resizeCanvas);
 eventBus.on('Router.TabChange', (viewName) => {
     if (viewName !== 'pcp') return;
@@ -60,18 +62,20 @@ onUnmounted(() => {
 
 watch([() => PCPStore.resolution, () => PCPStore.renderingType], () => {
     resizeCanvas();
-})
+});
 
-watch([() => data.value.filter(dp => !dataStore.dataPointFilterCheck(dp), 
-    optionsStore.includedDataOpacity, 
-    optionsStore.excludedDataOpacity, 
-    optionsStore.curveType,
-    optionsStore.selectedColorCodeCategory,
-    optionsStore.overrideColorCodeColumn)], () => {
+watch([includedDataOpacity, excludedDataOpacity, curveType,selectedColorCodeCategory, overrideColorCodeColumn], () => {
     restartRedrawCountdown();
-})
+});
 
 watch(() => dataStore.enabledCategoriesCount, () => {
+    restartRedrawCountdown();
+});
+
+eventBus.on('filterUpdate', () => {
+    restartRedrawCountdown();
+});
+eventBus.on('SourceForm.readData', () => {
     restartRedrawCountdown();
 })
 
@@ -88,7 +92,7 @@ function restartRedrawCountdown () {
     if (stateStore.activeView !== 'pcp') return;
     if (!canvasContainer.value) return;
 
-    let refreshDelay = 250;
+    let refreshDelay = 125;
 
     if (redrawTimerID) {
         clearTimeout(redrawTimerID);
@@ -126,8 +130,10 @@ async function draw () {
         }   
     }
 
+    console.time('batch-render');
     if (!optionsStore.hideExcluded) await batchRender(excludedDataArray, optionsStore.excludedDataOpacity, '#bfbfbf');
     await batchRender(includedDataArray, optionsStore.includedDataOpacity);
+    console.timeEnd('batch-render');
 
     const t_draw_end = performance.now();
     console.debug(`Draw time: ${(t_draw_end - t_draw_start)/1000} [s]`);
@@ -137,29 +143,22 @@ async function draw () {
 }
 
 function renderLine (d, color, opacity) {
-    ctx.beginPath();
     lineGenerator(d, ctx);
     ctx.lineWidth = 1;
     ctx.globalAlpha = opacity;
-    ctx.strokeStyle = color;
-    ctx.stroke();        
+    ctx.strokeStyle = color;   
 }
 
 async function batchRender (dataArray, opacity, overrideColor = null) {
-    let dataArrayLength = dataArray.length;
-    let chunkSize = dataArrayLength / getChunkCount(dataArrayLength);
-    for (let i = 0; i < dataArrayLength; i += chunkSize) {
+    let chunkSize = dataArray.length / 20;
+    for (let i = 0; i < dataArray.length; i += chunkSize) {
         let chunk = dataArray.slice(i, i + chunkSize);
-        await Promise.all(chunk.map(d => renderLine(d, overrideColor ? overrideColor : getLineColor(d), opacity)));
-
+        ctx.beginPath();
+        chunk.map(d => renderLine(d, overrideColor ? overrideColor : getLineColor(d), opacity));
+        ctx.stroke();  
         // Pause until next chunk 
         await new Promise(resolve => setTimeout(resolve, 0));
     }
-}
-
-function getChunkCount (dataArrayLength) {
-    let count = parseInt(Math.max(10,Math.min(50, dataArrayLength/250)));
-    return count;
 }
 
 async function resizeCanvas () {
@@ -169,6 +168,8 @@ async function resizeCanvas () {
 
     await nextTick();
 
+    // TODO: consider css transform scaling 
+    // https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas#scaling_canvas_using_css_transforms
     const w = canvasContainer.value.offsetWidth;
     const h = canvasContainer.value.offsetHeight;
     pathCanvas.width = w * resolution.value;

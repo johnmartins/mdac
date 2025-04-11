@@ -87,6 +87,8 @@ export const useDataStore = defineStore('data', {
 
             // Queue rerenders
             stateStore.reRenderMvGrid = true;
+
+            return f;
         },
         getFilterByID (id) {
             return this.filterIDMap.get(id)
@@ -113,28 +115,6 @@ export const useDataStore = defineStore('data', {
                 delete this.filters[filterToDelete.columnID]
             }
             this.filterIDMap.delete(filterToDelete.id)
-
-            // Queue rerenders
-            stateStore.reRenderMvGrid = true;
-        },
-        editFilter (oldFilter, newFilter) {
-            const stateStore = useStateStore();
-
-            let changeIndex = -1
-            for (let i = 0; i < this.filters[oldFilter.columnID].length; i++) {
-                const f = this.filters[oldFilter.columnID][i]
-        
-                if (f.id == oldFilter.id) {
-                    changeIndex = i
-                    break
-                }
-            }
-        
-            if (changeIndex >= 0) {
-                const f = this.filters[oldFilter.columnID][changeIndex]
-                f.thresholdA = newFilter.thresholdA
-                f.thresholdB = newFilter.thresholdB
-            }
 
             // Queue rerenders
             stateStore.reRenderMvGrid = true;
@@ -190,17 +170,17 @@ export const useDataStore = defineStore('data', {
              * Returns true if the data point passes the filter
              */
             for (let key of Object.keys(this.filters)) {
-                let passed = false
+                let passed = false;
                 // If there are no filters, then pass
-                if (this.filters[key].length === 0) passed = true        // TODO: Return true?
+                if (this.filters[key].length === 0) return true;
                 for (let filter of this.filters[key]) {
                     if (filter.filter(dataPoint[key])) {
-                        passed = true
+                        passed = true;
                     } 
                 }
-                if (!passed) return false
+                if (!passed) return false;
             }
-            return true
+            return true;
         },
         getArrayFromDataPoint (d, cols, {normalize = false} = {}) {
             if (!normalize) {
