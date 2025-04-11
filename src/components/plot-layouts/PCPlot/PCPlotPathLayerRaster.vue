@@ -130,8 +130,10 @@ async function draw () {
         }   
     }
 
+    console.time('batch-render');
     if (!optionsStore.hideExcluded) await batchRender(excludedDataArray, optionsStore.excludedDataOpacity, '#bfbfbf');
     await batchRender(includedDataArray, optionsStore.includedDataOpacity);
+    console.timeEnd('batch-render');
 
     const t_draw_end = performance.now();
     console.debug(`Draw time: ${(t_draw_end - t_draw_start)/1000} [s]`);
@@ -150,20 +152,13 @@ function renderLine (d, color, opacity) {
 }
 
 async function batchRender (dataArray, opacity, overrideColor = null) {
-    let dataArrayLength = dataArray.length;
-    let chunkSize = dataArrayLength / getChunkCount(dataArrayLength);
-    for (let i = 0; i < dataArrayLength; i += chunkSize) {
+    let chunkSize = dataArray.length / 20;
+    for (let i = 0; i < dataArray.length; i += chunkSize) {
         let chunk = dataArray.slice(i, i + chunkSize);
-        await Promise.all(chunk.map(d => renderLine(d, overrideColor ? overrideColor : getLineColor(d), opacity)));
-
+        chunk.map(d => renderLine(d, overrideColor ? overrideColor : getLineColor(d), opacity));
         // Pause until next chunk 
         await new Promise(resolve => setTimeout(resolve, 0));
     }
-}
-
-function getChunkCount (dataArrayLength) {
-    let count = parseInt(Math.max(10,Math.min(50, dataArrayLength/250)));
-    return count;
 }
 
 async function resizeCanvas () {
