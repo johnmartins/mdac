@@ -105,7 +105,7 @@ function flipCategory () {
     if (editedCategory.value.usesCategoricalData) {
         eventBus.emit('RedrawCategoricalFilters', selectedCategory.value);
     }
-    
+    eventBus.emit('flipCategory');
 }
 
 function editCategory () {

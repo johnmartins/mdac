@@ -73,7 +73,6 @@
         :fill="optionsStore.distributionFill"
         :stroke="optionsStore.distributionStroke"
         :stroke-opacity="optionsStore.distributionStrokeOpacity"
-
     />
 </g>
 <g v-else-if="c.usesCategoricalData && optionsStore.showDistributions && dataStore.distributionMap[c.title]">
@@ -193,6 +192,7 @@ function flipAxis (c) {
     }
 
     requestRasterRedraw();
+    eventBus.emit('flipCategory');
 }
 
 function onFilterInteraction (evt) {
