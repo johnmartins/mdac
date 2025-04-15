@@ -86,12 +86,18 @@ let redrawTimeout = null;
 
 // Listeners
 const eventBus = inject('eventBus');
+
 // Checks if filters are being edited in the PCP plot
 eventBus.on('PCPlot.dragFilterDone', () => {
     if (useFilters.value === true) {
         onChange();
     }
 });
+
+eventBus.on('flipCategory', () => {
+    onChange();
+});
+
 // Checks if new filters are being added, even in the scatter plot
 watch(() => dataStore.filterIDMap.size, () => {
     if (useFilters.value === true) {
@@ -130,7 +136,9 @@ async function runAnalysis () {
 
     for (const dp of data) {
         for (const c of dataStore.categories) {
+
             let bucketIndex;
+
             if (!c.usesCategoricalData){
                 bucketIndex = calculateContinuousDataBucket(dp, c, buckets);
             } else {
@@ -139,6 +147,13 @@ async function runAnalysis () {
             
             // Update stored distribution map used for visualization
             dataStore.distributionMap[c.title][bucketIndex]++;
+        }
+    }
+
+    for (const c of dataStore.categories) {
+        if (c.flipped === true) {
+            // Flip the distribution map for the y-axis
+            dataStore.distributionMap[c.title].reverse();
         }
     }
 
