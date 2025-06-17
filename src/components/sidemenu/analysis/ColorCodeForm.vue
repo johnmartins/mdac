@@ -22,7 +22,14 @@
                 Use similarity color coding
             </CheckboxInput>
 
+            <div class="d-grid">
+                <button class="small" @click="stateStore.showColorSettingsWindow = !stateStore.showColorSettingsWindow">
+                    Edit colors
+                </button>
+            </div> 
+            
             <strong>Color code legend</strong>
+                      
             
             <CheckboxInput 
                 v-model="showColorCodeLegend"
@@ -76,9 +83,11 @@ import {useOptionsStore} from "@/store/OptionsStore";
 import {useDataStore} from "@/store/DataStore";
 import CheckboxInput from "@/components/inputs/CheckboxInput.vue";
 import NumberInput from "@/components/inputs/NumberInput.vue";
+import { useStateStore } from "@/store/StateStore";
 
 const optionsStore = useOptionsStore();
 const dataStore = useDataStore();
+const stateStore = useStateStore();
 
 const {selectedColorCodeCategory, useSimilarityColorCoding, showColorCodeLegend} = storeToRefs(optionsStore);
 const {categories} = storeToRefs(dataStore);

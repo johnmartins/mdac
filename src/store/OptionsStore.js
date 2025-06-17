@@ -23,6 +23,8 @@ export const useOptionsStore = defineStore('options', {
         rangeIndicatorTickSize: 0.8,
         rangeIndicatorVerticalOffset: 0,
         rangeIndicatorHorizontalOffset: 20,
+        colorRangeContinuous: ["#0000FF", "#00FF00", "#FFFF00", "#FF0000"],
+        colorRangeCategorical: d3.schemeCategory10.slice(),
 
         // PCP lines
         showPcpLines: true,
@@ -98,13 +100,13 @@ export const useOptionsStore = defineStore('options', {
 
             if (!this.selectedColorCodeCategory.usesCategoricalData) {
                 const domain = [parseFloat(this.selectedColorCodeCategory.lb), parseFloat(this.selectedColorCodeCategory.ub)];
-                const interpolator = d3.interpolateRgbBasis(["blue", "green", "yellow", "red"]);
+                const interpolator = d3.interpolateRgbBasis(this.colorRangeContinuous);
                 let col = d3.scaleSequential().domain(domain).interpolator(interpolator)(parseFloat(value));
                 return col;
             } else {
                 return d3.scaleOrdinal()
                     .domain(this.selectedColorCodeCategory.availableCategoricalValues)
-                    .range(d3.schemeCategory10)(value);
+                    .range(this.colorRangeCategorical)(value);
             }
         },
         resetColorCodeOverride () {
