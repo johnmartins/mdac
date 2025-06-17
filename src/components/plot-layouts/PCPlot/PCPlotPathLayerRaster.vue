@@ -143,19 +143,19 @@ async function draw () {
 }
 
 function renderLine (d, color, opacity) {
-    lineGenerator(d, ctx);
+    ctx.beginPath();
     ctx.lineWidth = 1;
     ctx.globalAlpha = opacity;
     ctx.strokeStyle = color;   
+    lineGenerator(d, ctx);
+    ctx.stroke(); 
 }
 
 async function batchRender (dataArray, opacity, overrideColor = null) {
     let chunkSize = dataArray.length / 20;
     for (let i = 0; i < dataArray.length; i += chunkSize) {
         let chunk = dataArray.slice(i, i + chunkSize);
-        ctx.beginPath();
         chunk.map(d => renderLine(d, overrideColor ? overrideColor : getLineColor(d), opacity));
-        ctx.stroke();  
         // Pause until next chunk 
         await new Promise(resolve => setTimeout(resolve, 0));
     }

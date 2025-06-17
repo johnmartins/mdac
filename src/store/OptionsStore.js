@@ -78,32 +78,33 @@ export const useOptionsStore = defineStore('options', {
         },
         setExcludedDataOpacity (opacity) {
             if (opacity < 0.001) {
-                this.hideExcluded = true
+                this.hideExcluded = true;
             } else {
-                this.hideExcluded = false
+                this.hideExcluded = false;
             }
 
             this.excludedDataOpacity = opacity
         },
         getSampleColor (d) {
             if (this.overrideColorCodeColumn) {
-                return this.getSampleColorWithValue(d[this.overrideColorCodeColumn])
+                return this.getSampleColorWithValue(d[this.overrideColorCodeColumn]);
             } 
-            if (!this.selectedColorCodeCategory) return 'black'
-            return this.getSampleColorWithValue(d[this.selectedColorCodeCategory.title])
+            if (!this.selectedColorCodeCategory) return 'black';
+            return this.getSampleColorWithValue(d[this.selectedColorCodeCategory.title]);
         },
         getSampleColorWithValue (value) {
-            if (this.overrideColorCodeFunction) return this.overrideColorCodeFunction(value)
-            if (!this.selectedColorCodeCategory) return () => 'black'
+            if (this.overrideColorCodeFunction) return this.overrideColorCodeFunction(value);
+            if (!this.selectedColorCodeCategory) return () => 'black';
 
             if (!this.selectedColorCodeCategory.usesCategoricalData) {
-                return d3.scaleSequential()
-                    .domain([this.selectedColorCodeCategory.lb, this.selectedColorCodeCategory.ub])
-                    .interpolator(d3.interpolateRgbBasis(["blue", "green", "yellow", "red"]))(value)
+                const domain = [parseFloat(this.selectedColorCodeCategory.lb), parseFloat(this.selectedColorCodeCategory.ub)];
+                const interpolator = d3.interpolateRgbBasis(["blue", "green", "yellow", "red"]);
+                let col = d3.scaleSequential().domain(domain).interpolator(interpolator)(parseFloat(value));
+                return col;
             } else {
                 return d3.scaleOrdinal()
                     .domain(this.selectedColorCodeCategory.availableCategoricalValues)
-                    .range(d3.schemeCategory10)(value)
+                    .range(d3.schemeCategory10)(value);
             }
         },
         resetColorCodeOverride () {
