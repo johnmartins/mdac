@@ -127,17 +127,17 @@ import { ref, reactive, inject, computed } from "vue"
 import { storeToRefs } from "pinia"
 import { saveSvgAsPng } from "save-svg-as-png"
 
-import {useStateStore} from "@/store/StateStore"
-import {useDataStore} from "@/store/DataStore"
-import {useScatterStore} from "@/store/ScatterStore"
-import {useOptionsStore} from "@/store/OptionsStore"
-import SingleRangeFilter from "@/models/filters/SingleRangeFilter"
-import {getTrueEventCoordinates} from "@/utils/svg-utils"
-import CategoricFilter from "@/models/filters/CategoricFilter"
+import {useStateStore} from "@/store/StateStore.js"
+import {useDataStore} from "@/store/DataStore.js"
+import {useScatterStore} from "@/store/ScatterStore.js"
+import {useOptionsStore} from "@/store/OptionsStore.js"
+import SingleRangeFilter from "@/models/filters/SingleRangeFilter.js"
+import {getTrueEventCoordinates} from "@/utils/svg-utils.js"
+import CategoricFilter from "@/models/filters/CategoricFilter.js"
 
 // Components
 import ScatterPlotPointLayer from "./ScatterPlotPointLayer.vue"
-import RangeIndicator from "@/components/plot-features/RangeIndicator"
+import RangeIndicator from "@/components/plot-features/RangeIndicator.vue"
 
 const dataStore = useDataStore()
 const scatterStore = useScatterStore()

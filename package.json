@@ -8,10 +8,11 @@
     "url": "https://github.com/johnmartins"
   },
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --mode production",
-    "build-sub": "vue-cli-service build --mode sub",
-    "lint": "vue-cli-service lint"
+    "dev": "vite",
+    "preview": "vite preview",
+    "serve": "vite",
+    "build": "vite build",
+    "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "6.x",
@@ -19,28 +20,22 @@
     "@fortawesome/free-regular-svg-icons": "6.x",
     "@fortawesome/free-solid-svg-icons": "6.x",
     "@fortawesome/vue-fontawesome": "3.x",
-    "@popperjs/core": "^2.11.8",
-    "bootstrap": "^5.3.3",
-    "core-js": "3.x",
+    "@popperjs/core": "2.11.x",
+    "bootstrap": "5.3.x",
     "d3": "7.x",
     "file-saver": "2.x",
     "mitt": "3.x",
-    "pinia": "2.x",
+    "pinia": "3.0.x",
     "save-svg-as-png": "1.x",
-    "vue": "3.x",
-    "vue-router": "4.x"
+    "vue": "3.x"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.12.16",
-    "@vue/cli-plugin-babel": "5.x",
-    "@vue/cli-plugin-eslint": "~5.0.0",
-    "@vue/cli-plugin-router": "5.x",
-    "@vue/cli-service": "5.x",
+    "@vitejs/plugin-vue": "5.x",
     "@vue/compiler-sfc": "3.x",
-    "eslint-plugin-vue": "^8.0.3",
-    "sass": "1.x",
-    "sass-loader": "13.x",
-    "vue-cli-plugin-pinia": "0.x"
+    "eslint-plugin-vue": "8.x",
+    "sass": "^1.89.2",
+    "vite": "6.x",
+    "vite-plugin-vue-devtools": "^7.7.7"
   },
   "overrides": {
     "autoprefixer": "10.x",

@@ -24,12 +24,12 @@
 <script setup>
 import { storeToRefs } from "pinia";
 
-import { lineGenerator } from "@/utils/data-utils";
+import { lineGenerator } from "@/utils/data-utils.js";
 
 // Stores
-import { useDataStore } from "@/store/DataStore";
-import { usePCPStore } from "@/store/PCPStore";
-import { useOptionsStore } from "@/store/OptionsStore";
+import { useDataStore } from "@/store/DataStore.js";
+import { usePCPStore } from "@/store/PCPStore.js";
+import { useOptionsStore } from "@/store/OptionsStore.js";
 
 // Store references
 const dataStore = useDataStore();

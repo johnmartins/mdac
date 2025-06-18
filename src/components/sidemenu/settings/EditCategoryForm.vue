@@ -56,14 +56,14 @@ import { ref, watch, inject } from "vue";
 import { storeToRefs } from "pinia";
 
 // Stores
-import {useStateStore} from "@/store/StateStore";
+import {useStateStore} from "@/store/StateStore.js";
 
 // Components
-import TextInput from '@/components/inputs/TextInput';
-import SidebarSection from '@/components/layouts/SidebarSection';
+import TextInput from '@/components/inputs/TextInput.vue';
+import SidebarSection from '@/components/layouts/SidebarSection.vue';
     
 // Models
-import Category from '@/models/plots/Category';
+import Category from '@/models/plots/Category.js';
 
 // DOM
 const sidebarSection = ref(null);

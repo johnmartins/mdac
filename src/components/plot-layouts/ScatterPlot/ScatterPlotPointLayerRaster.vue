@@ -6,12 +6,14 @@
 </template>
 
 <script setup>
-import { useDataStore } from '@/store/DataStore';
-import { useOptionsStore } from '@/store/OptionsStore';
-import { useScatterStore } from '@/store/ScatterStore';
-import { useStateStore } from '@/store/StateStore';
 import { storeToRefs } from 'pinia';
-import { nextTick, onMounted, ref, inject, watch } from 'vue';
+
+import { useDataStore } from '@/store/DataStore.js';
+import { useOptionsStore } from '@/store/OptionsStore.js';
+import { useScatterStore } from '@/store/ScatterStore.js';
+import { useStateStore } from '@/store/StateStore.js';
+
+import { nextTick, onMounted, ref, inject } from 'vue';
 
 defineExpose({
     generateDataUrl,

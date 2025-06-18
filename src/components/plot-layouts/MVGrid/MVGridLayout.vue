@@ -54,17 +54,17 @@
 <script setup>
 
 import { nextTick, ref, watch, inject, reactive } from 'vue';
-import { useDataStore } from '@/store/DataStore';
-import { useStateStore } from '@/store/StateStore';
-import { useOptionsStore } from '@/store/OptionsStore';
-import { useScatterStore } from '@/store/ScatterStore';
 import { storeToRefs } from 'pinia';
-import Filter from '@/models/filters/Filter';
-
-import ScatterPlotPointLayerRaster from '../ScatterPlot/ScatterPlotPointLayerRaster.vue';
 
 // Models
-import ScatterPlotConfig from '@/models/plots/ScatterPlotConfig';
+import ScatterPlotConfig from '@/models/plots/ScatterPlotConfig.js';
+
+import { useDataStore } from '@/store/DataStore.js';
+import { useStateStore } from '@/store/StateStore.js';
+import { useOptionsStore } from '@/store/OptionsStore.js';
+import { useScatterStore } from '@/store/ScatterStore.js';
+
+import ScatterPlotPointLayerRaster from '../ScatterPlot/ScatterPlotPointLayerRaster.vue';
 
 // Stores
 const dataStore = useDataStore();
@@ -178,7 +178,8 @@ async function makePlot (cx, cy) {
 
 <style lang="scss" scoped>
 
-@import '@/scss/Colors.scss';
+@use 'sass:color';
+@use '@/scss/Colors.scss';
 
 .mv-grid-container {
     color: black;
@@ -215,12 +216,12 @@ async function makePlot (cx, cy) {
         }
 
         &.hovered-x {
-            background-color: transparentize($color-info, $amount: 0.2);
+            background-color: color.scale(Colors.$color-info, $alpha: -20%);
             color: white;
         }
 
         &.hovered-y {
-            background-color: transparentize($color-danger, $amount: 0.2);;
+            background-color: color.scale(Colors.$color-danger, $alpha: -20%);;
             color: white;
         }
     }

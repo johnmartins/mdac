@@ -1,6 +1,9 @@
 import { defineStore } from 'pinia';
-import Category from "@/models/plots/Category";
-import { useStateStore } from './StateStore';
+
+import Category from "@/models/plots/Category.js";
+
+import { useStateStore } from './StateStore.js';
+
 
 export const useDataStore = defineStore('data', {
     state: () => ({

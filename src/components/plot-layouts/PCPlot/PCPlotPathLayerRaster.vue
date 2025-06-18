@@ -10,13 +10,13 @@
 import { onMounted, ref, inject, watch, nextTick, onUnmounted } from "vue";
 import { storeToRefs } from "pinia";
 
-import { lineGenerator } from "@/utils/data-utils";
+import { lineGenerator } from "@/utils/data-utils.js";
 
 // Stores
-import { useDataStore } from "@/store/DataStore";
-import { usePCPStore } from "@/store/PCPStore";
-import { useOptionsStore } from "@/store/OptionsStore";
-import { useStateStore } from "@/store/StateStore";
+import { useDataStore } from "@/store/DataStore.js";
+import { usePCPStore } from "@/store/PCPStore.js";
+import { useOptionsStore } from "@/store/OptionsStore.js";
+import { useStateStore } from "@/store/StateStore.js";
 
 defineExpose({
     generateDataUrl

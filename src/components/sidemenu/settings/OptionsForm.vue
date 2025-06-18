@@ -78,12 +78,13 @@ import { reactive, ref, inject } from "vue"
 // Components
 import NumberInput from '@/components/inputs/NumberInput.vue';
 import SidebarSection from "@/components/layouts/SidebarSection.vue";
+import CheckboxInput from "@/components/inputs/CheckboxInput.vue";
 
 // Stores
-import {useOptionsStore} from "@/store/OptionsStore";
-import {usePCPStore} from "@/store/PCPStore";
-import {useStateStore} from "@/store/StateStore";
-import CheckboxInput from "@/components/inputs/CheckboxInput.vue";
+import {useOptionsStore} from "@/store/OptionsStore.js";
+import {usePCPStore} from "@/store/PCPStore.js";
+import {useStateStore} from "@/store/StateStore.js";
+
 
 // Store references
 const optionsStore = useOptionsStore();

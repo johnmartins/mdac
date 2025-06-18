@@ -1,4 +1,4 @@
-import Filter from '@/models/filters/Filter'
+import Filter from '@/models/filters/Filter.js'
 
 class SingleRangeFilter extends Filter {
 
