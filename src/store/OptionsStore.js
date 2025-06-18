@@ -77,6 +77,8 @@ export const useOptionsStore = defineStore('options', {
 
             this.showFilters = true;
             this.showDistributions = false;
+
+            this.resetRangeColors();
         },
         setExcludedDataOpacity (opacity) {
             if (opacity < 0.001) {
