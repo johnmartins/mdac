@@ -34,7 +34,7 @@
     background-color: $color-light;
 
     .side-menu-section-content {
-        padding: 8px;
+        padding: 8px 16px 8px 8px;
         transform: scaleY(1);
         transform-origin: top;
         transition: transform 0.25s ease, max-height 0.2s ease, padding 0.25s ease;
