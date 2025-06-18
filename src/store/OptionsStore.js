@@ -85,7 +85,7 @@ export const useOptionsStore = defineStore('options', {
                 this.hideExcluded = false;
             }
 
-            this.excludedDataOpacity = opacity
+            this.excludedDataOpacity = opacity;
         },
         getSampleColor (d) {
             if (this.overrideColorCodeColumn) {
@@ -110,34 +110,38 @@ export const useOptionsStore = defineStore('options', {
             }
         },
         resetColorCodeOverride () {
-            this.overrideColorCodeColumn = null
-            this.overrideColorCodeFunction = null
+            this.overrideColorCodeColumn = null;
+            this.overrideColorCodeFunction = null;
 
-            if (!this.selectedColorCodeCategory) return
+            if (!this.selectedColorCodeCategory) return;
 
-            this.colorCodeLowerBound = this.selectedColorCodeCategory.lb
-            this.colorCodeUpperBound = this.selectedColorCodeCategory.ub
+            this.colorCodeLowerBound = this.selectedColorCodeCategory.lb;
+            this.colorCodeUpperBound = this.selectedColorCodeCategory.ub;
 
             useStateStore().queueReRenders();
 
         },
         resetColorCoding () {
-            this.resetColorCodeOverride()
-            this.selectedColorCodeCategory = null,
-            this.colorCodeLowerBound = null
-            this.colorCodeUpperBound = null
+            this.resetColorCodeOverride();
+            this.selectedColorCodeCategory = null;
+            this.colorCodeLowerBound = null;
+            this.colorCodeUpperBound = null;
 
             useStateStore().queueReRenders();
 
         },
         getActiveColorCodeColumnTitle () {
-            if (this.overrideColorCodeColumn) return this.overrideColorCodeColumn
-            if (this.selectedColorCodeCategory) return this.selectedColorCodeCategory.title
+            if (this.overrideColorCodeColumn) return this.overrideColorCodeColumn;
+            if (this.selectedColorCodeCategory) return this.selectedColorCodeCategory.title;
             return null
         },
         getActiveColorCodeColumn () {
-            if (this.overrideColorCodeColumn) return this.overrideColorCodeColumn
-            if (this.selectedColorCodeCategory) return this.selectedColorCodeCategory
+            if (this.overrideColorCodeColumn) return this.overrideColorCodeColumn;
+            if (this.selectedColorCodeCategory) return this.selectedColorCodeCategory;
+        },
+        resetRangeColors () {
+            this.colorRangeContinuous = ["#0000FF", "#00FF00", "#FFFF00", "#FF0000"];
+            this.colorRangeCategorical = d3.schemeCategory10.slice();
         }
     },
 })

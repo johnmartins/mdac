@@ -18,7 +18,7 @@
                     <div><strong>Continuous data</strong></div>
                     <div v-for="(color, i) in optionsStore.colorRangeContinuous" :key="i">
                         <div class="color-row">
-                            <span>{{ i+1 }}</span>
+                            <span>{{ twoDigits(i+1) }}</span>
                             
                             <input 
                                 type="color" 
@@ -48,7 +48,7 @@
                     <div><strong>Categorical data</strong></div>
                     <div v-for="(color, i) in optionsStore.colorRangeCategorical" :key="i">
                         <div class="color-row">
-                            <span>{{ i+1 }}</span>
+                            <span>{{ twoDigits(i+1) }}</span>
                             <input 
                                 type="color" 
                                 class="color-input"
@@ -74,8 +74,9 @@
                 </div>
             </div>
         </div>
-        <div>
-            <button class="small" @click="closeAndRedraw">OK</button>
+        <div style="display: flex; justify-content: space-between;">
+            <button class="small danger" @click="resetToDefault">Reset to default</button>
+            <button class="small" @click="closeAndRedraw">Done</button>
         </div>
     </div>
 </div>
@@ -93,7 +94,19 @@ import { useStateStore } from '@/store/StateStore';
 const stateStore = useStateStore();
 const optionsStore = useOptionsStore();
 
-const eventBus = inject('eventBus')
+const eventBus = inject('eventBus');
+
+function twoDigits (number) {
+    let numStr = ""+number;
+    if (numStr.length === 1) {
+        numStr = "0"+numStr;
+    }
+    return numStr;
+}
+
+function resetToDefault () {
+    optionsStore.resetRangeColors();
+}
 
 function addColor (index, type) {
     if (['cont', 'cat'].indexOf(type) < 0) {
