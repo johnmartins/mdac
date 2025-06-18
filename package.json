@@ -35,7 +35,8 @@
     "eslint-plugin-vue": "8.x",
     "sass": "^1.89.2",
     "vite": "6.x",
-    "vite-plugin-vue-devtools": "^7.7.7"
+    "vite-plugin-vue-devtools": "^7.7.7",
+    "vite-plugin-singlefile": "^2.2.0"
   },
   "overrides": {
     "autoprefixer": "10.x",
