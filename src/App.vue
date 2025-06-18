@@ -210,7 +210,8 @@ function onMouseLeave () {
 </script>
 
 <style lang="scss">
-  @import "@/scss/GlobalStyles.scss";
+  @use "@/scss/GlobalStyles.scss";
+  @use "@/scss/Colors.scss";
 	
   $header-height: 40px;
   $nav-height: 60px;
@@ -218,7 +219,7 @@ function onMouseLeave () {
   #app {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    color: $color-light;
+    color: Colors.$color-light;
     height: 100%;
     max-height: 100%;
   }
@@ -230,7 +231,7 @@ function onMouseLeave () {
 		text-align: left;
         align-items: center;
 		border-bottom: 1px solid black;
-        background-color: $color-primary-base;
+        background-color: Colors.$color-primary-base;
 
 		.title-container {
 			font-weight: bold;

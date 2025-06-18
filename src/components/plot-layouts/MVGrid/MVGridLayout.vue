@@ -178,7 +178,8 @@ async function makePlot (cx, cy) {
 
 <style lang="scss" scoped>
 
-@import '@/scss/Colors.scss';
+@use 'sass:color';
+@use '@/scss/Colors.scss';
 
 .mv-grid-container {
     color: black;
@@ -215,12 +216,12 @@ async function makePlot (cx, cy) {
         }
 
         &.hovered-x {
-            background-color: transparentize($color-info, $amount: 0.2);
+            background-color: color.scale(Colors.$color-info, $alpha: -20%);
             color: white;
         }
 
         &.hovered-y {
-            background-color: transparentize($color-danger, $amount: 0.2);;
+            background-color: color.scale(Colors.$color-danger, $alpha: -20%);;
             color: white;
         }
     }

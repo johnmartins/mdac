@@ -1,9 +1,9 @@
-@import 'Colors.scss';
+@use "Colors.scss";
 
 .side-menu-container {
     font-size: 0.8rem;
     overflow-y: auto;
-    background-color: $color-light;
+    background-color: Colors.$color-light;
 }
 
 .information-box {
@@ -30,8 +30,8 @@
 }
 
 .side-menu-section {
-    color: $color-black;
-    background-color: $color-light;
+    color: Colors.$color-black;
+    background-color: Colors.$color-light;
 
     .side-menu-section-content {
         padding: 8px;
@@ -54,8 +54,8 @@
         display: flex !important;
         justify-content: space-between !important;
         margin-bottom: 0 !important;
-        background-color: $color-primary;
-        color: $color-light;
+        background-color: Colors.$color-primary;
+        color: Colors.$color-light;
         user-select: none;
     }
 }

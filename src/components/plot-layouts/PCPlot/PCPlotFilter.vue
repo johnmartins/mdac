@@ -132,20 +132,23 @@ function onMouseLeave (evt) {
 </script>
 
 <style lang="scss" scoped>
-    .filter-box {
-        x: -8px;
-        width: 16px; 
-        z-index: 99;
-        cursor: grab;
-    }
-    .filter-pull-box {
-        x: -10px;
-        width: 20px;
-        fill: transparentize($color: blue, $amount: 0.8);
-        cursor: ns-resize;
-    }
-    .filter-box-delete {
-        cursor: default !important;
-        fill: red !important;
-    }
+
+@use 'sass:color';
+
+.filter-box {
+    x: -8px;
+    width: 16px; 
+    z-index: 99;
+    cursor: grab;
+}
+.filter-pull-box {
+    x: -10px;
+    width: 20px;
+    fill: color.scale(blue, $alpha: -80%);
+    cursor: ns-resize;
+}
+.filter-box-delete {
+    cursor: default !important;
+    fill: red !important;
+}
 </style>
