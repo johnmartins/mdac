@@ -118,6 +118,7 @@ import MVGridLayout from "./components/plot-layouts/MVGrid/MVGridLayout.vue";
 import CategorySettings from '@/components/CategorySettings.vue';
 import LoadingModal from '@/components/LoadingModal.vue';
 import MVGridSideMenu from '@/components/plot-layouts/MVGrid/MVGridSideMenu.vue';
+import ColorSettings from "./components/ColorSettings.vue";
 
 import {useLayoutStore} from "@/store/LayoutStore.js";
 import {useStateStore} from "@/store/StateStore.js";

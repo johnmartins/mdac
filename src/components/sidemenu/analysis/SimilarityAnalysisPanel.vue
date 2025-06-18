@@ -37,7 +37,7 @@
 import { storeToRefs } from "pinia";
 import { computed, ref, inject } from "vue";
 
-import SidebarSection from "@/components/layouts/SidebarSection";
+import SidebarSection from "@/components/layouts/SidebarSection.vue";
 
 import WorkerMessage from "@/models/WorkerMessage.js";
 import { calculateIntersimilarity } from "@/sadse/similarity.js";
