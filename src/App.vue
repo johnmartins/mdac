@@ -92,6 +92,7 @@
             <PopupBox :popup-i-d="popup.id" />
         </div>
 
+        <ColorSettings />
         <CategorySettings />
         <LoadingModal />
     </div>
@@ -114,6 +115,7 @@ import ScatterSideMenu from '@/components/plot-layouts/ScatterPlot/ScatterSideMe
 import ScatterSideMenuRight from '@/components/plot-layouts/ScatterPlot/ScatterSideMenuRight';
 import MVGridLayout from "./components/plot-layouts/MVGrid/MVGridLayout";
 import CategorySettings from '@/components/CategorySettings';
+import ColorSettings from '@/components/ColorSettings';
 import LoadingModal from '@/components/LoadingModal';
 import MVGridSideMenu from '@/components/plot-layouts/MVGrid/MVGridSideMenu';
 
