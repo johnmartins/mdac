@@ -1,5 +1,5 @@
-import Category from "@/models/plots/Category"
-import { useDataStore } from "@/store/DataStore"
+import Category from "@/models/plots/Category.js"
+import { useDataStore } from "@/store/DataStore.js"
 
 async function calculateIntersimilarity (fidelityColumnTitle, targetColValue, ioType) {
     const dataStore = useDataStore()

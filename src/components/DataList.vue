@@ -58,11 +58,11 @@
 
 <script setup>
 
-import { reactive, ref, onMounted, onUpdated, nextTick } from "vue"
-import { storeToRefs } from "pinia"
+import { reactive, ref, onMounted, onUpdated, nextTick } from "vue";
+import { storeToRefs } from "pinia";
 
-import {useDataStore} from "@/store/DataStore"
-import {useStateStore} from "@/store/StateStore"
+import {useDataStore} from "@/store/DataStore.js"
+import {useStateStore} from "@/store/StateStore.js"
 
 const dataStore = useDataStore()
 const stateStore = useStateStore()

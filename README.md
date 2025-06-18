@@ -4,6 +4,13 @@
 
 The tool can be used at this link: [https://mdac.martinsson-bonde.com/](https://mdac.martinsson-bonde.com/)
 
+## INSTALLING/EXECUTING LOCALLY
+Building this project for local application (i.e., running **index.html** to use the application on your local computer) will *not* work by default. To enable this, go to `vite.config.js`, look for the "plugins" array, and uncomment `viteSingleFile()`. This will enable the application to be executed locally.
+
+After making this change, you can run `npm run build` to build a locally executable `dist/index.html`.
+
+If you do not do this, then executing `index.html` will merely result in a blank white page.
+
 ## How to use
 MDAC is an interactive data visualisation tool. It uses a parallel coordinates diagram to display the data, which the user can interact with by adding filters.
 

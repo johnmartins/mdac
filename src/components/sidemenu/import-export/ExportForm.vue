@@ -45,12 +45,13 @@
 import { ref, inject, watch } from "vue";
 import { storeToRefs } from "pinia";
 
+import CheckboxInput from "@/components/inputs/CheckboxInput.vue";
 import SidebarSection from "@/components/layouts/SidebarSection.vue";
 
-import { useDataStore } from "@/store/DataStore";
-import { usePCPStore } from "@/store/PCPStore";
-import { min } from "d3";
-import CheckboxInput from "@/components/inputs/CheckboxInput.vue";
+// Stores
+import { useDataStore } from "@/store/DataStore.js";
+import { usePCPStore } from "@/store/PCPStore.js";
+
 
 const dataStore = useDataStore();
 const pcpStore = usePCPStore();

@@ -1,7 +1,7 @@
 <template>
 
 <div class="labeled-input-container mb-1" style="width: 100%;">
-    <div>
+    <div v-if="props.showLabel">
         <span class="input-group-text">
             <slot />
         </span>
@@ -10,17 +10,22 @@
         class="color-input"
         type="color" 
         :value="model"
-        @input="$emit('update:modelValue', $event.target.value)" 
+        @input="$emit('update:modelValue', $event.target.value)"
     />
 </div>
 
 </template>
 
 <script setup>
-import { defineModel } from "vue";
 
 const model = defineModel();
 
+const props = defineProps({
+    showLabel: {
+        type: Boolean,
+        default: true
+    }
+});
 
 </script>
 
@@ -29,6 +34,7 @@ const model = defineModel();
 .color-input {
     height: 100%;
     width: 100%;
+    min-height: 1rem;
     padding: 0;
     cursor: pointer;
     border: 1px solid whitesmoke;

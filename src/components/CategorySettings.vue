@@ -49,51 +49,25 @@
 </template>
 
 <script setup>
-import {storeToRefs} from "pinia"
-import {useDataStore} from "@/store/DataStore"
-import {useStateStore} from "@/store/StateStore"
+import {storeToRefs} from "pinia";
 
-const stateStore = useStateStore()
-const {showCategorySettingsWindow} = storeToRefs(stateStore)
-const dataStore = useDataStore()
-const {categories} = storeToRefs(dataStore)
+import {useDataStore} from "@/store/DataStore.js";
+import {useStateStore} from "@/store/StateStore.js";
+
+const stateStore = useStateStore();
+const {showCategorySettingsWindow} = storeToRefs(stateStore);
+const dataStore = useDataStore();
+const {categories} = storeToRefs(dataStore);
 
 function positionSort (a, b) {
-    if (a.position > b.position) return 1
-    else if (a.position < b.position) return -1
-    return 0
+    if (a.position > b.position) return 1;
+    else if (a.position < b.position) return -1;
+    return 0;
 }
 
 </script>
 
 <style lang="scss" scoped>
-
-$height: 80px;
-$width: 300px;
-
-
-.window {
-    position: absolute;
-    top: calc(50% - 2*$height);
-    left: calc(50% - $width/2);
-    background: white;
-    border: 1px solid silver;
-    border-radius: 4px;
-    padding: 8px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    cursor: auto;
-    font-size: 0.8em;    
-    font-family: monospace;
-    color: black;
-}
-
-.window-header {
-    font-size: 1rem !important;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-}
 
 .button-row {
     display: flex;

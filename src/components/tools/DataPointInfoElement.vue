@@ -9,8 +9,6 @@
 
 <script setup>
 
-import {ref} from 'vue'
-
 const props = defineProps({
     category: Object,
     value: [Number, String]

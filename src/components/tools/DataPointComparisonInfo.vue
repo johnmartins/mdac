@@ -38,16 +38,17 @@
 </template>
 
 <script setup>
-import {computed} from "vue"
+import {computed} from "vue";
+import {storeToRefs} from 'pinia';
 
-import {useDataStore} from "../../store/DataStore"
-import {useScatterStore} from "../../store/ScatterStore"
-import {storeToRefs} from 'pinia'
-import {euclideanDistance} from "../../sadse/similarity"
+import {useDataStore} from "@/store/DataStore.js"
+import {useScatterStore} from "@/store/ScatterStore.js"
+
+import {euclideanDistance} from "@/sadse/similarity.js"
 
 // Components
 import SidebarSection from "@/components/layouts/SidebarSection.vue"
-import DataPointComparisonElement from './DataPointComparisonElement'
+import DataPointComparisonElement from './DataPointComparisonElement.vue'
 
 const dataStore = useDataStore()
 const scatterStore = useScatterStore()

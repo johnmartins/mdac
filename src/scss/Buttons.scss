@@ -1,13 +1,13 @@
-@import "Colors.scss";
+@use "Colors.scss";
 
 button {
-    border: 1px solid $color-primary-base;
+    border: 1px solid Colors.$color-primary-base;
     border-radius: 0px;
     outline: none;
-    background-color: $color-primary;
+    background-color: Colors.$color-primary;
 
     text-transform: uppercase !important;
-    color: $color-light;
+    color: Colors.$color-light;
     font-size: 12px !important;
     letter-spacing: 1px;
 
@@ -22,7 +22,7 @@ button {
     transition: color 0.25s ease-in-out, background-color 0.25s ease-in-out;
 
     &:hover {
-        background-color: $color-primary-base;
+        background-color: Colors.$color-primary-base;
     }
 
     &.small {
@@ -31,46 +31,46 @@ button {
     }
 
     &.success {
-        background-color: $color-success;
-        border: 1px solid $color-success-base;
+        background-color: Colors.$color-success;
+        border: 1px solid Colors.$color-success-base;
 
         &:hover {
-            background-color: $color-success-base;
+            background-color: Colors.$color-success-base;
         }
     }
 
     // Danger variation
     &.danger {
-        background-color: $color-danger;
-        border: 1px solid $color-danger-base;
+        background-color: Colors.$color-danger;
+        border: 1px solid Colors.$color-danger-base;
 
         &:hover {
-            background-color: $color-danger-base;
+            background-color: Colors.$color-danger-base;
         }
     }
 
     &.info {
-        background-color: $color-info;
-        border: 1px solid $color-info-base;
+        background-color: Colors.$color-info;
+        border: 1px solid Colors.$color-info-base;
 
         &:hover {
-            background-color: $color-info-base;
+            background-color: Colors.$color-info-base;
         }
     }
 
     &.active {
-        background-color: $color-light;
-        color: $color-primary-base;
+        background-color: Colors.$color-light;
+        color: Colors.$color-primary-base;
         border-width: 1px;
     }
 
     &:disabled {
-        background-color: $color-light-gray;
-        border: 1px solid $color-gray;
-        color: $color-gray;
+        background-color: Colors.$color-light-gray;
+        border: 1px solid Colors.$color-gray;
+        color: Colors.$color-gray;
         
         &:hover {
-            background-color: $color-light-gray;
+            background-color: Colors.$color-light-gray;
             cursor: default;
         }
     }

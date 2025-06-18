@@ -14,13 +14,14 @@
 
 <script setup>
 
-import {useDataStore} from "../../store/DataStore"
-import {useScatterStore} from "../../store/ScatterStore"
 import {storeToRefs} from 'pinia'
 
+import {useDataStore} from "@/store/DataStore.js"
+import {useScatterStore} from "@/store/ScatterStore.js"
+
 // Components
-import DataPointInfoElement from './DataPointInfoElement'
-import SidebarSection from "../layouts/SidebarSection.vue"
+import DataPointInfoElement from './DataPointInfoElement.vue'
+import SidebarSection from "@/components/layouts/SidebarSection.vue"
 
 const dataStore = useDataStore()
 const scatterStore = useScatterStore()

@@ -21,12 +21,16 @@
 <script setup>
 import { ref } from "vue"
 import { storeToRefs } from "pinia"
-import {useScatterStore} from "@/store/ScatterStore"
-import ScatterPlotConfig from "@/models/plots/ScatterPlotConfig"
+
+import { useScatterStore } from "@/store/ScatterStore.js"
+
+import ScatterPlotConfig from "@/models/plots/ScatterPlotConfig.js"
+
 import SidebarSection from "@/components/layouts/SidebarSection.vue"
 
+
 const scatterStore = useScatterStore()
-const {plots, selectedPlotID} = storeToRefs(scatterStore)
+const { plots, selectedPlotID } = storeToRefs(scatterStore)
 
 const plotSelector = ref(null)
 

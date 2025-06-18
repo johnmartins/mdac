@@ -34,14 +34,16 @@
 <script setup>
 import { ref } from "vue"
 import { storeToRefs } from "pinia"
-import {useDataStore} from "@/store/DataStore"
-import {useScatterStore} from "@/store/ScatterStore"
+
+import {useDataStore} from "@/store/DataStore.js"
+import {useScatterStore} from "@/store/ScatterStore.js"
+
 import SidebarSection from "@/components/layouts/SidebarSection.vue"
 
 const dataStore = useDataStore()
-const {data, filters, categories} = storeToRefs(dataStore)
+const { data, filters, categories } = storeToRefs(dataStore)
 const scatterStore = useScatterStore()
-const {selectedPlot} = storeToRefs(scatterStore)
+const { selectedPlot } = storeToRefs(scatterStore)
 
 // DOM References
 const xAxisSelector = ref(null)
