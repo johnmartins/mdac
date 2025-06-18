@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 
 import App from './App.vue'
 
-import faIcons from "./fontawesome"
+import faIcons from "./fontawesome.js"
 
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap"

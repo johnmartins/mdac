@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import * as d3 from "d3"
-import { useStateStore } from './StateStore';
+import { useStateStore } from './StateStore.js';
 
 export const useOptionsStore = defineStore('options', {
     state: () => ({

@@ -65,14 +65,16 @@
 <script setup>
 import { nextTick, ref, watch, inject } from "vue";
 import { storeToRefs } from "pinia";
-import SidebarSection from "@/components/layouts/SidebarSection";
 
-// Stores
-import { useOptionsStore } from "@/store/OptionsStore";
-import { useDataStore } from "@/store/DataStore";
+import SidebarSection from "@/components/layouts/SidebarSection.vue";
 import NumberInput from "@/components/inputs/NumberInput.vue";
 import CheckboxInput from "@/components/inputs/CheckboxInput.vue";
 import ColorInput from "@/components/inputs/ColorInput.vue";
+
+// Stores
+import { useOptionsStore } from "@/store/OptionsStore.js";
+import { useDataStore } from "@/store/DataStore.js";
+
 
 const dataStore = useDataStore();
 const optionsStore = useOptionsStore();

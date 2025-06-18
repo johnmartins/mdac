@@ -17,15 +17,15 @@
 </template>
 
 <script setup>
-import { reactive, ref, inject } from "vue"
-import { storeToRefs } from "pinia"
+import { storeToRefs } from "pinia";
 
-import {useDataStore} from "@/store/DataStore"
-import FilterElement from '@/components/sidemenu/analysis/FilterElement'
-import SidebarSection from "@/components/layouts/SidebarSection.vue"
+import { useDataStore } from "@/store/DataStore.js";
 
-const dataStore = useDataStore()
-const {data, filters} = storeToRefs(dataStore)
+import FilterElement from '@/components/sidemenu/analysis/FilterElement.vue';
+import SidebarSection from "@/components/layouts/SidebarSection.vue";
+
+const dataStore = useDataStore();
+const {data, filters} = storeToRefs(dataStore);
 
 
 </script>

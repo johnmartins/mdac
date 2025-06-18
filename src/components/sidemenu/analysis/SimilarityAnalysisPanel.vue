@@ -34,15 +34,18 @@
     </SidebarSection>
 </template>
 <script setup>
+import { storeToRefs } from "pinia";
+import { computed, ref, inject } from "vue";
 
-import Category from "@/models/plots/Category"
-import WorkerMessage from "@/models/WorkerMessage"
-import { calculateIntersimilarity } from "@/sadse/similarity"
-import { useStateStore } from "@/store/StateStore"
-import { storeToRefs } from "pinia"
-import { computed, ref, inject } from "vue"
-import { useDataStore } from "../../../store/DataStore"
-import SidebarSection from "@/components/layouts/SidebarSection"
+import SidebarSection from "@/components/layouts/SidebarSection";
+
+import WorkerMessage from "@/models/WorkerMessage.js";
+import { calculateIntersimilarity } from "@/sadse/similarity.js";
+
+// Stores
+import { useStateStore } from "@/store/StateStore.js";
+import { useDataStore } from "@/store/DataStore.js";
+
 
 const analysisWorker = new Worker('analysis.js')
 

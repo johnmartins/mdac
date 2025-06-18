@@ -54,17 +54,17 @@
 <script setup>
 
 import { nextTick, ref, watch, inject, reactive } from 'vue';
-import { useDataStore } from '@/store/DataStore';
-import { useStateStore } from '@/store/StateStore';
-import { useOptionsStore } from '@/store/OptionsStore';
-import { useScatterStore } from '@/store/ScatterStore';
 import { storeToRefs } from 'pinia';
-import Filter from '@/models/filters/Filter';
-
-import ScatterPlotPointLayerRaster from '../ScatterPlot/ScatterPlotPointLayerRaster.vue';
 
 // Models
-import ScatterPlotConfig from '@/models/plots/ScatterPlotConfig';
+import ScatterPlotConfig from '@/models/plots/ScatterPlotConfig.js';
+
+import { useDataStore } from '@/store/DataStore.js';
+import { useStateStore } from '@/store/StateStore.js';
+import { useOptionsStore } from '@/store/OptionsStore.js';
+import { useScatterStore } from '@/store/ScatterStore.js';
+
+import ScatterPlotPointLayerRaster from '../ScatterPlot/ScatterPlotPointLayerRaster.vue';
 
 // Stores
 const dataStore = useDataStore();

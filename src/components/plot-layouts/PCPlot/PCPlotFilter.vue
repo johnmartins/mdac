@@ -31,12 +31,12 @@
 import { computed, ref, inject } from 'vue';
 import { storeToRefs } from "pinia";
 
-import Category from '@/models/plots/Category';
+import Category from '@/models/plots/Category.js';
 
 // Stores
-import { usePCPStore } from "@/store/PCPStore";
-import { useDataStore } from '@/store/DataStore';
-import { useStateStore } from '@/store/StateStore';
+import { usePCPStore } from "@/store/PCPStore.js";
+import { useDataStore } from '@/store/DataStore.js';
+import { useStateStore } from '@/store/StateStore.js';
 
 const PCPStore = usePCPStore();
 const dataStore = useDataStore();

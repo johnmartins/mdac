@@ -33,13 +33,13 @@
 import * as d3 from "d3";
 import { storeToRefs } from "pinia";
 
-import {truncateDecimals} from "@/utils/data-utils";
-import {euclideanDistance} from "@/sadse/similarity";
+import { truncateDecimals } from "@/utils/data-utils.js";
+import { euclideanDistance } from "@/sadse/similarity.js";
 
-import {useDataStore} from "@/store/DataStore";
-import {useScatterStore} from "@/store/ScatterStore";
-import {useOptionsStore} from "@/store/OptionsStore";
-import { useStateStore } from "@/store/StateStore";
+import { useDataStore } from "@/store/DataStore.js";
+import { useScatterStore } from "@/store/ScatterStore.js";
+import { useOptionsStore } from "@/store/OptionsStore.js";
+import { useStateStore } from "@/store/StateStore.js";
 
 const dataStore = useDataStore();
 const stateStore = useStateStore();

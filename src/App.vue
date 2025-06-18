@@ -56,7 +56,7 @@
             </div>
 
             <div class="version-container">
-                Version {{ appVersion }}
+                Version {{ APP_VERSION }}
             </div>
         </div>
         <div class="content-container">
@@ -99,29 +99,29 @@
 
 <script setup>
 import { reactive, ref, onMounted, onUpdated, inject, onErrorCaptured } from "vue";
+import { storeToRefs } from "pinia";
 
 // Layouts
-import SidebarLayout from '@/components/layouts/SidebarLayout';
-import DoubleSidebarLayout from '@/components/layouts/DoubleSidebarLayout';
-import BoxLayout from '@/components/layouts/BoxLayout';
-import PopupBox from '@/components/layouts/PopupBox';
+import SidebarLayout from '@/components/layouts/SidebarLayout.vue';
+import DoubleSidebarLayout from '@/components/layouts/DoubleSidebarLayout.vue';
+import BoxLayout from '@/components/layouts/BoxLayout.vue';
+import PopupBox from '@/components/layouts/PopupBox.vue';
 
 import PCPlot from '@/components/plot-layouts/PCPlot/PCPlot.vue';
-import PCPSideMenu from '@/components/plot-layouts/PCPlot/PCPSideMenu';
-import DataList from '@/components/DataList';
-import ScatterPlot from '@/components/plot-layouts/ScatterPlot/ScatterPlot';
-import ScatterSideMenu from '@/components/plot-layouts/ScatterPlot/ScatterSideMenu';
-import ScatterSideMenuRight from '@/components/plot-layouts/ScatterPlot/ScatterSideMenuRight';
-import MVGridLayout from "./components/plot-layouts/MVGrid/MVGridLayout";
-import CategorySettings from '@/components/CategorySettings';
-import LoadingModal from '@/components/LoadingModal';
-import MVGridSideMenu from '@/components/plot-layouts/MVGrid/MVGridSideMenu';
+import PCPSideMenu from '@/components/plot-layouts/PCPlot/PCPSideMenu.vue';
+import DataList from '@/components/DataList.vue';
+import ScatterPlot from '@/components/plot-layouts/ScatterPlot/ScatterPlot.vue';
+import ScatterSideMenu from '@/components/plot-layouts/ScatterPlot/ScatterSideMenu.vue';
+import ScatterSideMenuRight from '@/components/plot-layouts/ScatterPlot/ScatterSideMenuRight.vue';
+import MVGridLayout from "./components/plot-layouts/MVGrid/MVGridLayout.vue";
+import CategorySettings from '@/components/CategorySettings.vue';
+import LoadingModal from '@/components/LoadingModal.vue';
+import MVGridSideMenu from '@/components/plot-layouts/MVGrid/MVGridSideMenu.vue';
 
-import { storeToRefs } from "pinia";
-import {useLayoutStore} from "@/store/LayoutStore";
-import {useStateStore} from "@/store/StateStore";
-import {useDataStore} from "@/store/DataStore";
-import Popup from "@/models/layout/Popup";
+import {useLayoutStore} from "@/store/LayoutStore.js";
+import {useStateStore} from "@/store/StateStore.js";
+import {useDataStore} from "@/store/DataStore.js";
+import Popup from "@/models/layout/Popup.js";
 
 const stateStore = useStateStore();
 const layoutStore = useLayoutStore();
@@ -136,7 +136,7 @@ const scatterContainer = ref(null);
 const dataContainer = ref(null);
 const mvGridContainer = ref(null);
 const plot = ref(null);
-const appVersion = ref(process.env.VUE_APP_VERSION);
+const APP_VERSION = import.meta.env.VITE_APP_VERSION;
 
 const eventBus = inject('eventBus')
 

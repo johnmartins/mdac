@@ -6,8 +6,8 @@
 </template>
 
 <script setup>
-import DataPointInfo from '@/components/tools/DataPointInfo'
-import DataPointComparisonInfo from "@/components/tools/DataPointComparisonInfo"
+import DataPointInfo from '@/components/tools/DataPointInfo.vue';
+import DataPointComparisonInfo from "@/components/tools/DataPointComparisonInfo.vue";
 </script>
 
 <style lang="scss" scoped>

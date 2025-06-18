@@ -32,18 +32,19 @@ import { ref, inject, nextTick } from "vue"
 import { storeToRefs } from "pinia"
 import * as d3 from "d3"
 
-import {useStateStore} from "@/store/StateStore"
-import {useDataStore} from "@/store/DataStore"
-import {useScatterStore} from "@/store/ScatterStore"
-import {usePCPStore} from "@/store/PCPStore"
-import {useLayoutStore} from "@/store/LayoutStore"
-import {useOptionsStore} from "@/store/OptionsStore"
-import {isNumeric} from "@/utils/data-utils"
+import {isNumeric} from "@/utils/data-utils.js"
+
+import {useStateStore} from "@/store/StateStore.js"
+import {useDataStore} from "@/store/DataStore.js"
+import {useScatterStore} from "@/store/ScatterStore.js"
+import {usePCPStore} from "@/store/PCPStore.js"
+import {useLayoutStore} from "@/store/LayoutStore.js"
+import {useOptionsStore} from "@/store/OptionsStore.js"
 
 import SidebarSection from "@/components/layouts/SidebarSection.vue"
 
-import Category from "@/models/plots/Category"
-import Popup from '@/models/layout/Popup'
+import Category from "@/models/plots/Category.js"
+import Popup from '@/models/layout/Popup.js'
 
 // DOM references
 const fileDelimiterSelect = ref(null)

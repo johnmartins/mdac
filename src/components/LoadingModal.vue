@@ -10,7 +10,7 @@
 <script setup>
 import { storeToRefs } from "pinia";
 
-import {useStateStore} from "@/store/StateStore";
+import {useStateStore} from "@/store/StateStore.js";
 
 const stateStore = useStateStore();
 const { loadingReason } = storeToRefs(stateStore);

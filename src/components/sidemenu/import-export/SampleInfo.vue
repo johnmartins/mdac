@@ -19,15 +19,13 @@
 </template>
 
 <script setup>
+import { storeToRefs } from "pinia";
 
-import { reactive, ref, onMounted, onUpdated } from "vue"
-import { storeToRefs } from "pinia"
+import {useDataStore} from "@/store/DataStore.js";
+import SidebarSection from "@/components/layouts/SidebarSection.vue";
 
-import {useDataStore} from "@/store/DataStore"
-import SidebarSection from "@/components/layouts/SidebarSection.vue"
-
-const dataStore = useDataStore()
-const {data, filters, categories} = storeToRefs(dataStore)
+const dataStore = useDataStore();
+const { data, filters, categories } = storeToRefs(dataStore);
 
 </script>
 
