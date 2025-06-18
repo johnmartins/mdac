@@ -22,7 +22,14 @@
                 Use similarity color coding
             </CheckboxInput>
 
+            <div class="d-grid">
+                <button class="small" @click="stateStore.showColorSettingsWindow = !stateStore.showColorSettingsWindow">
+                    Edit colors
+                </button>
+            </div> 
+            
             <strong>Color code legend</strong>
+                      
             
             <CheckboxInput 
                 v-model="showColorCodeLegend"
@@ -75,6 +82,7 @@ import { storeToRefs } from "pinia";
 import SidebarSection from "@/components/layouts/SidebarSection.vue";
 import CheckboxInput from "@/components/inputs/CheckboxInput.vue";
 import NumberInput from "@/components/inputs/NumberInput.vue";
+import { useStateStore } from "@/store/StateStore";
 
 // Stores
 import {useOptionsStore} from "@/store/OptionsStore.js";
@@ -82,6 +90,7 @@ import {useDataStore} from "@/store/DataStore.js";
 
 const optionsStore = useOptionsStore();
 const dataStore = useDataStore();
+const stateStore = useStateStore();
 
 const {selectedColorCodeCategory, useSimilarityColorCoding, showColorCodeLegend} = storeToRefs(optionsStore);
 const {categories} = storeToRefs(dataStore);

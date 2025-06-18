@@ -92,6 +92,7 @@
             <PopupBox :popup-i-d="popup.id" />
         </div>
 
+        <ColorSettings />
         <CategorySettings />
         <LoadingModal />
     </div>

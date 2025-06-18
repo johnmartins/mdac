@@ -1,0 +1,23 @@
+.window {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    background: white;
+    border: 1px solid silver;
+    border-radius: 4px;
+    padding: 8px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    cursor: auto;
+    font-size: 0.8em;    
+    font-family: monospace;
+    color: black;
+}
+
+.window-header {
+    font-size: 1rem !important;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
