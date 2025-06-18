@@ -49,19 +49,20 @@
 </template>
 
 <script setup>
-import {storeToRefs} from "pinia"
-import {useDataStore} from "@/store/DataStore"
-import {useStateStore} from "@/store/StateStore"
+import {storeToRefs} from "pinia";
 
-const stateStore = useStateStore()
-const {showCategorySettingsWindow} = storeToRefs(stateStore)
-const dataStore = useDataStore()
-const {categories} = storeToRefs(dataStore)
+import {useDataStore} from "@/store/DataStore.js";
+import {useStateStore} from "@/store/StateStore.js";
+
+const stateStore = useStateStore();
+const {showCategorySettingsWindow} = storeToRefs(stateStore);
+const dataStore = useDataStore();
+const {categories} = storeToRefs(dataStore);
 
 function positionSort (a, b) {
-    if (a.position > b.position) return 1
-    else if (a.position < b.position) return -1
-    return 0
+    if (a.position > b.position) return 1;
+    else if (a.position < b.position) return -1;
+    return 0;
 }
 
 </script>

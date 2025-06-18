@@ -94,20 +94,19 @@
 
 <script setup>
 import { inject } from "vue";
-
-import { truncateDecimals } from "@/utils/data-utils";
 import { storeToRefs } from "pinia";
+
+// Utils
+import { getTrueEventCoordinates } from "@/utils/svg-utils.js";
+import { truncateDecimals } from "@/utils/data-utils.js";
 
 import PCPlotFilter from "./PCPlotFilter.vue";
 
-// Utils
-import { getTrueEventCoordinates } from "@/utils/svg-utils";
-
 // Stores
-import { useDataStore } from "@/store/DataStore";
-import { usePCPStore } from "@/store/PCPStore";
-import { useOptionsStore } from "@/store/OptionsStore";
-import { useStateStore } from "@/store/StateStore";
+import { useDataStore } from "@/store/DataStore.js";
+import { usePCPStore } from "@/store/PCPStore.js";
+import { useOptionsStore } from "@/store/OptionsStore.js";
+import { useStateStore } from "@/store/StateStore.js";
 
 const eventBus = inject('eventBus');
 

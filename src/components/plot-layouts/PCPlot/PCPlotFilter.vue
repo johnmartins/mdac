@@ -31,12 +31,12 @@
 import { computed, ref, inject } from 'vue';
 import { storeToRefs } from "pinia";
 
-import Category from '@/models/plots/Category';
+import Category from '@/models/plots/Category.js';
 
 // Stores
-import { usePCPStore } from "@/store/PCPStore";
-import { useDataStore } from '@/store/DataStore';
-import { useStateStore } from '@/store/StateStore';
+import { usePCPStore } from "@/store/PCPStore.js";
+import { useDataStore } from '@/store/DataStore.js';
+import { useStateStore } from '@/store/StateStore.js';
 
 const PCPStore = usePCPStore();
 const dataStore = useDataStore();
@@ -132,20 +132,23 @@ function onMouseLeave (evt) {
 </script>
 
 <style lang="scss" scoped>
-    .filter-box {
-        x: -8px;
-        width: 16px; 
-        z-index: 99;
-        cursor: grab;
-    }
-    .filter-pull-box {
-        x: -10px;
-        width: 20px;
-        fill: transparentize($color: blue, $amount: 0.8);
-        cursor: ns-resize;
-    }
-    .filter-box-delete {
-        cursor: default !important;
-        fill: red !important;
-    }
+
+@use 'sass:color';
+
+.filter-box {
+    x: -8px;
+    width: 16px; 
+    z-index: 99;
+    cursor: grab;
+}
+.filter-pull-box {
+    x: -10px;
+    width: 20px;
+    fill: color.scale(blue, $alpha: -80%);
+    cursor: ns-resize;
+}
+.filter-box-delete {
+    cursor: default !important;
+    fill: red !important;
+}
 </style>

@@ -1,8 +1,8 @@
 import * as d3 from "d3";
 
-import { useDataStore } from "@/store/DataStore";
-import { useOptionsStore } from "@/store/OptionsStore";
-import { usePCPStore } from "@/store/PCPStore";
+import { useDataStore } from "@/store/DataStore.js";
+import { useOptionsStore } from "@/store/OptionsStore.js";
+import { usePCPStore } from "@/store/PCPStore.js";
 
 /**
  * Deletes decimals without mercy. No rounding.

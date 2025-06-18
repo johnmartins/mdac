@@ -52,8 +52,9 @@
 <script setup>
 import { ref, onMounted, reactive, inject } from "vue";
 
-import {useDataStore} from "@/store/DataStore";
-import Category from '@/models/plots/Category';
+import Category from '@/models/plots/Category.js';
+
+import {useDataStore} from "@/store/DataStore.js";
 
 const dataStore = useDataStore();
 const eventBus = inject('eventBus');

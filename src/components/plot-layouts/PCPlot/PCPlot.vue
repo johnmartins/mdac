@@ -77,26 +77,26 @@ import { saveAs } from "file-saver";
 import { saveSvgAsPng } from "save-svg-as-png";
 
 // Components
-import PCPlotPathLayerVector from "./PCPlotPathLayerVector";
-import PCPlotPathLayerRaster from "./PCPlotPathLayerRaster";
-import RangeIndicator from "@/components/plot-features/RangeIndicator";
+import PCPlotPathLayerVector from "./PCPlotPathLayerVector.vue";
+import PCPlotPathLayerRaster from "./PCPlotPathLayerRaster.vue";
+import RangeIndicator from "@/components/plot-features/RangeIndicator.vue";
 import PCPlotAxis from "./PCPlotAxis.vue";
 
 // Models
-import SingleRangeFilter from "@/models/filters/SingleRangeFilter";
-import CategoricFilter from "@/models/filters/CategoricFilter";
-import Popup from '@/models/layout/Popup';
+import SingleRangeFilter from "@/models/filters/SingleRangeFilter.js";
+import CategoricFilter from "@/models/filters/CategoricFilter.js";
+import Popup from '@/models/layout/Popup.js';
 
 // Misc
-import { truncateDecimals } from "@/utils/data-utils";
-import { getTrueEventCoordinates } from "@/utils/svg-utils";
+import { truncateDecimals } from "@/utils/data-utils.js";
+import { getTrueEventCoordinates } from "@/utils/svg-utils.js";
 
 // Stores
-import { useDataStore } from "@/store/DataStore";
-import { useOptionsStore } from "@/store/OptionsStore";
-import { useStateStore } from "@/store/StateStore";
-import { usePCPStore } from "@/store/PCPStore";
-import { useLayoutStore } from "@/store/LayoutStore";
+import { useDataStore } from "@/store/DataStore.js";
+import { useOptionsStore } from "@/store/OptionsStore.js";
+import { useStateStore } from "@/store/StateStore.js";
+import { usePCPStore } from "@/store/PCPStore.js";
+import { useLayoutStore } from "@/store/LayoutStore.js";
 
 // Store references
 const dataStore = useDataStore();

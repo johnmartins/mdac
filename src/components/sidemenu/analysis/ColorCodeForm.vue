@@ -78,12 +78,15 @@
 
 <script setup>
 import { storeToRefs } from "pinia";
-import SidebarSection from "@/components/layouts/SidebarSection";
-import {useOptionsStore} from "@/store/OptionsStore";
-import {useDataStore} from "@/store/DataStore";
+
+import SidebarSection from "@/components/layouts/SidebarSection.vue";
 import CheckboxInput from "@/components/inputs/CheckboxInput.vue";
 import NumberInput from "@/components/inputs/NumberInput.vue";
 import { useStateStore } from "@/store/StateStore";
+
+// Stores
+import {useOptionsStore} from "@/store/OptionsStore.js";
+import {useDataStore} from "@/store/DataStore.js";
 
 const optionsStore = useOptionsStore();
 const dataStore = useDataStore();

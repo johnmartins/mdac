@@ -40,8 +40,8 @@
 import { computed } from "vue";
 import { storeToRefs } from "pinia";
 
-import { linspace } from "@/utils/data-utils";
-import { useOptionsStore } from "../../store/OptionsStore";
+import { linspace } from "@/utils/data-utils.js";
+import { useOptionsStore } from "@/store/OptionsStore.js";
 
 const optionsStore = useOptionsStore();
 const {colorCodeUpperBound, colorCodeLowerBound, showColorCodeLegend} = storeToRefs(optionsStore);

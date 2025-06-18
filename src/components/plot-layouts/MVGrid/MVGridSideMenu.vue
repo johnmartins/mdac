@@ -7,9 +7,9 @@
 </template>
 
 <script setup>
-import FiltersPanel from '@/components/sidemenu/analysis/FiltersPanel'
-import SampleInfo from '@/components/sidemenu/import-export/SampleInfo'
-import ColorCodeForm from '@/components/sidemenu/analysis/ColorCodeForm'
+import FiltersPanel from '@/components/sidemenu/analysis/FiltersPanel.vue';
+import SampleInfo from '@/components/sidemenu/import-export/SampleInfo.vue';
+import ColorCodeForm from '@/components/sidemenu/analysis/ColorCodeForm.vue';
 
 
 </script>
