@@ -5,7 +5,7 @@ authors:
     given-names: Julian
     orcid: "https://orcid.org/0000-0003-4441-7089"
 title: Multidisciplinary Analysis Client (MDAC)
-version: v1.9.0
-date-released: 2023-05-26
+version: v1.19.0
+date-released: 2025-08-29
 url: "https://github.com/johnmartins/mdac"
-doi: 10.5281/zenodo.7973486 
+doi: 10.5281/zenodo.6784231
